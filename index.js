@@ -21,6 +21,7 @@ var watchSequence = require('gulp-watch-sequence');
 var bowerFiles    = require('bower-files');
 var browserSync   = require('browser-sync');
 var combined      = require('combined-stream');
+var runSequence   = require('run-sequence');
 var bourbon       = require('node-bourbon');
 
 var project       = require('./package.json');
