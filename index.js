@@ -24,7 +24,7 @@ var combined      = require('combined-stream');
 var runSequence   = require('run-sequence');
 var bourbon       = require('node-bourbon');
 
-var project       = require('./package.json');
+var project       = require(path.resolve('package.json'));
 
 var HTTP_PORT     = 8000;
 var CONSOLE_WIDTH = 80;
@@ -52,115 +52,14 @@ var CDN_APPS      = project.name;
 var RELEASE_LIBS  = RELEASE + '/' + CDN_LIBS;
 var RELEASE_APPS  = RELEASE + '/' + CDN_APPS;
 
+var bowerDepsVersioned = require('./lib/bower-deps-versioned');
+var versionDirectory   = require('./lib/version-directory');
+var reserveAndUglify   = require('./lib/reserve-and-uglify')
+
 var traceur;
 var sass;
 var bower;
 var uglify;
-
-// TODO move to node package
-function bowerDepsVersioned() {
-  var path = require('path');
-  var through = require('through2');
-  var bowerPackages = require(path.resolve('bower.json')).dependencies;
-  var files         = [ ];
-  var map           = { };
-  for(var key in bowerPackages) {
-    var bowerPath   = BOWER + '/' + key + '/';
-    var packageJSON = require(path.resolve(bowerPath + 'bower.json'));
-    [ ].concat(packageJSON.main).forEach(function(value) {
-      var relative = path.normalize(bowerPath + value);
-      var absolute = path.resolve(relative);
-      files.push(relative);
-      map[absolute] = '/' + path.join(key, packageJSON.version, value);
-    });
-  }
-  return {
-    src: function(opts) {
-      return gulp.src(files, opts)
-        .pipe(semiflat(process.cwd()));
-    },
-    version: function() {
-      return through.obj(function(file, encoding, done) {
-        file.base = process.cwd();
-        file.path = file.base + map[file.path];
-        done(null, file);
-      });
-    }
-  };
-}
-
-// TODO move to node package
-function versionDirectory() {
-  var fs = require('fs');
-  var crypto = require('crypto');
-  var through = require('through2');
-  var baseDirectory;
-  var hash = crypto.createHash('md5');
-  return through.obj(function(file, encoding, done) {
-    var fileBase = path.resolve(file.base);
-    var error;
-    baseDirectory = baseDirectory || fileBase;
-    if (fileBase !== baseDirectory) {
-      error = new Error('base path must be the same in all files');
-    } else if (file.isBuffer()) {
-      hash.update(file.relative);
-      hash.update(file.contents);
-    } else {
-      hash.update(file.relative);
-    }
-    done(error, file);
-  }, function(done) {
-    fs.rename(RELEASE_APPS, RELEASE_APPS + '-' + hash.digest('hex'), done);
-  });
-}
-
-// TODO move to node package
-function uglify2() {
-  var through = require('through2');
-  var uglify = require('uglify-js');
-  var gutil  = require('gulp-util');
-  var reserved = [ ];
-  return {
-    reserve: function() {
-      return through.obj(function(file, encoding, done) {
-        var regexp  = /\/\*{2}[^]*@ngInject[^\/]*\*\/\n+.*\w+\s*\(\s*(.*)\s*\)\s*\{/gm;
-        var text    = file.contents.toString();
-        var pending = [ ];
-        var analysis;
-        do {
-          analysis = regexp.exec(text);
-          if (analysis) {
-            pending = pending.concat(analysis[1].split(/\s*,\s*/));
-          }
-        } while(analysis);
-// TODO better logging
-if (pending.length) {
-console.log(file.relative, '\n@ngInject:', pending);
-}
-        reserved = reserved.concat(pending);
-        done(null, file);
-      });
-    },
-    minify: function() {
-      return through.obj(function(file, encoding, done) {
-        var options = {
-          fromString: true,
-          mangle: {
-            except: reserved.join(',')
-          }
-        };
-        var output = uglify.minify(file.contents.toString(), options);
-        this.push(new gutil.File({
-          path:     file.path,
-          base:     file.base,
-          cwd:      file.cwd,
-          contents: new Buffer(output.code)
-        }));
-        done();
-      });
-    }
-  };
-}
 
 function jsLibStream(opts) {
   return combined.create()
@@ -396,7 +295,7 @@ gulp.task('html:partials', function() {
 
 // inject dependencies into html and output to build directory
 gulp.task('html:inject', function() {
-  bower = bowerDepsVersioned();
+  bower = bowerDepsVersioned(BOWER);
   return htmlAppSrcStream()
     .pipe(plumber())
     .pipe(traceur.injectAppJS(JS_BUILD))
@@ -427,7 +326,7 @@ gulp.task('release:clean', function() {
 });
 
 gulp.task('release:init', function() {
-  uglify = uglify2();
+  uglify = reserveAndUglify();
   return combined.create()
     .append(jsLibStream())
     .append(jsSrcStream())
