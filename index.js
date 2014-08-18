@@ -61,12 +61,12 @@ var uglify;
 function bowerDepsVersioned() {
   var path = require('path');
   var through = require('through2');
-  var bowerPackages = require('./bower.json').dependencies;
+  var bowerPackages = require(path.resolve('bower.json')).dependencies;
   var files         = [ ];
   var map           = { };
   for(var key in bowerPackages) {
     var bowerPath   = BOWER + '/' + key + '/';
-    var packageJSON = require('./' + bowerPath + 'bower.json');
+    var packageJSON = require(path.resolve(bowerPath + 'bower.json'));
     [ ].concat(packageJSON.main).forEach(function(value) {
       var relative = path.normalize(bowerPath + value);
       var absolute = path.resolve(relative);
