@@ -89,6 +89,12 @@ function cssSrcStream(opts) {
     .pipe(semiflat(CSS_SRC));
 }
 
+function bowerStream(opts) {
+  return bowerFiles(CONSOLE_WIDTH)
+    .js(browserify.RUNTIME)
+    .stream(opts);
+}
+
 function htmlPartialsSrcStream(opts) {
   return gulp.src(HTML_SRC + '/**/partials/**/*.html', opts)
     .pipe(semiflat(HTML_SRC));
@@ -101,7 +107,13 @@ function htmlAppSrcStream(opts) {
 
 function routes() {
   var result = { };
-  [ JS_LIB_LOCAL, CSS_LIB_LOCAL, BOWER, JS_BUILD, CSS_BUILD ].forEach(function(path) {
+  [ JS_LIB_LOCAL,
+    CSS_LIB_LOCAL,
+    BOWER,
+    JS_BUILD,
+    CSS_BUILD,
+    browserify.RUNTIME
+  ].forEach(function(path) {
     result['/' + path] = path;
   });
   return result;
@@ -188,7 +200,8 @@ gulp.task('js:unit', function() {
   });
   return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
     .pipe(semiflat(JS_LIB_LOCAL))
-    .pipe(bundler.compile(preprocessor, 'es6ify').all())
+    .pipe(bundler.compile(preprocessor, 'es6ify').all('test/karma-main.js'))
+    .pipe(gulp.dest(JS_BUILD))
 // TODO karma
 //    .pipe(traceur.karma({
 //      files:      bowerFiles(CONSOLE_WIDTH).js({ dev: true }).list,
@@ -279,7 +292,7 @@ gulp.task('html:inject', function() {
     .pipe(plumber())
     .pipe(injectAdjacent('js', JS_BUILD))
     .pipe(injectAdjacent('css', CSS_BUILD))
-    .pipe(inject(bowerFiles(CONSOLE_WIDTH).js.stream({ read: false }), {
+    .pipe(inject(bowerStream({ read: false }), {
       name: 'bower'
     }))
     .pipe(gulp.dest(HTML_BUILD));
@@ -314,7 +327,7 @@ gulp.task('release:init', function() {
 });
 
 gulp.task('release:js', function() {
-  return gulp.src([ JS_BUILD + '/**/*.js', '!**/dev/**' ])
+  return gulp.src([ JS_BUILD + '/**/*.js', '!**/dev/**', '!**/test**' ])
     .pipe(uglify.minify())
 // TODO @ngInject
     .pipe(gulp.dest(RELEASE_APPS));
@@ -335,7 +348,7 @@ var releaseLibList;
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
   releaseLibList = [ ];
-  return bowerFiles(CONSOLE_WIDTH).js.stream()
+  return bowerFiles(CONSOLE_WIDTH).js().stream()
     .pipe(semiflat('*'))
     .pipe(gulp.dest(RELEASE_LIBS))
     .pipe(versionDirectory())
