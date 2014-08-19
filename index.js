@@ -14,7 +14,6 @@ var rimraf        = require('gulp-rimraf');
 var sassAlt       = require('gulp-sass-alt');
 var semiflat      = require('gulp-semiflat');
 var slash         = require('gulp-slash');
-var traceurOut    = require('gulp-traceur-out');
 var watch         = require('gulp-watch');
 var watchSequence = require('gulp-watch-sequence');
 
@@ -53,10 +52,14 @@ var RELEASE_LIBS  = RELEASE + '/' + CDN_LIBS;
 var RELEASE_APPS  = RELEASE + '/' + CDN_APPS;
 
 var bowerDepsVersioned = require('./lib/bower-deps-versioned');
+var browserify         = require('./lib/browserify');
+var injectAdjFiles     = require('./lib/inject/adjacent-files');
+var injectTransform    = require('./lib/inject/relative-transform');
+var jsHintReporter     = require('./lib/jshint-reporter');
+var reserveAndUglify   = require('./lib/reserve-and-uglify');
 var versionDirectory   = require('./lib/version-directory');
-var reserveAndUglify   = require('./lib/reserve-and-uglify')
 
-var traceur;
+var bundler;
 var sass;
 var bower;
 var uglify;
@@ -189,16 +192,14 @@ gulp.task('js:clean', function() {
 
 // init traceur libs and run linter
 gulp.task('js:init', function() {
-  traceur = traceurOut(TEMP);
+  bundler = browserify();
   return combined.create()
-    .append(jsLibStream()
-      .pipe(traceur.libraries()))
-    .append(jsSrcStream()
-      .pipe(traceur.sources()))
-    .append(jsSpecStream()
-      .pipe(traceur.sources()))
+    .append(jsLibStream())
+    .append(jsSrcStream())
+    .append(jsSpecStream())
+    .pipe(bundler.sources())
     .pipe(jshint())
-    .pipe(traceur.jsHintReporter(CONSOLE_WIDTH));
+    .pipe(jsHintReporter(CONSOLE_WIDTH));
 });
 
 // karma unit tests on local library only
@@ -223,9 +224,7 @@ gulp.task('js:unit', function() {
 //  in the build directory with source map for each
 gulp.task('js:build', function() {
   return jsSrcStream({ read: false })
-    .pipe(traceur.transpile())
-    .pipe(traceur.traceurReporter(CONSOLE_WIDTH))
-    .pipe(traceur.adjustSourceMaps())
+    .pipe(bundler.transpile(CONSOLE_WIDTH))
     .pipe(gulp.dest(JS_BUILD));
 });
 
@@ -298,8 +297,8 @@ gulp.task('html:inject', function() {
   bower = bowerDepsVersioned(BOWER);
   return htmlAppSrcStream()
     .pipe(plumber())
-    .pipe(traceur.injectAppJS(JS_BUILD))
-    .pipe(sass.injectAppCSS(CSS_BUILD))
+    .pipe(injectAdjFiles('js', JS_BUILD))
+    .pipe(injectAdjFiles('css', CSS_BUILD))
     .pipe(inject(bower.src({ read: false }), {
       name: 'bower'
     }))
@@ -358,29 +357,16 @@ gulp.task('release:bower', function() {
 
 // inject dependencies into html and output to build directory
 gulp.task('release:inject', function() {
-  function relativeTransform(filepath, file, index, length, targetFile) {
-    var relative = slash(path.relative(path.dirname(targetFile.path), file.path));
-    switch(path.extname(relative)) {
-      case '.css':
-        return '<link rel="stylesheet" href="' + relative + '">';
-      case '.js':
-        return '<script src="' + relative + '"></script>';
-    }
-  }
   return gulp.src(RELEASE_APPS + '/**/*.html')
     .pipe(filter([ '**', '!**/dev/**' ]))
     .pipe(plumber())
-    .pipe(traceur.injectAppJS(RELEASE_APPS, {
+    .pipe(injectAdjFiles('js|css', RELEASE_APPS, {
       name:      'inject',
-      transform: relativeTransform
-    }))
-    .pipe(sass.injectAppCSS(RELEASE_APPS, {
-      name:      'inject',
-      transform: relativeTransform
+      transform: injectTransform
     }))
     .pipe(inject(releaseLibStream({ read: false }), {
       name:      'bower',
-      transform: relativeTransform
+      transform: injectTransform
     }))
     .pipe(gulp.dest(RELEASE_APPS));
 });
