@@ -47,6 +47,7 @@
 "mold-source-map": "latest",
     "run-sequence": "0.3.6",
 "through2": "1.1.1",
+"through-pipes": "latest",
     "uglify-js": "2.4.15"
   }
 }

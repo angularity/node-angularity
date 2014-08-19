@@ -13,11 +13,9 @@ var plumber       = require('gulp-plumber');
 var rimraf        = require('gulp-rimraf');
 var sassAlt       = require('gulp-sass-alt');
 var semiflat      = require('gulp-semiflat');
-var slash         = require('gulp-slash');
 var watch         = require('gulp-watch');
 var watchSequence = require('gulp-watch-sequence');
 
-var bowerFiles    = require('bower-files');
 var browserSync   = require('browser-sync');
 var combined      = require('combined-stream');
 var runSequence   = require('run-sequence');
@@ -28,7 +26,6 @@ var project       = require(path.resolve('package.json'));
 var HTTP_PORT     = 8000;
 var CONSOLE_WIDTH = 80;
 
-var TEMP          = '.build';
 var BOWER         = 'bower_components';
 
 var JS_LIB_BOWER  = 'bower_components/**/js-lib';
@@ -46,23 +43,18 @@ var HTML_BUILD    = 'build';
 var PARTIALS_NAME = 'templates';
 
 var RELEASE       = 'release';
-var CDN_LIBS      = 'html-libraries';
+var CDN_LIBS      = 'html-lib';
 var CDN_APPS      = project.name;
 var RELEASE_LIBS  = RELEASE + '/' + CDN_LIBS;
 var RELEASE_APPS  = RELEASE + '/' + CDN_APPS;
 
-var bowerDepsVersioned = require('./lib/bower-deps-versioned');
-var browserify         = require('./lib/browserify');
-var injectAdjFiles     = require('./lib/inject/adjacent-files');
-var injectTransform    = require('./lib/inject/relative-transform');
-var jsHintReporter     = require('./lib/jshint-reporter');
-var reserveAndUglify   = require('./lib/reserve-and-uglify');
-var versionDirectory   = require('./lib/version-directory');
-
-var bundler;
-var sass;
-var bower;
-var uglify;
+var browserify        = require('./lib/browserify');
+var bowerFiles        = require('./lib/inject/bower-files');
+var injectAdjacent    = require('./lib/inject/adjacent-files');
+var injectTransform   = require('./lib/inject/relative-transform');
+var jsHintReporter    = require('./lib/jshint-reporter');
+var reserveAndUglify  = require('./lib/reserve-and-uglify');
+var versionDirectory  = require('./lib/version-directory');
 
 function jsLibStream(opts) {
   return combined.create()
@@ -105,11 +97,6 @@ function htmlPartialsSrcStream(opts) {
 function htmlAppSrcStream(opts) {
   return gulp.src([ HTML_SRC + '/**/*.html', '!**/partials/**/*' ], opts) // ignore partials
     .pipe(semiflat(HTML_SRC));
-}
-
-function releaseLibStream(opts) {
-  return gulp.src(RELEASE_LIBS + '/**/*', opts)
-    .pipe(semiflat(RELEASE));
 }
 
 function routes() {
@@ -159,10 +146,8 @@ gulp.task('reload', function() {
 gulp.task('js', function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'javascript'));
   runSequence(
-    [ 'js:clean', 'tmp:clean' ],
-    'js:init',
+    [ 'js:clean', 'js:init' ],
     'js:build',
-    'tmp:clean',
     done
   );
 });
@@ -170,18 +155,10 @@ gulp.task('js', function(done) {
 gulp.task('test', function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'test'));
   runSequence(
-    'tmp:clean',
     'js:init',
     'js:unit',
-    'tmp:clean',
     done
   );
-});
-
-// clean the temp directory
-gulp.task('tmp:clean', function() {
-  return gulp.src(TEMP, { read: false })
-    .pipe(rimraf());
 });
 
 // clean the js build directory
@@ -190,9 +167,11 @@ gulp.task('js:clean', function() {
     .pipe(rimraf());
 });
 
+var bundler;
+
 // init traceur libs and run linter
 gulp.task('js:init', function() {
-  bundler = browserify();
+  bundler = browserify(CONSOLE_WIDTH);
   return combined.create()
     .append(jsLibStream())
     .append(jsSrcStream())
@@ -204,27 +183,27 @@ gulp.task('js:init', function() {
 
 // karma unit tests on local library only
 gulp.task('js:unit', function() {
+  var preprocessor = bundler.jasminePreprocessor({
+    '@': function (filename) { return filename + ':0:0'; }
+  });
   return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
-    .pipe(traceur.concatJasmine({
-      '@': function (file) { return file.path + ':0:0'; }
-    }))
-    .pipe(gulp.dest(TEMP))
-    .pipe(traceur.transpile())
-    .pipe(traceur.traceurReporter(CONSOLE_WIDTH))
-    .pipe(traceur.karma({
-      files:      bowerFiles({ dev: true }).js,
-      frameworks: [ 'jasmine' ],
-      reporters:  [ 'spec' ],
-      browsers:   [ 'Chrome' ],
-      logLevel:   'error'
-    }, CONSOLE_WIDTH));
+    .pipe(semiflat(JS_LIB_LOCAL))
+    .pipe(bundler.compile(preprocessor, 'es6ify').all())
+// TODO karma
+//    .pipe(traceur.karma({
+//      files:      bowerFiles(CONSOLE_WIDTH).js({ dev: true }).list,
+//      frameworks: [ 'jasmine' ],
+//      reporters:  [ 'spec' ],
+//      browsers:   [ 'Chrome' ],
+//      logLevel:   'error'
+//    }, CONSOLE_WIDTH));
 });
 
 // resolve all imports for the source files to give a single optimised js file
 //  in the build directory with source map for each
 gulp.task('js:build', function() {
   return jsSrcStream({ read: false })
-    .pipe(bundler.transpile(CONSOLE_WIDTH))
+    .pipe(bundler.compile('es6ify').each())
     .pipe(gulp.dest(JS_BUILD));
 });
 
@@ -243,6 +222,8 @@ gulp.task('css:clean', function() {
   return gulp.src(CSS_BUILD + '/**/*.css*', { read: false })
     .pipe(rimraf());
 });
+
+var sass;
 
 // discover css libs
 gulp.task('css:init', function() {
@@ -294,12 +275,11 @@ gulp.task('html:partials', function() {
 
 // inject dependencies into html and output to build directory
 gulp.task('html:inject', function() {
-  bower = bowerDepsVersioned(BOWER);
   return htmlAppSrcStream()
     .pipe(plumber())
-    .pipe(injectAdjFiles('js', JS_BUILD))
-    .pipe(injectAdjFiles('css', CSS_BUILD))
-    .pipe(inject(bower.src({ read: false }), {
+    .pipe(injectAdjacent('js', JS_BUILD))
+    .pipe(injectAdjacent('css', CSS_BUILD))
+    .pipe(inject(bowerFiles(CONSOLE_WIDTH).js.stream({ read: false }), {
       name: 'bower'
     }))
     .pipe(gulp.dest(HTML_BUILD));
@@ -313,7 +293,6 @@ gulp.task('release', [ 'build' ], function(done) {
     'release:init',
     [ 'release:js', 'release:css', 'release:html', 'release:bower' ],
     'release:inject',
-    'release:version',
     done
   );
 });
@@ -323,6 +302,8 @@ gulp.task('release:clean', function() {
   return gulp.src(RELEASE, { read: false })
     .pipe(rimraf());
 });
+
+var uglify;
 
 gulp.task('release:init', function() {
   uglify = reserveAndUglify();
@@ -335,6 +316,7 @@ gulp.task('release:init', function() {
 gulp.task('release:js', function() {
   return gulp.src([ JS_BUILD + '/**/*.js', '!**/dev/**' ])
     .pipe(uglify.minify())
+// TODO @ngInject
     .pipe(gulp.dest(RELEASE_APPS));
 });
 
@@ -348,32 +330,31 @@ gulp.task('release:html', function() {
     .pipe(gulp.dest(RELEASE_APPS));
 });
 
+var releaseLibList;
+
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
-  return bower.src()
-    .pipe(bower.version())
-    .pipe(gulp.dest(RELEASE_LIBS));
+  releaseLibList = [ ];
+  return bowerFiles(CONSOLE_WIDTH).js.stream()
+    .pipe(semiflat('*'))
+    .pipe(gulp.dest(RELEASE_LIBS))
+    .pipe(versionDirectory())
+    .on('data', releaseLibList.push.bind(releaseLibList));
 });
 
 // inject dependencies into html and output to build directory
 gulp.task('release:inject', function() {
-  return gulp.src(RELEASE_APPS + '/**/*.html')
-    .pipe(filter([ '**', '!**/dev/**' ]))
+  return gulp.src([ RELEASE_APPS + '/**/*.html', '!**/dev/**' ])
     .pipe(plumber())
-    .pipe(injectAdjFiles('js|css', RELEASE_APPS, {
-      name:      'inject',
+    .pipe(injectAdjacent('js|css', RELEASE_APPS, {
+      name: 'inject',
       transform: injectTransform
     }))
-    .pipe(inject(releaseLibStream({ read: false }), {
-      name:      'bower',
+    .pipe(inject(gulp.src(releaseLibList, { read: false }), {
+      name: 'bower',
       transform: injectTransform
     }))
-    .pipe(gulp.dest(RELEASE_APPS));
-});
-
-// rename app folder with the content MD5 hash
-gulp.task('release:version', function() {
-  return gulp.src(RELEASE_APPS + '/**')
+    .pipe(gulp.dest(RELEASE_APPS))
     .pipe(versionDirectory());
 });
 
