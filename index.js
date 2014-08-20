@@ -4,6 +4,7 @@ var path          = require('path');
 
 var gulp          = require('gulp');
 var concat        = require('gulp-concat');
+var wrap          = require('gulp-wrap');
 var filter        = require('gulp-filter');
 var inject        = require('gulp-inject');
 var jshint        = require('gulp-jshint');
@@ -53,7 +54,6 @@ var bowerFiles        = require('./lib/inject/bower-files');
 var injectAdjacent    = require('./lib/inject/adjacent-files');
 var injectTransform   = require('./lib/inject/relative-transform');
 var jsHintReporter    = require('./lib/jshint-reporter');
-var reserveAndUglify  = require('./lib/reserve-and-uglify');
 var versionDirectory  = require('./lib/version-directory');
 
 function jsLibStream(opts) {
@@ -181,7 +181,7 @@ gulp.task('js:clean', function() {
 
 var bundler;
 
-// init traceur libs and run linter
+// mark sources for browserify and run linter
 gulp.task('js:init', function() {
   bundler = browserify(CONSOLE_WIDTH);
   return combined.create()
@@ -189,18 +189,19 @@ gulp.task('js:init', function() {
     .append(jsSrcStream())
     .append(jsSpecStream())
     .pipe(bundler.sources())
+    .pipe(bundler.reserve())
     .pipe(jshint())
     .pipe(jsHintReporter(CONSOLE_WIDTH));
 });
 
-// karma unit tests on local library only
+// karma unit tests in local library only
 gulp.task('js:unit', function() {
-  var preprocessor = bundler.jasminePreprocessor({
+  var preJasmine = bundler.jasminePreprocessor({
     '@': function (filename) { return filename + ':0:0'; }
   });
   return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
     .pipe(semiflat(JS_LIB_LOCAL))
-    .pipe(bundler.compile(preprocessor, 'es6ify').all('test/karma-main.js'))
+    .pipe(bundler.compile(preJasmine, 'es6ify').all('test/karma-main.js'))
     .pipe(gulp.dest(JS_BUILD))
 // TODO karma
 //    .pipe(traceur.karma({
@@ -212,8 +213,7 @@ gulp.task('js:unit', function() {
 //    }, CONSOLE_WIDTH));
 });
 
-// resolve all imports for the source files to give a single optimised js file
-//  in the build directory with source map for each
+// give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function() {
   return jsSrcStream({ read: false })
     .pipe(bundler.compile('es6ify').each())
@@ -303,8 +303,7 @@ gulp.task('release', [ 'build' ], function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'release'));
   runSequence(
     'release:clean',
-    'release:init',
-    [ 'release:js', 'release:css', 'release:html', 'release:bower' ],
+    [ 'release:adjacent', 'release:bower' ],
     'release:inject',
     done
   );
@@ -316,43 +315,26 @@ gulp.task('release:clean', function() {
     .pipe(rimraf());
 });
 
-var uglify;
-
-gulp.task('release:init', function() {
-  uglify = reserveAndUglify();
+gulp.task('release:adjacent', function() {
   return combined.create()
-    .append(jsLibStream())
-    .append(jsSrcStream())
-    .pipe(uglify.reserve());
-});
-
-gulp.task('release:js', function() {
-  return gulp.src([ JS_BUILD + '/**/*.js', '!**/dev/**', '!**/test**' ])
-    .pipe(uglify.minify())
-// TODO @ngInject
+    .append(gulp.src([ JS_BUILD   + '/**/*.js',   '!**/dev/**', '!**/test**'      ]))
+    .append(gulp.src([ CSS_BUILD  + '/**/*.css',  '!**/dev/**', '!**/test**'      ]))
+    .append(gulp.src([ HTML_SRC   + '/**/*.html', '!**/dev/**', '!**/partials/**' ]))
     .pipe(gulp.dest(RELEASE_APPS));
 });
-
-gulp.task('release:css', function() {
-  return gulp.src([ CSS_BUILD + '/**/*.css', '!**/dev/**' ])
-    .pipe(gulp.dest(RELEASE_APPS));
-});
-
-gulp.task('release:html', function() {
-  return gulp.src([ HTML_BUILD + '/**/*.html', '!**/dev/**' ])
-    .pipe(gulp.dest(RELEASE_APPS));
-});
-
-var releaseLibList;
 
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
-  releaseLibList = [ ];
-  return bowerFiles(CONSOLE_WIDTH).js().stream()
-    .pipe(semiflat('*'))
+  return bowerStream({ manifest: true })
+    .pipe(wrap([
+      '/* ' + hr('-', 114),
+      ' * <%= file.relative %>',
+      ' * ' + hr('-', 114) + ' */',
+      '<%= contents %>'
+    ].join('\n')))
+    .pipe(concat('vendor.js'))
     .pipe(gulp.dest(RELEASE_LIBS))
-    .pipe(versionDirectory())
-    .on('data', releaseLibList.push.bind(releaseLibList));
+    .pipe(versionDirectory());
 });
 
 // inject dependencies into html and output to build directory
@@ -363,7 +345,7 @@ gulp.task('release:inject', function() {
       name: 'inject',
       transform: injectTransform
     }))
-    .pipe(inject(gulp.src(releaseLibList, { read: false }), {
+    .pipe(inject(gulp.src(RELEASE_LIBS + '*/**', { read: false }), {
       name: 'bower',
       transform: injectTransform
     }))
