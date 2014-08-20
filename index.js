@@ -5,7 +5,6 @@ var path          = require('path');
 var gulp          = require('gulp');
 var concat        = require('gulp-concat');
 var wrap          = require('gulp-wrap');
-var filter        = require('gulp-filter');
 var inject        = require('gulp-inject');
 var jshint        = require('gulp-jshint');
 var minifyHtml    = require('gulp-minify-html');
@@ -197,7 +196,7 @@ gulp.task('js:init', function() {
 // karma unit tests in local library only
 gulp.task('js:unit', function() {
   var preJasmine = bundler.jasminePreprocessor({
-    '@': function (filename) { return filename + ':0:0'; }
+    '@': function (filename) { return filename + ':0:0'; }  // @ is replaced with filename:0:0
   });
   return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
     .pipe(semiflat(JS_LIB_LOCAL))
@@ -215,8 +214,11 @@ gulp.task('js:unit', function() {
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function() {
+  function testIsApp(filename) {
+    return !(/[\\\/]dev[\\\/]/i.test(filename));
+  }
   return jsSrcStream({ read: false })
-    .pipe(bundler.compile('es6ify').each())
+    .pipe(bundler.compile('es6ify').each(testIsApp))
     .pipe(gulp.dest(JS_BUILD));
 });
 
@@ -240,6 +242,7 @@ var sass;
 
 // discover css libs
 gulp.task('css:init', function() {
+// TODO absorb sass-alt into lib
   sass = sassAlt();
   return cssLibStream({ read: false })
     .pipe(sass.libraries(bourbon.includePaths));
