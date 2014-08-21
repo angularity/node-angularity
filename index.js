@@ -209,7 +209,7 @@ gulp.task('js:unit', function() {
   });
   return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
     .pipe(semiflat(JS_LIB_LOCAL))
-    .pipe(bundler.compile(preJasmine, 'es6ify').all('test/karma-main.js'))
+    .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
     .pipe(gulp.dest(JS_BUILD))
     .pipe(karma({
       files:      bowerStream({ dev: true }).list,
@@ -223,7 +223,7 @@ gulp.task('js:unit', function() {
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function() {
   return jsSrcStream({ read: false })
-    .pipe(bundler.compile('es6ify').each(isMinify))
+    .pipe(bundler.compile(bundler.es6ifyTransform).each(isMinify))
     .pipe(gulp.dest(JS_BUILD));
 });
 
