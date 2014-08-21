@@ -48,11 +48,12 @@ var CDN_APPS      = project.name;
 var RELEASE_LIBS  = RELEASE + '/' + CDN_LIBS;
 var RELEASE_APPS  = RELEASE + '/' + CDN_APPS;
 
-var browserify        = require('./lib/browserify');
+var jsHintReporter    = require('./lib/build/jshint-reporter');
+var browserify        = require('./lib/build/browserify');
+var karma             = require('./lib/test/karma');
 var bowerFiles        = require('./lib/inject/bower-files');
 var injectAdjacent    = require('./lib/inject/adjacent-files');
 var injectTransform   = require('./lib/inject/relative-transform');
-var jsHintReporter    = require('./lib/jshint-reporter');
 var versionDirectory  = require('./lib/version-directory');
 
 function jsLibStream(opts) {
@@ -90,8 +91,8 @@ function cssSrcStream(opts) {
 
 function bowerStream(opts) {
   return bowerFiles(CONSOLE_WIDTH)
-    .js(browserify.RUNTIME)
-    .stream(opts);
+    .prepend(browserify.RUNTIME)
+    .js(opts);
 }
 
 function htmlPartialsSrcStream(opts) {
@@ -120,6 +121,14 @@ function routes() {
 
 // DEFAULT ---------------------------------
 gulp.task('default', [ 'watch' ]);
+
+var isMinify = true;
+
+gulp.task('nominify', function(done) {
+  console.log(hr('-', CONSOLE_WIDTH, 'nominify'));
+  isMinify = false;
+  runSequence('watch', done);
+});
 
 gulp.task('build', function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'build'));
@@ -202,23 +211,19 @@ gulp.task('js:unit', function() {
     .pipe(semiflat(JS_LIB_LOCAL))
     .pipe(bundler.compile(preJasmine, 'es6ify').all('test/karma-main.js'))
     .pipe(gulp.dest(JS_BUILD))
-// TODO karma
-//    .pipe(traceur.karma({
-//      files:      bowerFiles(CONSOLE_WIDTH).js({ dev: true }).list,
-//      frameworks: [ 'jasmine' ],
-//      reporters:  [ 'spec' ],
-//      browsers:   [ 'Chrome' ],
-//      logLevel:   'error'
-//    }, CONSOLE_WIDTH));
+    .pipe(karma({
+      files:      bowerStream({ dev: true }).list,
+      frameworks: [ 'jasmine' ],
+      reporters:  [ 'spec' ],
+      browsers:   [ 'Chrome' ],
+      logLevel:   'error'
+    }, CONSOLE_WIDTH));
 });
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function() {
-  function testIsApp(filename) {
-    return !(/[\\\/]dev[\\\/]/i.test(filename));
-  }
   return jsSrcStream({ read: false })
-    .pipe(bundler.compile('es6ify').each(testIsApp))
+    .pipe(bundler.compile('es6ify').each(isMinify))
     .pipe(gulp.dest(JS_BUILD));
 });
 
