@@ -11,7 +11,6 @@ var minifyHtml    = require('gulp-minify-html');
 var ngHtml2js     = require('gulp-ng-html2js');
 var plumber       = require('gulp-plumber');
 var rimraf        = require('gulp-rimraf');
-var sassAlt       = require('gulp-sass-alt');
 var semiflat      = require('gulp-semiflat');
 var watch         = require('gulp-watch');
 var watchSequence = require('gulp-watch-sequence');
@@ -66,12 +65,12 @@ function jsLibStream(opts) {
 }
 
 function jsSrcStream(opts) {
-  return gulp.src(JS_SRC + '/**/*.js', opts)              // local app JS
+  return gulp.src([ JS_SRC + '/**/*.js', '!**/assets/**' ], opts)           // local app JS
     .pipe(semiflat(JS_SRC));
 }
 
 function jsSpecStream(opts) {
-  return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js', opts)   // local lib SPEC JS
+  return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js', opts)                     // local lib SPEC JS
     .pipe(semiflat(JS_LIB_LOCAL));
 }
 
@@ -86,7 +85,7 @@ function scssLibStream(opts) {
 }
 
 function scssSrcStream(opts) {
-  return gulp.src(CSS_SRC + '/**/*.scss', opts)  // local app CSS
+  return gulp.src([ CSS_SRC + '/**/*.scss', '!**/assets/**' ], opts)  // local app CSS
     .pipe(semiflat(CSS_SRC));
 }
 
@@ -97,12 +96,12 @@ function bowerStream(opts) {
 }
 
 function htmlPartialsSrcStream(opts) {
-  return gulp.src(HTML_SRC + '/**/partials/**/*.html', opts)
+  return gulp.src([ HTML_SRC + '/**/partials/**/*.html', '!**/assets/**' ], opts)
     .pipe(semiflat(HTML_SRC));
 }
 
 function htmlAppSrcStream(opts) {
-  return gulp.src([ HTML_SRC + '/**/*.html', '!**/partials/**/*' ], opts) // ignore partials
+  return gulp.src([ HTML_SRC + '/**/*.html', '!**/assets/**' ], opts) // ignore partials
     .pipe(semiflat(HTML_SRC));
 }
 
@@ -188,7 +187,7 @@ gulp.task('test', function(done) {
 
 // clean the js build directory
 gulp.task('js:clean', function() {
-  return gulp.src([ JS_BUILD + '/**/*.js*', '!**/*.*.js' ], { read: false })
+  return gulp.src(JS_BUILD + '/**/*.js*', { read: false })
     .pipe(rimraf());
 });
 
@@ -269,7 +268,7 @@ gulp.task('html', function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'html'));
   runSequence(
     'html:clean',
-    'html:partials',
+    [ 'html:partials', 'html:assets' ],
     'html:inject',
     done
   );
@@ -277,7 +276,7 @@ gulp.task('html', function(done) {
 
 // clean the html build directory
 gulp.task('html:clean', function() {
-  return gulp.src(HTML_BUILD + '/**/*.html*', { read: false })
+  return gulp.src([ HTML_BUILD + '/**/*.html*', HTML_BUILD + '/**/assets/**' ], { read: false })
     .pipe(rimraf());
 });
 
@@ -295,6 +294,12 @@ gulp.task('html:partials', function() {
     }))
     .pipe(concat(PARTIALS_NAME + '.html.js'))
     .pipe(gulp.dest(JS_BUILD));
+});
+
+// copy assets to build directory
+gulp.task('html:assets', function() {
+  return gulp.src(HTML_SRC + '/**/assets/**')
+    .pipe(gulp.dest(HTML_BUILD));
 });
 
 // inject dependencies into html and output to build directory
@@ -331,6 +336,7 @@ gulp.task('release:adjacent', function() {
     .append(gulp.src([ JS_BUILD   + '/**/*.js',   '!**/dev/**', '!**/test**'      ]))
     .append(gulp.src([ CSS_BUILD  + '/**/*.css',  '!**/dev/**', '!**/test**'      ]))
     .append(gulp.src([ HTML_SRC   + '/**/*.html', '!**/dev/**', '!**/partials/**' ]))
+    .append(gulp.src([ HTML_SRC   + '/**/assets/**' ]))
     .pipe(gulp.dest(RELEASE_APPS));
 });
 
