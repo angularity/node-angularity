@@ -50,6 +50,7 @@ var RELEASE_APPS  = RELEASE + '/' + CDN_APPS;
 
 var jsHintReporter    = require('./lib/build/jshint-reporter');
 var browserify        = require('./lib/build/browserify');
+var nodeSass          = require('./lib/build/node-sass');
 var karma             = require('./lib/test/karma');
 var bowerFiles        = require('./lib/inject/bower-files');
 var injectAdjacent    = require('./lib/inject/adjacent-files');
@@ -74,7 +75,7 @@ function jsSpecStream(opts) {
     .pipe(semiflat(JS_LIB_LOCAL));
 }
 
-function cssLibStream(opts) {
+function scssLibStream(opts) {
   return combined.create()
     .append(gulp.src(CSS_LIB_BOWER + '/**/*.scss', opts)            // bower lib CSS
       .pipe(semiflat(CSS_LIB_BOWER)))
@@ -84,7 +85,7 @@ function cssLibStream(opts) {
       .pipe(semiflat(BOWER + '/**/bootstrap')));
 }
 
-function cssSrcStream(opts) {
+function scssSrcStream(opts) {
   return gulp.src(CSS_SRC + '/**/*.scss', opts)  // local app CSS
     .pipe(semiflat(CSS_SRC));
 }
@@ -119,21 +120,16 @@ function routes() {
   return result;
 }
 
+function hr(char, length, title) {
+  var text = (title) ? (' ' + title.split('').join(' ').toUpperCase() + ' ') : '';  // double spaced title text
+  while (text.length < length) {
+    text = char + text + char;  // centre title between the given character
+  }
+  return text.slice(0, length); // enforce length, left justified
+}
+
 // DEFAULT ---------------------------------
-gulp.task('default', [ 'watch' ]);
-
-var isMinify = true;
-
-gulp.task('nominify', function(done) {
-  console.log(hr('-', CONSOLE_WIDTH, 'nominify'));
-  isMinify = false;
-  runSequence('watch', done);
-});
-
-gulp.task('build', function(done) {
-  console.log(hr('-', CONSOLE_WIDTH, 'build'));
-  runSequence('js', 'css', 'html', done);
-});
+var isMinify = (process.argv[process.argv.length - 1] !== 'nominify');
 
 function hr(char, length, title) {
   var text = (title) ? (' ' + title.split('').join(' ').toUpperCase() + ' ') : '';  // double spaced title text
@@ -142,6 +138,15 @@ function hr(char, length, title) {
   }
   return text.slice(0, length); // enforce length, left justified
 }
+
+gulp.task('default', [ 'watch' ]);
+
+gulp.task('nominify', [ 'watch' ]);
+
+gulp.task('build', function(done) {
+  console.log(hr('-', CONSOLE_WIDTH, 'build'));
+  runSequence('js', 'css', 'html', done);
+});
 
 // SERVER ---------------------------------
 gulp.task('server', [ 'build' ], function() {
@@ -247,17 +252,15 @@ var sass;
 
 // discover css libs
 gulp.task('css:init', function() {
-// TODO absorb sass-alt into lib
-  sass = sassAlt();
-  return cssLibStream({ read: false })
+  sass = nodeSass();
+  return scssLibStream({ read: false })
     .pipe(sass.libraries(bourbon.includePaths));
 });
 
 // compile sass with the previously discovered lib paths
 gulp.task('css:build', function() {
-  return cssSrcStream({ read: false })
-    .pipe(sass.transpile())
-    .pipe(sass.sassReporter(CONSOLE_WIDTH))
+  return scssSrcStream({ read: false })
+    .pipe(sass.compile())
     .pipe(gulp.dest(CSS_BUILD));
 });
 
