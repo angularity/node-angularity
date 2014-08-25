@@ -208,7 +208,7 @@ gulp.task('js:init', function() {
 
 // karma unit tests in local library only
 gulp.task('js:unit', function() {
-  var preJasmine = bundler.jasminePreprocessor({
+  var preJasmine = bundler.getJasmineTransform({
     '@': function (filename) { return filename + ':0:0'; }  // @ is replaced with filename:0:0
   });
   return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
