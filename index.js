@@ -12,6 +12,7 @@ var ngHtml2js     = require('gulp-ng-html2js');
 var plumber       = require('gulp-plumber');
 var rimraf        = require('gulp-rimraf');
 var semiflat      = require('gulp-semiflat');
+var slash         = require('gulp-slash');
 var watch         = require('gulp-watch');
 var watchSequence = require('gulp-watch-sequence');
 
@@ -116,7 +117,7 @@ function routes() {
     CSS_LIB_LOCAL,
     browserify.RUNTIME
   ].forEach(function(path) {
-    result['/' + path] = path;
+    result['/' + slash(path)] = path;
   });
   return result;
 }
