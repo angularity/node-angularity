@@ -107,11 +107,13 @@ function htmlAppSrcStream(opts) {
 
 function routes() {
   var result = { };
-  [ JS_LIB_LOCAL,
-    CSS_LIB_LOCAL,
-    BOWER,
+  [ BOWER,
+    JS_SRC,
     JS_BUILD,
+    JS_LIB_LOCAL,
+    CSS_SRC,
     CSS_BUILD,
+    CSS_LIB_LOCAL,
     browserify.RUNTIME
   ].forEach(function(path) {
     result['/' + path] = path;
