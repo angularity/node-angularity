@@ -3241,9 +3241,9 @@
       }
     },
     "gulp-track-filenames": {
-      "version": "0.0.10",
+      "version": "0.1.0",
       "from": "gulp-track-filenames@latest",
-      "resolved": "https://registry.npmjs.org/gulp-track-filenames/-/gulp-track-filenames-0.0.10.tgz",
+      "resolved": "https://registry.npmjs.org/gulp-track-filenames/-/gulp-track-filenames-0.1.0.tgz",
       "dependencies": {
         "through2": {
           "version": "0.5.1",
