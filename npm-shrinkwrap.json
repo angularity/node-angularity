@@ -1,6 +1,6 @@
 {
   "name": "gulp-es6-modular",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "dependencies": {
     "archy": {
       "version": "0.0.2",
@@ -729,15 +729,15 @@
           "from": "which@~1.0.5",
           "resolved": "https://registry.npmjs.org/which/-/which-1.0.5.tgz"
         },
-        "boom": {
-          "version": "0.4.2",
-          "from": "boom@0.4.2",
-          "resolved": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz"
-        },
         "aws-sign2": {
           "version": "0.5.0",
           "from": "aws-sign2@0.5.0",
           "resolved": "https://registry.npmjs.org/aws-sign2/-/aws-sign2-0.5.0.tgz"
+        },
+        "boom": {
+          "version": "0.4.2",
+          "from": "boom@0.4.2",
+          "resolved": "https://registry.npmjs.org/boom/-/boom-0.4.2.tgz"
         },
         "cryptiles": {
           "version": "0.2.2",
@@ -764,15 +764,15 @@
           "from": "mute-stream@0.0.4",
           "resolved": "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.4.tgz"
         },
-        "oauth-sign": {
-          "version": "0.3.0",
-          "from": "oauth-sign@0.3.0",
-          "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz"
-        },
         "node-uuid": {
           "version": "1.4.1",
           "from": "node-uuid@1.4.1",
           "resolved": "https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.1.tgz"
+        },
+        "oauth-sign": {
+          "version": "0.3.0",
+          "from": "oauth-sign@0.3.0",
+          "resolved": "https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz"
         },
         "sntp": {
           "version": "0.2.4",
@@ -3153,9 +3153,8 @@
       }
     },
     "gulp-semiflat": {
-      "version": "0.0.8",
+      "version": "0.0.9",
       "from": "gulp-semiflat@latest",
-      "resolved": "https://registry.npmjs.org/gulp-semiflat/-/gulp-semiflat-0.0.8.tgz",
       "dependencies": {
         "through2": {
           "version": "0.5.1",

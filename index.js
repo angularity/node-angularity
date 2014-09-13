@@ -43,25 +43,25 @@ var HTML_BUILD    = 'build';
 var PARTIALS_NAME = 'templates';
 
 var RELEASE       = 'release';
-var CDN_LIBS      = 'html-lib';
-var CDN_APPS      = project.name;
-var RELEASE_LIBS  = RELEASE + '/' + CDN_LIBS;
-var RELEASE_APPS  = RELEASE + '/' + CDN_APPS;
+var CDN_LIB       = 'html-lib';
+var CDN_APP       = (project.path ? (project.path + '/') : '') + project.name;
+var RELEASE_LIB   = RELEASE + '/' + CDN_LIB + '/$';
+var RELEASE_APP   = RELEASE + '/' + CDN_APP + '/$';
 
-var jsHintReporter    = require('./lib/build/jshint-reporter');
-var browserify        = require('./lib/build/browserify');
-var nodeSass          = require('./lib/build/node-sass');
-var karma             = require('./lib/test/karma');
-var bowerFiles        = require('./lib/inject/bower-files');
-var injectAdjacent    = require('./lib/inject/adjacent-files');
-var injectTransform   = require('./lib/inject/relative-transform');
-var versionDirectory  = require('./lib/version-directory');
+var jsHintReporter   = require('./lib/build/jshint-reporter');
+var browserify       = require('./lib/build/browserify');
+var nodeSass         = require('./lib/build/node-sass');
+var karma            = require('./lib/test/karma');
+var bowerFiles       = require('./lib/inject/bower-files');
+var injectAdjacent   = require('./lib/inject/adjacent-files');
+var injectTransform  = require('./lib/inject/relative-transform');
+var versionDirectory = require('./lib/release/version-directory');
 
 function jsLibStream(opts) {
   return combined.create()
     .append(gulp.src(JS_LIB_BOWER + '/**/*.js', opts)                       // bower lib JS
       .pipe(semiflat(JS_LIB_BOWER)))
-    .append(gulp.src([ JS_LIB_LOCAL + '/**/*.js', '!**/*.spec.js' ], opts)  // local lib JS overwrites
+    .append(gulp.src([ JS_LIB_LOCAL + '/**/*.js', '`!**/*.spec.js' ], opts)  // local lib JS overwrites
       .pipe(semiflat(JS_LIB_LOCAL)));
 }
 
@@ -323,7 +323,9 @@ gulp.task('release', [ 'build' ], function(done) {
   runSequence(
     'release:clean',
     [ 'release:adjacent', 'release:bower' ],
+    'release:versionlib',
     'release:inject',
+    'release:versionapp',
     done
   );
 });
@@ -340,37 +342,47 @@ gulp.task('release:adjacent', function() {
     .append(gulp.src([ CSS_BUILD  + '/**/*.css',  '!**/dev/**', '!**/test**'      ]))
     .append(gulp.src([ HTML_SRC   + '/**/*.html', '!**/dev/**', '!**/partials/**' ]))
     .append(gulp.src([ HTML_SRC   + '/**/assets/**' ]))
-    .pipe(gulp.dest(RELEASE_APPS));
+    .pipe(gulp.dest(RELEASE_APP));
 });
 
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
   return bowerStream({ manifest: true })
     .pipe(wrap([
-      '/* ' + hr('-', 114),
-      ' * <%= file.relative %>',
-      ' * ' + hr('-', 114) + ' */',
-      '<%= contents %>'
-    ].join('\n')))
+        '/* ' + hr('-', 114),
+        ' * <%= file.relative %>',
+        ' * ' + hr('-', 114) + ' */',
+        '<%= contents %>'
+      ].join('\n')))
     .pipe(concat('vendor.js'))
-    .pipe(gulp.dest(RELEASE_LIBS))
-    .pipe(versionDirectory());
+    .pipe(gulp.dest(RELEASE_LIB));
+});
+
+// version the release app directory
+gulp.task('release:versionlib', function() {
+  return gulp.src(RELEASE_LIB + '/**')
+    .pipe(versionDirectory('$', true));
 });
 
 // inject dependencies into html and output to build directory
 gulp.task('release:inject', function() {
-  return gulp.src([ RELEASE_APPS + '/**/*.html', '!**/dev/**' ])
+  return gulp.src([ RELEASE_APP + '/**/*.html', '!**/dev/**' ])
     .pipe(plumber())
-    .pipe(injectAdjacent('js|css', RELEASE_APPS, {
+    .pipe(injectAdjacent('js|css', RELEASE_APP, {
       name: 'inject',
       transform: injectTransform
     }))
-    .pipe(inject(gulp.src(RELEASE_LIBS + '*/**', { read: false }), {
+    .pipe(inject(gulp.src(RELEASE_LIB.replace('$', '*') + '/**', { read: false }), {
       name: 'bower',
       transform: injectTransform
     }))
-    .pipe(gulp.dest(RELEASE_APPS))
-    .pipe(versionDirectory());
+    .pipe(gulp.dest(RELEASE_APP));
+});
+
+// version the release app directory
+gulp.task('release:versionapp', function() {
+  return gulp.src(RELEASE_APP + '/**')
+    .pipe(versionDirectory('$', true));
 });
 
 // WATCH ---------------------------------
