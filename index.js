@@ -253,7 +253,7 @@ var sass;
 
 // discover css libs
 gulp.task('css:init', function() {
-  sass = nodeSass();
+  sass = nodeSass(CONSOLE_WIDTH);
   return scssLibStream({ read: false })
     .pipe(sass.libraries(bourbon.includePaths));
 });
