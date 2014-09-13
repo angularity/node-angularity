@@ -214,8 +214,7 @@ gulp.task('js:unit', function() {
   var preJasmine = bundler.getJasmineTransform({
     '@': function (filename) { return filename + ':0:0'; }  // @ is replaced with filename:0:0
   });
-  return gulp.src(JS_LIB_LOCAL + '/**/*.spec.js')
-    .pipe(semiflat(JS_LIB_LOCAL))
+  return jsSpecStream()
     .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
     .pipe(gulp.dest(JS_BUILD))
     .pipe(karma({
