@@ -44,7 +44,7 @@ var PARTIALS_NAME = 'templates';
 
 var RELEASE       = 'release';
 var CDN_LIB       = 'html-lib';
-var CDN_APP       = (project.path ? (project.path + '/') : '') + project.name;
+var CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
 var RELEASE_LIB   = RELEASE + '/' + CDN_LIB + '/$';
 var RELEASE_APP   = RELEASE + '/' + CDN_APP + '/$';
 
