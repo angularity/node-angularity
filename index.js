@@ -133,14 +133,6 @@ function hr(char, length, title) {
 // DEFAULT ---------------------------------
 var isMinify = (process.argv[process.argv.length - 1] !== 'nominify');
 
-function hr(char, length, title) {
-  var text = (title) ? (' ' + title.split('').join(' ').toUpperCase() + ' ') : '';  // double spaced title text
-  while (text.length < length) {
-    text = char + text + char;  // centre title between the given character
-  }
-  return text.slice(0, length); // enforce length, left justified
-}
-
 gulp.task('default', [ 'watch' ]);
 
 gulp.task('nominify', [ 'watch' ]);
@@ -393,32 +385,29 @@ gulp.task('watch', [ 'server' ], function() {
   });
 
   // watch statements
-  watch({
+  watch([
+    JS_LIB_BOWER + '/**/*.js',
+    JS_LIB_LOCAL + '/**/*.js',
+    JS_SRC       + '/**/*.js'
+  ], {
     name: 'JS',
-    emitOnGlob: false,
-    glob: [
-      JS_LIB_BOWER + '/**/*.js',
-      JS_LIB_LOCAL + '/**/*.js',
-      JS_SRC       + '/**/*.js'
-    ]
+    emitOnGlob: false
   }, queue.getHandler('js', 'html', 'reload')); // html will be needed in case previous injection failed
 
-  watch({
+  watch([
+    CSS_LIB_BOWER + '/**/*.scss',
+    CSS_LIB_LOCAL + '/**/*.scss',
+    CSS_SRC       + '/**/*.scss'
+  ],{
     name: 'CSS',
-    emitOnGlob: false,
-    glob: [
-      CSS_LIB_BOWER + '/**/*.scss',
-      CSS_LIB_LOCAL + '/**/*.scss',
-      CSS_SRC       + '/**/*.scss'
-    ]
+    emitOnGlob: false
   }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
-  watch({
+  watch([
+    BOWER    + '/**/*',
+    HTML_SRC + '/**/*.html'
+  ], {
     name: 'HTML | BOWER',
-    emitOnGlob: false,
-    glob: [
-      BOWER    + '/**/*',
-      HTML_SRC + '/**/*.html'
-    ]
+    emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
 });
