@@ -90,10 +90,16 @@ function scssSrcStream(opts) {
     .pipe(semiflat(CSS_SRC));
 }
 
-function bowerStream(opts) {
+function bowerJsStream(opts) {
   return bowerFiles(CONSOLE_WIDTH)
     .prepend(browserify.RUNTIME)
     .js(opts);
+}
+
+function bowerJsCssStream(opts) {
+  return bowerFiles(CONSOLE_WIDTH)
+    .prepend(browserify.RUNTIME)
+    .all(opts);
 }
 
 function htmlPartialsSrcStream(opts) {
@@ -210,7 +216,7 @@ gulp.task('js:unit', function() {
     .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
     .pipe(gulp.dest(JS_BUILD))
     .pipe(karma({
-      files:      bowerStream({ dev: true }).list,
+      files:      bowerJsStream({ dev: true }).list,
       frameworks: [ 'jasmine' ],
       reporters:  [ 'spec' ],
       browsers:   [ 'Chrome' ],
@@ -302,7 +308,7 @@ gulp.task('html:inject', function() {
     .pipe(plumber())
     .pipe(injectAdjacent('js', JS_BUILD))
     .pipe(injectAdjacent('css', CSS_BUILD))
-    .pipe(inject(bowerStream({ read: false }), {
+    .pipe(inject(bowerJsCssStream({ read: false }), {
       name: 'bower'
     }))
     .pipe(gulp.dest(HTML_BUILD));
@@ -338,7 +344,7 @@ gulp.task('release:adjacent', function() {
 
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
-  return bowerStream({ manifest: true })
+  return bowerJsCssStream({ manifest: true })
     .pipe(wrap([
         '/* ' + hr('-', 114),
         ' * <%= file.relative %>',
