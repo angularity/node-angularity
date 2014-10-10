@@ -1,5 +1,3 @@
-#!/usr/local/bin/node
-
 'use strict';
 
 var path          = require('path');
@@ -140,7 +138,6 @@ function hr(char, length, title) {
 
 // DEFAULT ---------------------------------
 var isMinify = (process.argv[process.argv.length - 1] !== 'nominify');
-var taskName =  process.argv[process.argv.length - 1 - Number(!isMinify)];
 
 gulp.task('default', [ 'watch' ]);
 
@@ -420,8 +417,3 @@ gulp.task('watch', [ 'server' ], function() {
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
 });
-
-// KICKOFF ---------------------------------
-if (process.argv.indexOf('gulp') < 0) {
-  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
-}
