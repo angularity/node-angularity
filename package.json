@@ -3,6 +3,9 @@
   "description": "Gulpfile for building Angular ES6 and SASS from local and bower sources",
   "version": "0.0.8",
   "main": "index.js",
+  "bin": {
+    "gulp-es6-modular": "index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/bholloway/gulp-es6-modular"

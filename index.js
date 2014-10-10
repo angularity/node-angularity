@@ -138,6 +138,7 @@ function hr(char, length, title) {
 
 // DEFAULT ---------------------------------
 var isMinify = (process.argv[process.argv.length - 1] !== 'nominify');
+var taskName =  process.argv[process.argv.length - 1 - Number(!isMinify)];
 
 gulp.task('default', [ 'watch' ]);
 
@@ -418,4 +419,7 @@ gulp.task('watch', [ 'server' ], function() {
   }, queue.getHandler('html', 'reload'));
 });
 
-module.exports = gulp;
+// KICKOFF ---------------------------------
+if (process.argv.indexOf('gulp') < 0) {
+  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+}
