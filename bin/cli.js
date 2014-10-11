@@ -22,5 +22,5 @@ gulp.on('task_stop', function (e) {
 });
 
 var taskName = process.argv[1];
-console.log(progress.argv);
+console.log(process.argv);
 gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
