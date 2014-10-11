@@ -90,15 +90,14 @@ function scssSrcStream(opts) {
     .pipe(semiflat(CSS_SRC));
 }
 
-function bowerJsStream(opts) {
+function testDependencyStream(opts) {
   return bowerFiles(CONSOLE_WIDTH)
     .prepend(browserify.RUNTIME)
     .js(opts);
 }
 
-function bowerJsCssStream(opts) {
+function bowerStream(opts) {
   return bowerFiles(CONSOLE_WIDTH)
-    .prepend(browserify.RUNTIME)
     .all(opts);
 }
 
@@ -120,8 +119,7 @@ function routes() {
     JS_LIB_LOCAL,
     CSS_SRC,
     CSS_BUILD,
-    CSS_LIB_LOCAL,
-    browserify.RUNTIME
+    CSS_LIB_LOCAL
   ].forEach(function(path) {
     result['/' + slash(path)] = path;
   });
@@ -171,8 +169,8 @@ gulp.task('reload', function() {
 gulp.task('js', function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'javascript'));
   runSequence(
-    [ 'js:clean', 'js:init' ],
-    'js:build',
+    [ 'js:clean', 'js:init'    ],
+    [ 'js:build', 'js:runtime' ],
     done
   );
 });
@@ -216,7 +214,7 @@ gulp.task('js:unit', function() {
     .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
     .pipe(gulp.dest(JS_BUILD))
     .pipe(karma({
-      files:      bowerJsStream({ dev: true }).list,
+      files:      testDependencyStream({ dev: true }).list,
       frameworks: [ 'jasmine' ],
       reporters:  [ 'spec' ],
       browsers:   [ 'Chrome' ],
@@ -228,6 +226,13 @@ gulp.task('js:unit', function() {
 gulp.task('js:build', function() {
   return jsSrcStream({ read: false })
     .pipe(bundler.compile(bundler.es6ifyTransform).each(isMinify))
+    .pipe(gulp.dest(JS_BUILD));
+});
+
+// copy the traceur runtime to the build directory
+//  have previously tried to include with bower components gives too many problems
+gulp.task('js:runtime', function() {
+  return gulp.src(browserify.RUNTIME)
     .pipe(gulp.dest(JS_BUILD));
 });
 
@@ -308,7 +313,7 @@ gulp.task('html:inject', function() {
     .pipe(plumber())
     .pipe(injectAdjacent('js', JS_BUILD))
     .pipe(injectAdjacent('css', CSS_BUILD))
-    .pipe(inject(bowerJsCssStream({ read: false }), {
+    .pipe(inject(bowerStream({ read: false }), {
       name: 'bower'
     }))
     .pipe(gulp.dest(HTML_BUILD));
@@ -344,7 +349,7 @@ gulp.task('release:adjacent', function() {
 
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
-  return bowerJsCssStream({ manifest: true })
+  return bowerStream({ manifest: true })
     .pipe(wrap([
         '/* ' + hr('-', 114),
         ' * <%= file.relative %>',

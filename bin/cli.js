@@ -1,6 +1,6 @@
 #!/usr/local/bin/node
 
-'use strict'
+'use strict';
 
 var gulp       = require('gulp');
 var gutil      = require('gulp-util');
@@ -22,4 +22,5 @@ gulp.on('task_stop', function (e) {
 });
 
 var taskName = process.argv[1];
+console.log(progress.argv);
 gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
