@@ -4,7 +4,7 @@
   "version": "0.0.9",
   "main": "index.js",
   "bin": {
-    "gulp-es6-modular": "bin/cli.js"
+    "angularity": "bin/cli.js"
   },
   "repository": {
     "type": "git",
