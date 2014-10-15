@@ -1,21 +1,37 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.0.10",
-  "main": "index.js",
-  "bin": {
-    "angularity": "bin/cli.js"
-  },
+  "version": "0.0.11",
+  "tags": [
+    "build",
+    "system",
+    "make",
+    "tool",
+    "pipeline",
+    "angular",
+    "es6",
+    "esnext",
+    "browserify",
+    "es6ify"
+  ],
+  "author": "Ben Holloway",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/angularity/node-angularity"
   },
-  "author": "Ben Holloway",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/angularity/node-angularity/issues"
   },
   "homepage": "http://angularity.github.io",
+  "files": [
+    "index.js",
+    "bin"
+  ],
+  "main": "index.js",
+  "bin": {
+    "angularity": "./bin/cli.js"
+  },
   "dependencies": {
     "bower": "latest",
     "bower-files": "latest",
