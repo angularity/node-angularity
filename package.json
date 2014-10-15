@@ -32,6 +32,10 @@
   "bin": {
     "angularity": "./bin/cli.js"
   },
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 0.9"
+  },
   "dependencies": {
     "bower": "latest",
     "bower-files": "latest",
