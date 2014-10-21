@@ -351,20 +351,21 @@ gulp.task('release:bower', function() {
       ' * <%= file.relative %>',
       ' * ' + hr('-', 114) + ' */',
       '<%= contents %>'
-    ].join('\n'))
+    ].join('\n'));
   }
   return combined.create()
     .append(bowerFiles(CONSOLE_WIDTH)
       .js({ manifest: true })
       .pipe(wrapWithBannerComment())
       .pipe(concat('vendor.js'))
+      .pipe(gulp.dest(RELEASE_LIB))
     )
     .append(bowerFiles(CONSOLE_WIDTH)
       .css({ manifest: true })
       .pipe(wrapWithBannerComment())
       .pipe(concat('vendor.css'))
-    )
-    .pipe(gulp.dest(RELEASE_LIB));
+      .pipe(gulp.dest(RELEASE_LIB))
+    );
 });
 
 // version the release app directory
