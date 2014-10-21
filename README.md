@@ -1,4 +1,4 @@
-anguarity
+angularity
 =========
 
 > An oppionated node-js build system for Ecmascript-6 Angular-js projects
