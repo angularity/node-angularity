@@ -103,7 +103,7 @@ function htmlPartialsSrcStream(opts) {
 }
 
 function htmlAppSrcStream(opts) {
-  return gulp.src([ HTML_SRC + '/**/*.html', '!**/assets/**' ], opts) // ignore partials
+  return gulp.src([ HTML_SRC + '/**/*.html', '!**/assets/**', '!**/partials/**' ], opts) // ignore partials and assets
     .pipe(semiflat(HTML_SRC));
 }
 
