@@ -21,7 +21,7 @@ var combined      = require('combined-stream');
 var runSequence   = require('run-sequence');
 var bourbon       = require('node-bourbon');
 
-var project       = require(path.resolve('package.json'));
+//var project       = require(path.resolve('package.json'));
 
 var HTTP_PORT     = 8000;
 var CONSOLE_WIDTH = 80;
@@ -44,7 +44,8 @@ var PARTIALS_NAME = 'templates';
 
 var RELEASE       = 'release';
 var CDN_LIB       = 'html-lib';
-var CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
+var CDN_APP       = 'test.version';
+//var CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
 var RELEASE_LIB   = RELEASE + '/' + CDN_LIB + '/$';
 var RELEASE_APP   = RELEASE + '/' + CDN_APP + '/$';
 
@@ -56,6 +57,10 @@ var bowerFiles       = require('./lib/inject/bower-files');
 var injectAdjacent   = require('./lib/inject/adjacent-files');
 var injectTransform  = require('./lib/inject/relative-transform');
 var versionDirectory = require('./lib/release/version-directory');
+
+var ES5 = 'ES5';
+var ES6 = 'ES6';
+var javascriptTarget = ES5;
 
 function jsLibStream(opts) {
   return combined.create()
@@ -210,23 +215,50 @@ gulp.task('js:unit', function() {
   var preJasmine = bundler.getJasmineTransform({
     '@': function (filename) { return filename + ':0:0'; }  // @ is replaced with filename:0:0
   });
-  return jsSpecStream()
-    .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
-    .pipe(gulp.dest(JS_BUILD))
-    .pipe(karma({
-      files:      testDependencyStream({ dev: true }).list,
-      frameworks: [ 'jasmine' ],
-      reporters:  [ 'spec' ],
-      browsers:   [ 'Chrome' ],
-      logLevel:   'error'
-    }, CONSOLE_WIDTH));
+
+  if(javascriptTarget === ES5) {
+
+    return jsSpecStream()
+        .pipe(bundler.compile(preJasmine).all('test/karma-main.js'))
+        .pipe(gulp.dest(JS_BUILD))
+        .pipe(karma({
+          files     : testDependencyStream({dev: true}).list,
+          frameworks: ['jasmine'],
+          reporters : ['spec'],
+          browsers  : ['Chrome'],
+          logLevel  : 'error'
+        }, CONSOLE_WIDTH));
+
+  } else if(javascriptTarget === ES6) {
+
+      return jsSpecStream()
+          .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
+          .pipe(gulp.dest(JS_BUILD))
+          .pipe(karma({
+            files     : testDependencyStream({dev: true}).list,
+            frameworks: ['jasmine'],
+            reporters : ['spec'],
+            browsers  : ['Chrome'],
+            logLevel  : 'error'
+          }, CONSOLE_WIDTH));
+  }
+
 });
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function() {
-  return jsSrcStream({ read: false })
-    .pipe(bundler.compile(bundler.es6ifyTransform).each(isMinify))
-    .pipe(gulp.dest(JS_BUILD));
+  if(javascriptTarget === ES5) {
+
+    return jsSrcStream({ read: false })
+        .pipe(bundler.compile().each(isMinify))
+        .pipe(gulp.dest(JS_BUILD));
+
+  } else if(javascriptTarget === ES6) {
+
+    return jsSrcStream({ read: false })
+        .pipe(bundler.compile(bundler.es6ifyTransform).each(isMinify))
+        .pipe(gulp.dest(JS_BUILD));
+  }
 });
 
 // copy the traceur runtime to the build directory
