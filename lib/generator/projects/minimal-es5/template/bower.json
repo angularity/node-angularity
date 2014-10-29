@@ -1,0 +1,13 @@
+{
+  "name": "es6-modular",
+  "version": "0.0.1",
+  "description": "A project created from the minimal generator.",
+  "private": true,
+  "main": [],
+  "dependencies": {
+    "jQuery": "latest",
+    "angular": "latest",
+    "angular-bootstrap": "latest",
+    "angular-ui-router": "latest"
+  }
+}

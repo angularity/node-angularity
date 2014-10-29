@@ -1,0 +1,10 @@
+{
+  "name": "es6-modular",
+  "version": "0.0.1",
+  "description": "A project created from the minimal generator.",
+  "private": true,
+  "scripts": {
+    "postinstall": "bower install"
+  },
+  "dependencies": "node-uuid"
+}
