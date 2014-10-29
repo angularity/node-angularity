@@ -70,10 +70,13 @@
     "mold-source-map": "latest",
     "node-bourbon": "latest",
     "node-sass": "latest",
-    "pretty-hrtime": "^0.2.0",
     "run-sequence": "latest",
     "through2": "latest",
     "through-pipes": "latest",
-    "stream-spigot": "latest"
+    "pretty-hrtime": "latest",
+    "stream-spigot": "latest",
+    "shelljs": "latest",
+    "lodash": "latest",
+    "ide-template": "impaler/ide-template.git"
   }
 }
