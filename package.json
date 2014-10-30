@@ -47,7 +47,6 @@
     "es6ify": "latest",
     "gulp": "3.8.7",
     "gulp-concat": "latest",
-    "gulp-wrap": "latest",
     "gulp-inject": "latest",
     "gulp-jshint": "latest",
     "gulp-load-plugins": "latest",
@@ -77,6 +76,7 @@
     "stream-spigot": "latest",
     "shelljs": "latest",
     "lodash": "latest",
+    "require-dir": "latest",
     "ide-template": "impaler/ide-template.git"
   }
 }
