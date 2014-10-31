@@ -7,11 +7,13 @@
  *
  * If no arguments are specified it will load an interactive cli menu.
  */
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var prettyTime = require('pretty-hrtime');
-var chalk = require('chalk');
-var requireDir = require('require-dir');
+var gulp   = require('gulp'),
+gutil      = require('gulp-util'),
+prettyTime = require('pretty-hrtime'),
+chalk      = require('chalk'),
+requireDir = require('require-dir');
+
+require('../lib/config').init();
 
 require('../index');
 requireDir('../tasks');
@@ -34,6 +36,6 @@ gulp.on('task_stop', function (e) {
 var taskName = process.argv[2];
 
 if (typeof taskName === 'undefined')
-  require('../lib/generator/cliMenu').defaultPrompt();
+  require('../lib/cli/mainMenu').defaultPrompt();
 else
   gulp.start(gulp.hasTask(taskName) ? taskName : 'default');

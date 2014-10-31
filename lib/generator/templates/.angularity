@@ -1,0 +1,7 @@
+{
+  "serverHttpPort" : "<%= serverHttpPort %>",
+  "javascriptVersion" : "<%= javascriptVersion %>",
+  "minify" : "<%= minify %>",
+  "consoleWidth" : "800"<% if (webstormExecutablePath !== 'wstorm') { %>,
+  "webstormExecutablePath":"<%= webstormExecutablePath %>"<% } %>
+}

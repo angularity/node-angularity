@@ -1,18 +1,18 @@
 'use strict';
 
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var wrap = require('gulp-wrap');
-var inject = require('gulp-inject');
-var plumber = require('gulp-plumber');
-var rimraf = require('gulp-rimraf');
-var runSequence = require('run-sequence');
-var combined = require('combined-stream');
+var gulp        = require('gulp'),
+    concat      = require('gulp-concat'),
+    wrap        = require('gulp-wrap'),
+    inject      = require('gulp-inject'),
+    plumber     = require('gulp-plumber'),
+    rimraf      = require('gulp-rimraf'),
+    runSequence = require('run-sequence'),
+    combined    = require('combined-stream');
 
-var injectAdjacent = require('../lib/inject/adjacent-files');
-var injectTransform = require('../lib/inject/relative-transform');
-var versionDirectory = require('../lib/release/version-directory');
-var angularity = require('../index');
+var injectAdjacent   = require('../lib/inject/adjacent-files'),
+    injectTransform  = require('../lib/inject/relative-transform'),
+    versionDirectory = require('../lib/release/version-directory'),
+    angularity       = require('../index');
 
 // RELEASE ---------------------------------
 gulp.task('release', ['build'], function (done) {

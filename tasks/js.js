@@ -1,43 +1,16 @@
 'use strict';
 
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var wrap = require('gulp-wrap');
-var inject = require('gulp-inject');
-var jshint = require('gulp-jshint');
-var minifyHtml = require('gulp-minify-html');
-var ngHtml2js = require('gulp-ng-html2js');
-var plumber = require('gulp-plumber');
-var rimraf = require('gulp-rimraf');
-var watch = require('gulp-watch');
-var watchSequence = require('gulp-watch-sequence');
-var runSequence = require('run-sequence');
-var bourbon = require('node-bourbon');
+var gulp        = require('gulp'),
+    jshint      = require('gulp-jshint'),
+    rimraf      = require('gulp-rimraf'),
+    runSequence = require('run-sequence'),
+    combined    = require('combined-stream');
 
-var combined = require('combined-stream');
-
-var karma = require('../lib/test/karma');
-var jsHintReporter = require('../lib/build/jshint-reporter');
-var browserify = require('../lib/build/browserify');
-var nodeSass = require('../lib/build/node-sass');
-
-var injectAdjacent = require('../lib/inject/adjacent-files');
-var injectTransform = require('../lib/inject/relative-transform');
-var versionDirectory = require('../lib/release/version-directory');
-
-var angularity = require('../index');
-
-// DEFAULT ---------------------------------
-var isMinify = (process.argv[process.argv.length - 1] !== 'nominify');
-
-gulp.task('default', ['watch']);
-
-gulp.task('nominify', ['watch']);
-
-gulp.task('build', function (done) {
-  console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'build'));
-  runSequence('js', 'css', 'html', done);
-});
+var karma          = require('../lib/test/karma'),
+    jsHintReporter = require('../lib/build/jshint-reporter'),
+    browserify     = require('../lib/build/browserify'),
+    config         = require('../lib/config'),
+    angularity     = require('../index');
 
 // JS ---------------------------------
 gulp.task('js', function (done) {
@@ -87,7 +60,7 @@ gulp.task('js:unit', function () {
     }  // @ is replaced with filename:0:0
   });
 
-  if (angularity.javascriptTarget === angularity.ES5) {
+  if (angularity.JAVASCRIPT_TARGET === config.ES5) {
 
     return angularity.jsSpecStream()
       .pipe(bundler.compile(preJasmine).all('test/karma-main.js'))
@@ -100,7 +73,7 @@ gulp.task('js:unit', function () {
         logLevel  : 'error'
       }, angularity.CONSOLE_WIDTH));
 
-  } else if (angularity.javascriptTarget === angularity.ES6) {
+  } else if (angularity.JAVASCRIPT_TARGET === config.ES6) {
 
     return angularity.jsSpecStream()
       .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
@@ -118,16 +91,16 @@ gulp.task('js:unit', function () {
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
-  if (angularity.javascriptTarget === angularity.ES5) {
+  if (angularity.JAVASCRIPT_TARGET === config.ES5) {
 
     return angularity.jsSrcStream({read: false})
-      .pipe(bundler.compile().each(isMinify))
+      .pipe(bundler.compile().each(config.isMinify))
       .pipe(gulp.dest(angularity.JS_BUILD));
 
-  } else if (angularity.javascriptTarget === angularity.ES6) {
+  } else if (angularity.JAVASCRIPT_TARGET === config.ES6) {
 
     return angularity.jsSrcStream({read: false})
-      .pipe(bundler.compile(bundler.es6ifyTransform).each(isMinify))
+      .pipe(bundler.compile(bundler.es6ifyTransform).each(config.isMinify))
       .pipe(gulp.dest(angularity.JS_BUILD));
   }
 });
@@ -138,21 +111,3 @@ gulp.task('js:runtime', function () {
   return gulp.src(browserify.RUNTIME)
     .pipe(gulp.dest(angularity.JS_BUILD));
 });
-
-// CSS ---------------------------------
-gulp.task('css', function (done) {
-  console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'css'));
-  runSequence(
-    ['css:clean', 'css:init'],
-    'css:build',
-    done
-  );
-});
-
-// clean the css build directory
-gulp.task('css:clean', function () {
-  return gulp.src(angularity.CSS_BUILD + '/**/*.css*', {read: false})
-    .pipe(rimraf());
-});
-
-

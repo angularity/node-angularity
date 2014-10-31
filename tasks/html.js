@@ -9,8 +9,7 @@ var gulp        = require('gulp'),
     rimraf      = require('gulp-rimraf'),
     runSequence = require('run-sequence');
 
-var nodeSass       = require('../lib/build/node-sass'),
-    injectAdjacent = require('../lib/inject/adjacent-files'),
+var injectAdjacent = require('../lib/inject/adjacent-files'),
     angularity     = require('../index');
 
 // HTML ---------------------------------
@@ -62,20 +61,4 @@ gulp.task('html:inject', function () {
       name: 'bower'
     }))
     .pipe(gulp.dest(angularity.HTML_BUILD));
-});
-
-var sass;
-
-// discover css libs
-gulp.task('css:init', function () {
-  sass = nodeSass(angularity.CONSOLE_WIDTH);
-  return angularity.scssLibStream({read: false})
-    .pipe(sass.libraries(bourbon.includePaths));
-});
-
-// compile sass with the previously discovered lib paths
-gulp.task('css:build', function () {
-  return angularity.scssSrcStream({read: false})
-    .pipe(sass.compile())
-    .pipe(gulp.dest(angularity.CSS_BUILD));
 });

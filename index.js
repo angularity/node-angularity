@@ -1,17 +1,18 @@
 'use strict';
 
-var gulp = require('gulp');
-var semiflat = require('gulp-semiflat');
-var combined = require('combined-stream');
-var slash = require('gulp-slash');
+var gulp     = require('gulp'),
+    semiflat = require('gulp-semiflat'),
+    combined = require('combined-stream'),
+    slash    = require('gulp-slash');
 
-var browserify = require('./lib/build/browserify');
-var bowerFiles = require('./lib/inject/bower-files');
+var browserify       = require('./lib/build/browserify'),
+    bowerFiles       = require('./lib/inject/bower-files'),
+    angularityConfig = require('./lib/config');
 
 var angularity = {};
 
-angularity.HTTP_PORT = 8000;
-angularity.CONSOLE_WIDTH = 80;
+angularity.HTTP_PORT = angularityConfig.serverHttpPort();
+angularity.CONSOLE_WIDTH = angularityConfig.consoleWidth();
 
 angularity.BOWER = 'bower_components';
 
@@ -36,10 +37,7 @@ angularity.CDN_APP = 'test.version'; //todo fix name
 //angularity.CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
 angularity.RELEASE_LIB = angularity.RELEASE + '/' + angularity.CDN_LIB + '/$';
 angularity.RELEASE_APP = angularity.RELEASE + '/' + angularity.CDN_APP + '/$';
-
-angularity.ES5 = 'ES5';
-angularity.ES6 = 'ES6';
-angularity.javascriptTarget = angularity.ES5;
+angularity.JAVASCRIPT_VERSION = angularityConfig.javascriptVersion();
 
 angularity.jsLibStream = function (opts) {
   return combined.create()
