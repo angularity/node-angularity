@@ -77,6 +77,8 @@
     "shelljs": "latest",
     "lodash": "latest",
     "require-dir": "latest",
+    "gulp-wrap": "latest",
+    "inquirer": "latest",
     "ide-template": "impaler/ide-template.git"
   }
 }

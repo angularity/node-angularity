@@ -15,9 +15,15 @@ var karma          = require('../lib/test/karma'),
 // JS ---------------------------------
 gulp.task('js', function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'javascript'));
+
+  var buildTasks = ['js:build'];
+
+  if (angularity.JAVASCRIPT_VERSION === config.ES6)
+    buildTasks.push('js:runtime');
+
   runSequence(
     ['js:clean', 'js:init'],
-    ['js:build', 'js:runtime'],
+    buildTasks,
     done
   );
 });
@@ -60,7 +66,7 @@ gulp.task('js:unit', function () {
     }  // @ is replaced with filename:0:0
   });
 
-  if (angularity.JAVASCRIPT_TARGET === config.ES5) {
+  if (angularity.JAVASCRIPT_VERSION === config.ES5) {
 
     return angularity.jsSpecStream()
       .pipe(bundler.compile(preJasmine).all('test/karma-main.js'))
@@ -73,7 +79,7 @@ gulp.task('js:unit', function () {
         logLevel  : 'error'
       }, angularity.CONSOLE_WIDTH));
 
-  } else if (angularity.JAVASCRIPT_TARGET === config.ES6) {
+  } else if (angularity.JAVASCRIPT_VERSION === config.ES6) {
 
     return angularity.jsSpecStream()
       .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
@@ -91,13 +97,13 @@ gulp.task('js:unit', function () {
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
-  if (angularity.JAVASCRIPT_TARGET === config.ES5) {
+  if (angularity.JAVASCRIPT_VERSION === config.ES5) {
 
     return angularity.jsSrcStream({read: false})
       .pipe(bundler.compile().each(config.isMinify))
       .pipe(gulp.dest(angularity.JS_BUILD));
 
-  } else if (angularity.JAVASCRIPT_TARGET === config.ES6) {
+  } else if (angularity.JAVASCRIPT_VERSION === config.ES6) {
 
     return angularity.jsSrcStream({read: false})
       .pipe(bundler.compile(bundler.es6ifyTransform).each(config.isMinify))
@@ -106,7 +112,7 @@ gulp.task('js:build', function () {
 });
 
 // copy the traceur runtime to the build directory
-//  have previously tried to include with bower components gives too many problems
+// have previously tried to include with bower components gives too many problems
 gulp.task('js:runtime', function () {
   return gulp.src(browserify.RUNTIME)
     .pipe(gulp.dest(angularity.JS_BUILD));
