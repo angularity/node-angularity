@@ -1,5 +1,6 @@
 'use strict';
 
+//todo combine with config.js
 var gulp     = require('gulp'),
     semiflat = require('gulp-semiflat'),
     combined = require('combined-stream'),
@@ -39,6 +40,7 @@ angularity.RELEASE_LIB = angularity.RELEASE + '/' + angularity.CDN_LIB + '/$';
 angularity.RELEASE_APP = angularity.RELEASE + '/' + angularity.CDN_APP + '/$';
 angularity.JAVASCRIPT_VERSION = angularityConfig.javascriptVersion();
 
+//todo move to tasks
 angularity.jsLibStream = function (opts) {
   return combined.create()
     .append(gulp.src(angularity.JS_LIB_BOWER + '/**/*.js', opts)                       // bower lib JS
