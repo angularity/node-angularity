@@ -65,50 +65,23 @@ gulp.task('js:unit', function () {
       return filename + ':0:0';
     }  // @ is replaced with filename:0:0
   });
-
-  if (angularity.JAVASCRIPT_VERSION === config.ES5) {
-
-    return angularity.jsSpecStream()
-      .pipe(bundler.compile(preJasmine).all('test/karma-main.js'))
-      .pipe(gulp.dest(angularity.JS_BUILD))
-      .pipe(karma({
-        files     : angularity.testDependencyStream({dev: true}).list,
-        frameworks: ['jasmine'],
-        reporters : ['spec'],
-        browsers  : ['Chrome'],
-        logLevel  : 'error'
-      }, angularity.CONSOLE_WIDTH));
-
-  } else if (angularity.JAVASCRIPT_VERSION === config.ES6) {
-
-    return angularity.jsSpecStream()
-      .pipe(bundler.compile(preJasmine, bundler.es6ifyTransform).all('test/karma-main.js'))
-      .pipe(gulp.dest(angularity.JS_BUILD))
-      .pipe(karma({
-        files     : angularity.testDependencyStream({dev: true}).list,
-        frameworks: ['jasmine'],
-        reporters : ['spec'],
-        browsers  : ['Chrome'],
-        logLevel  : 'error'
-      }, angularity.CONSOLE_WIDTH));
-  }
-
+  return angularity.jsSpecStream()
+    .pipe(bundler.compile(preJasmine, config.ES6 && bundler.es6ifyTransform).all('test/karma-main.js'))
+    .pipe(gulp.dest(angularity.JS_BUILD))
+    .pipe(karma({
+      files     : angularity.testDependencyStream({dev: true}).list,
+      frameworks: ['jasmine'],
+      reporters : ['spec'],
+      browsers  : ['Chrome'],
+      logLevel  : 'error'
+    }, angularity.CONSOLE_WIDTH));
 });
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
-  if (angularity.JAVASCRIPT_VERSION === config.ES5) {
-
-    return angularity.jsSrcStream({read: false})
-      .pipe(bundler.compile().each(config.isMinify))
-      .pipe(gulp.dest(angularity.JS_BUILD));
-
-  } else if (angularity.JAVASCRIPT_VERSION === config.ES6) {
-
-    return angularity.jsSrcStream({read: false})
-      .pipe(bundler.compile(bundler.es6ifyTransform).each(config.isMinify))
-      .pipe(gulp.dest(angularity.JS_BUILD));
-  }
+  return angularity.jsSrcStream({read: false})
+    .pipe(bundler.compile(config.ES6 && bundler.es6ifyTransform).each(config.isMinify))
+    .pipe(gulp.dest(angularity.JS_BUILD));
 });
 
 // copy the traceur runtime to the build directory

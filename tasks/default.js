@@ -7,8 +7,6 @@ var gulp        = require('gulp'),
     prettyTime  = require('pretty-hrtime'),
     angularity  = require('../index');
 
-// DEFAULT ---------------------------------
-
 gulp.task('default', ['watch']);
 
 gulp.task('nominify', ['watch']);

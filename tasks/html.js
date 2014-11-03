@@ -12,7 +12,6 @@ var gulp        = require('gulp'),
 var injectAdjacent = require('../lib/inject/adjacent-files'),
     angularity     = require('../index');
 
-// HTML ---------------------------------
 gulp.task('html', function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'html'));
   runSequence(
