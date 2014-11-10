@@ -1,7 +1,6 @@
 {
   "name": "angularity-project",
   "version": "0.0.1",
-  "description": "Minimal ES5 project.",
   "private": true,
   "scripts": {
     "postinstall": "bower install"
