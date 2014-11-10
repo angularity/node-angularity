@@ -6,7 +6,6 @@ var gulp          = require('gulp'),
 
 var angularity = require('../index');
 
-// WATCH ---------------------------------
 gulp.task('watch', ['server'], function () {
 
   // enqueue actions to avoid multiple trigger

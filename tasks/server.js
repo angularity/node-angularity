@@ -5,7 +5,6 @@ var gulp        = require('gulp'),
 
 var angularity = require('../index');
 
-// SERVER ---------------------------------
 gulp.task('server', ['build'], function () {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'server'));
   browserSync({

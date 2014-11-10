@@ -9,7 +9,6 @@ var nodeSass   = require('../lib/build/node-sass'),
     angularity = require('../index'),
     sass;
 
-// CSS ---------------------------------
 gulp.task('css', function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'css'));
   runSequence(

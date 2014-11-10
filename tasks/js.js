@@ -12,14 +12,14 @@ var karma          = require('../lib/test/karma'),
     config         = require('../lib/config'),
     angularity     = require('../index');
 
-// JS ---------------------------------
 gulp.task('js', function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'javascript'));
 
   var buildTasks = ['js:build'];
 
-  if (angularity.JAVASCRIPT_VERSION === config.ES6)
+  if (angularity.JAVASCRIPT_VERSION === config.ES6) {
     buildTasks.push('js:runtime');
+  }
 
   runSequence(
     ['js:clean', 'js:init'],

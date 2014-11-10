@@ -14,7 +14,6 @@ var injectAdjacent   = require('../lib/inject/adjacent-files'),
     versionDirectory = require('../lib/release/version-directory'),
     angularity       = require('../index');
 
-// RELEASE ---------------------------------
 gulp.task('release', ['build'], function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'release'));
   runSequence(
