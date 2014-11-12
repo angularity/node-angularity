@@ -91,7 +91,8 @@ angularity.htmlPartialsSrcStream = function (opts) {
 };
 
 angularity.htmlAppSrcStream = function (opts) {
-  return gulp.src([angularity.HTML_SRC + '/**/*.html', '!**/assets/**'], opts) // ignore partials
+  return gulp.src([angularity.HTML_SRC + '/**/*.html',
+    '!**/assets/**', '!**/partials/**'], opts) // ignore partials and assets
     .pipe(semiflat(angularity.HTML_SRC));
 };
 
