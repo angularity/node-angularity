@@ -10,6 +10,7 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence');
 
 var injectAdjacent = require('../lib/inject/adjacent-files'),
+    bowerFiles     = require('../lib/inject/bower-files'),
     angularity     = require('../index');
 
 gulp.task('html', function (done) {
@@ -56,8 +57,8 @@ gulp.task('html:inject', function () {
     .pipe(plumber())
     .pipe(injectAdjacent('js', angularity.JS_BUILD))
     .pipe(injectAdjacent('css', angularity.CSS_BUILD))
-    .pipe(inject(angularity.bowerStream({read: false}), {
-      name: 'bower'
-    }))
+    .pipe(inject(
+      bowerFiles(angularity.CONSOLE_WIDTH).all({ read: false, cwd:process.cwd() }),
+      {name: 'bower'}))
     .pipe(gulp.dest(angularity.HTML_BUILD));
 });
