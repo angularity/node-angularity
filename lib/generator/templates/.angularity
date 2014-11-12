@@ -1,6 +1,6 @@
 {
   "serverHttpPort" : "<%= serverHttpPort %>",
   "javascriptVersion" : "<%= javascriptVersion %>",
-  "consoleWidth" : "800"<% if (webstormExecutablePath !== 'wstorm') { %>,
+  "consoleWidth" : "80"<% if (webstormExecutablePath !== 'wstorm') { %>,
   "webstormExecutablePath":"<%= webstormExecutablePath %>"<% } %>
 }

@@ -2,7 +2,7 @@
   "name": "<%= name %>",
   "version": "<%= version %>",
   "serverHttpPort":"<%= serverHttpPort %>",
-  "consoleWidth": "800",
+  "consoleWidth": "80",
   "javascriptVersion":"<%= javascriptVersion %>",<% if(webstormExecutablePath) {%>
   "webstormExecutablePath":"<%= webstormExecutablePath %>",<% } %>
   "verified": "<%= angularityVersion %>"
