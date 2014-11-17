@@ -43,11 +43,8 @@ var HTML_BUILD    = 'build';
 var PARTIALS_NAME = 'templates';
 
 var RELEASE       = 'release';
-var CDN_LIB       = 'html-lib';
-var CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
-// TODO BH: reinstate CDN as an option
-var RELEASE_LIB   = RELEASE;// + '/' + CDN_LIB + '/$';
-var RELEASE_APP   = RELEASE;// + '/' + CDN_APP + '/$';
+var RELEASE_LIB   = RELEASE + '/vendor';
+var RELEASE_APP   = RELEASE;
 
 var jsHintReporter   = require('./lib/build/jshint-reporter');
 var browserify       = require('./lib/build/browserify');
@@ -92,9 +89,9 @@ function scssSrcStream(opts) {
 }
 
 function testDependencyStream(opts) {
-  return bowerFiles(CONSOLE_WIDTH)
+  return bowerFiles()
     .prepend(browserify.RUNTIME)
-    .js(opts);
+    .src('js', opts);
 }
 
 function htmlPartialsSrcStream(opts) {
@@ -309,7 +306,7 @@ gulp.task('html:inject', function() {
     .pipe(plumber())
     .pipe(injectAdjacent('js', JS_BUILD))
     .pipe(injectAdjacent('css', CSS_BUILD))
-    .pipe(inject(bowerFiles(CONSOLE_WIDTH).all({ read: false }), {
+    .pipe(inject(bowerFiles().src(/^(js|css)$/, { read: false }), {
       name: 'bower'
     }))
     .pipe(gulp.dest(HTML_BUILD));
@@ -321,9 +318,9 @@ gulp.task('release', [ 'build' ], function(done) {
   runSequence(
     'release:clean',
     [ 'release:adjacent', 'release:bower' ],
-    'release:versionlib',
+//    'release:versionlib',
     'release:inject',
-    'release:versionapp',
+//    'release:versionapp',
     done
   );
 });
@@ -345,27 +342,8 @@ gulp.task('release:adjacent', function() {
 
 // copy bower main elements to versioned directories in release
 gulp.task('release:bower', function() {
-  function wrapWithBannerComment() {
-    return wrap([
-      '/* ' + hr('-', 114),
-      ' * <%= file.relative %>',
-      ' * ' + hr('-', 114) + ' */',
-      '<%= contents %>'
-    ].join('\n'));
-  }
-  return combined.create()
-    .append(bowerFiles(CONSOLE_WIDTH)
-      .js({ manifest: true })
-      .pipe(wrapWithBannerComment())
-      .pipe(concat('vendor.js'))
-      .pipe(gulp.dest(RELEASE_LIB))
-    )
-    .append(bowerFiles(CONSOLE_WIDTH)
-      .css({ manifest: true })
-      .pipe(wrapWithBannerComment())
-      .pipe(concat('vendor.css'))
-      .pipe(gulp.dest(RELEASE_LIB))
-    );
+  return bowerFiles().src('*', { base: true, manifest: true })
+    .pipe(gulp.dest(RELEASE_LIB));
 });
 
 // version the release app directory
@@ -376,32 +354,17 @@ gulp.task('release:versionlib', function() {
 
 // inject dependencies into html and output to build directory
 gulp.task('release:inject', function() {
-  // TODO BH make flat release more robust
-  if (RELEASE_APP === RELEASE_LIB) {
-    return gulp.src([ RELEASE_APP + '/**/*.html', '!**/dev/**' ])
-      .pipe(plumber())
-      .pipe(inject(gulp.src(RELEASE_APP + '/**/vendor.*', { read: false }), {
-        name: 'bower',
-        transform: injectTransform
-      }))
-      .pipe(inject(gulp.src([ RELEASE_APP + '/**', '!**/vendor.*' ], { read: false }), {
-        name: 'inject',
-        transform: injectTransform
-      }))
-      .pipe(gulp.dest(RELEASE_APP));
-  } else {
-    return gulp.src([ RELEASE_APP + '/**/*.html', '!**/dev/**' ])
-      .pipe(plumber())
-      .pipe(injectAdjacent('js|css', RELEASE_APP, {
-        name: 'inject',
-        transform: injectTransform
-      }))
-      .pipe(inject(gulp.src(RELEASE_LIB.replace('$', '*') + '/**', { read: false }), {
-        name: 'bower',
-        transform: injectTransform
-      }))
-      .pipe(gulp.dest(RELEASE_APP));
-  }
+  return gulp.src([ RELEASE_APP + '/**/*.html', '!**/dev/**' ])
+    .pipe(plumber())
+    .pipe(injectAdjacent('js|css', RELEASE_APP, {
+      name: 'inject',
+      transform: injectTransform
+    }))
+    .pipe(inject(gulp.src(RELEASE_LIB.replace('$', '*') + '/**', { read: false }), {
+      name: 'bower',
+      transform: injectTransform
+    }))
+    .pipe(gulp.dest(RELEASE_APP));
 });
 
 // version the release app directory
