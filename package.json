@@ -24,11 +24,6 @@
     "url": "https://github.com/angularity/node-angularity/issues"
   },
   "homepage": "http://angularity.github.io",
-  "files": [
-    "index.js",
-    "bin",
-    "lib"
-  ],
   "main": "index.js",
   "bin": {
     "angularity": "./bin/cli.js"
