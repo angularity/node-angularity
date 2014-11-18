@@ -317,10 +317,8 @@ gulp.task('release', [ 'build' ], function(done) {
   console.log(hr('-', CONSOLE_WIDTH, 'release'));
   runSequence(
     'release:clean',
-    [ 'release:adjacent', 'release:bower' ],
-//    'release:versionlib',
+    'release:adjacent',
     'release:inject',
-//    'release:versionapp',
     done
   );
 });
@@ -340,27 +338,18 @@ gulp.task('release:adjacent', function() {
     .pipe(gulp.dest(RELEASE_APP));
 });
 
-// copy bower main elements to versioned directories in release
-gulp.task('release:bower', function() {
-  return bowerFiles().src('*', { base: true, manifest: true })
-    .pipe(gulp.dest(RELEASE_LIB));
-});
-
-// version the release app directory
-gulp.task('release:versionlib', function() {
-  return gulp.src(RELEASE_LIB + '/**')
-    .pipe(versionDirectory('$', true));
-});
-
 // inject dependencies into html and output to build directory
 gulp.task('release:inject', function() {
+  var bower = bowerFiles()
+    .src('*', { base: true, manifest: true })
+    .pipe(gulp.dest(RELEASE_LIB));
   return gulp.src([ RELEASE_APP + '/**/*.html', '!**/dev/**' ])
     .pipe(plumber())
     .pipe(injectAdjacent('js|css', RELEASE_APP, {
       name: 'inject',
       transform: injectTransform
     }))
-    .pipe(inject(gulp.src(RELEASE_LIB.replace('$', '*') + '/**', { read: false }), {
+    .pipe(inject(bower, {
       name: 'bower',
       transform: injectTransform
     }))
