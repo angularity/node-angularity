@@ -75,6 +75,6 @@
     "stream-spigot": "latest",
     "through-pipes": "latest",
     "through2": "latest",
-    "visit": "latest"
+    "rework-visit": "latest"
   }
 }
