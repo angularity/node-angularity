@@ -6,7 +6,7 @@
  * @ngInject
  * Created by ${USER} on ${DATE}.
  */
-function ${NAME}(/* TODO inject */) {
+export default function ${NAME}(/* TODO inject */) {
   'use strict';
 
   return {
@@ -25,5 +25,3 @@ function ${NAME}(/* TODO inject */) {
 function link(${DS}element, ${DS}attributes, ${DS}scope) {
 
 }
-
-module.exports = ${NAME};
