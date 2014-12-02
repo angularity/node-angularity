@@ -4,9 +4,12 @@
   "private": true,
   "main": [],
   "dependencies": {
-    "jQuery": "latest",
-    "angular": "latest",
-    "angular-bootstrap": "latest",
-    "angular-ui-router": "latest"
+    "jQuery": "2.1.1",
+    "angular": "1.3.2",
+    "angular-bootstrap": "0.12.0",
+    "angular-ui-router": "0.2.13"
+  },
+  "resolutions": {
+    "angular": "1.3.2"
   }
 }

@@ -1,9 +1,11 @@
 {
-    "name": "angularity-project",
-    "version": "0.0.1",
-    "private": true,
-    "scripts": {
-        "postinstall": "bower install"
-    },
-    "dependencies": "node-uuid"
+  "name": "angularity-project",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "postinstall": "bower install"
+  },
+  "dependencies": {
+    "node-uuid": "1.4.1"
+  }
 }

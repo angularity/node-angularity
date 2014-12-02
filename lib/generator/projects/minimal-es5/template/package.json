@@ -5,5 +5,7 @@
   "scripts": {
     "postinstall": "bower install"
   },
-  "dependencies": "node-uuid"
+  "dependencies": {
+    "node-uuid": "1.4.1"
+  }
 }
