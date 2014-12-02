@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "tags": [
     "build",
     "system",
@@ -37,7 +37,7 @@
     "node": ">= 0.9"
   },
   "dependencies": {
-    "asks": "^1.0.3",
+    "asks": "latest",
     "bower": "latest",
     "bower-files": "latest",
     "browser-sync": "latest",
@@ -62,6 +62,9 @@
     "gulp-watch": "latest",
     "gulp-watch-sequence": "latest",
     "gulp-wrap": "latest",
+    "html-parser": "^0.7.3",
+    "htmlparser": "^1.7.7",
+    "htmlparser2": "^3.8.2",
     "ide-template": "impaler/ide-template.git",
     "inquirer": "latest",
     "karma": "latest",
@@ -75,12 +78,15 @@
     "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
+    "q": "^1.1.2",
+    "request-progress": "^0.3.1",
     "require-dir": "latest",
+    "rework": "^1.0.1",
+    "rework-visit": "^1.0.0",
     "run-sequence": "latest",
     "shelljs": "latest",
     "stream-spigot": "latest",
     "through-pipes": "latest",
-    "through2": "latest",
-    "asks": "latest"
+    "through2": "latest"
   }
 }
