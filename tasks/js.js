@@ -9,7 +9,8 @@ var gulp        = require('gulp'),
 var karma          = require('../lib/test/karma'),
     jsHintReporter = require('../lib/build/jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
-    config         = require('../lib/config'),
+    config         = require('../lib/config/config'),
+    compileTargets = require('../lib/config/configDefaults').compileTargets,
     angularity     = require('../index');
 
 gulp.task('js', function (done) {
@@ -17,7 +18,7 @@ gulp.task('js', function (done) {
 
   var buildTasks = ['js:build'];
 
-  if (angularity.JAVASCRIPT_VERSION === config.ES6) {
+  if (angularity.JAVASCRIPT_VERSION === compileTargets.ES6) {
     buildTasks.push('js:runtime');
   }
 
@@ -66,7 +67,7 @@ gulp.task('js:unit', function () {
     }  // @ is replaced with filename:0:0
   });
   return angularity.jsSpecStream()
-    .pipe(bundler.compile(preJasmine, config.ES6 && bundler.es6ifyTransform)
+    .pipe(bundler.compile(preJasmine, compileTargets.ES6 && bundler.es6ifyTransform)
       .all('test/karma-main.js'))
     .pipe(gulp.dest(angularity.JS_BUILD))
     .pipe(karma({
@@ -81,7 +82,7 @@ gulp.task('js:unit', function () {
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
   return angularity.jsSrcStream({read: false})
-    .pipe(bundler.compile(config.ES6 && bundler.es6ifyTransform)
+    .pipe(bundler.compile(compileTargets.ES6 && bundler.es6ifyTransform)
       .each(config.isMinify))
     .pipe(gulp.dest(angularity.JS_BUILD));
 });

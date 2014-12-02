@@ -12,7 +12,7 @@ var gulp       = require('gulp'),
 
 // Initiate the angularity configuration,
 // prompt the user if a global config does not exist
-require('../lib/config').init();
+require('../lib/config/config').init();
 
 require('../index');
 requireDir('../tasks');

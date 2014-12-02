@@ -37,6 +37,7 @@
     "node": ">= 0.9"
   },
   "dependencies": {
+    "asks": "^1.0.3",
     "bower": "latest",
     "bower-files": "latest",
     "browser-sync": "latest",
@@ -60,25 +61,26 @@
     "gulp-util": "latest",
     "gulp-watch": "latest",
     "gulp-watch-sequence": "latest",
+    "gulp-wrap": "latest",
+    "ide-template": "impaler/ide-template.git",
+    "inquirer": "latest",
     "karma": "latest",
     "karma-chrome-launcher": "latest",
     "karma-jasmine": "0.2.x",
     "karma-spec-reporter": "latest",
+    "lodash": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
     "node-bourbon": "latest",
     "node-sass": "latest",
-    "run-sequence": "latest",
-    "through2": "latest",
-    "through-pipes": "latest",
     "pretty-hrtime": "latest",
-    "stream-spigot": "latest",
-    "shelljs": "latest",
-    "lodash": "latest",
     "require-dir": "latest",
-    "gulp-wrap": "latest",
-    "inquirer": "latest",
-    "ide-template": "impaler/ide-template.git"
+    "run-sequence": "latest",
+    "shelljs": "latest",
+    "stream-spigot": "latest",
+    "through-pipes": "latest",
+    "through2": "latest",
+    "asks": "latest"
   }
 }

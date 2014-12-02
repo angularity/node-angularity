@@ -8,7 +8,7 @@ var gulp     = require('gulp'),
 
 var browserify       = require('./lib/build/browserify'),
     bowerFiles       = require('./lib/inject/bower-files'),
-    angularityConfig = require('./lib/config');
+    angularityConfig = require('./lib/config/config');
 
 var angularity = {};
 

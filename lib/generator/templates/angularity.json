@@ -5,5 +5,5 @@
   "consoleWidth": "80",
   "javascriptVersion":"<%= javascriptVersion %>",<% if(webstormExecutablePath) {%>
   "webstormExecutablePath":"<%= webstormExecutablePath %>",<% } %>
-  "verified": "<%= angularityVersion %>"
+  "angularityVersion": "<%= angularityVersion %>"
 }
