@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "tags": [
     "build",
     "system",
