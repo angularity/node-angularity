@@ -7,6 +7,8 @@
  */
 'use strict';
 
+var path = require('path');
+
 var gulp       = require('gulp'),
     requireDir = require('require-dir');
 
@@ -21,6 +23,12 @@ var taskName = process.argv[2];
 
 if (typeof taskName === 'undefined') {
   require('../lib/cli/mainMenu').defaultPrompt();
+
+} else if (taskName == '-v') {
+  var packagePath = path.join(__dirname, '..', 'package.json');
+  var version = require(packagePath).version;
+  console.log('Angularity:', version);
+
 } else {
   gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
 }
