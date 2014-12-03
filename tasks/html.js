@@ -57,8 +57,8 @@ gulp.task('html:inject', function () {
     .pipe(plumber())
     .pipe(injectAdjacent('js', angularity.JS_BUILD))
     .pipe(injectAdjacent('css', angularity.CSS_BUILD))
-    .pipe(inject(
-      bowerFiles(angularity.CONSOLE_WIDTH).all({ read: false, cwd:process.cwd() }),
-      {name: 'bower'}))
+    .pipe(inject(bowerFiles().src(/^(js|css)$/, {read: false}), {
+      name: 'bower'
+    }))
     .pipe(gulp.dest(angularity.HTML_BUILD));
 });
