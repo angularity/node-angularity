@@ -26,7 +26,9 @@
   "homepage": "http://angularity.github.io",
   "files": [
     "index.js",
-    "bin"
+    "bin",
+    "lib",
+    "tasks"
   ],
   "main": "index.js",
   "bin": {
