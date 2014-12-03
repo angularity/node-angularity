@@ -11,7 +11,7 @@ import bind from 'util/bind';
 export default class ${NAME}
 {
 
-    constructor($scope)
+    constructor(${DS}scope)
     {
         extend(${DS}scope, bind(this));
 
