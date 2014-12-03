@@ -1,0 +1,9 @@
+{
+  "name": "<%= name %>",
+  "version": "<%= version %>",
+  "serverHttpPort":"<%= serverHttpPort %>",
+  "consoleWidth": "80",
+  "javascriptVersion":"<%= javascriptVersion %>",<% if(webstormExecutablePath) {%>
+  "webstormExecutablePath":"<%= webstormExecutablePath %>",<% } %>
+  "angularityVersion": "<%= angularityVersion %>"
+}

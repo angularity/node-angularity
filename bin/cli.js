@@ -1,25 +1,26 @@
 #!/usr/bin/env node
-
+/**
+ * The main command line interface for running Angularity
+ * from the npm global install.
+ *
+ * If no arguments are specified it will load an interactive cli menu.
+ */
 'use strict';
 
-var gulp       = require('gulp');
-var gutil      = require('gulp-util');
-var prettyTime = require('gulp/node_modules/pretty-hrtime');
-var chalk      = require('gulp/node_modules/chalk');
+var gulp       = require('gulp'),
+    requireDir = require('require-dir');
+
+// Initiate the angularity configuration,
+// prompt the user if a global config does not exist
+require('../lib/config/config').init();
 
 require('../index');
-
-gulp.on('task_start', function (e) {
-  gutil.log('Starting', '\'' + chalk.cyan(e.task) + '\'...');
-});
-
-gulp.on('task_stop', function (e) {
-  var time = prettyTime(e.hrDuration);
-  gutil.log(
-    'Finished', '\'' + chalk.cyan(e.task) + '\'',
-    'after', chalk.magenta(time)
-  );
-});
+requireDir('../tasks');
 
 var taskName = process.argv[2];
-gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+
+if (typeof taskName === 'undefined') {
+  require('../lib/cli/mainMenu').defaultPrompt();
+} else {
+  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+}
