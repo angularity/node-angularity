@@ -85,6 +85,7 @@
     "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
+    "q": "latest",
     "request-progress": "latest",
     "require-dir": "latest",
     "rework": "latest",
