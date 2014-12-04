@@ -82,6 +82,7 @@
     "mime": "1.2.11",
     "minifyify": "4.4.0",
     "minimatch": "2.0.1",
+    "mocha": "^2.0.1",
     "mold-source-map": "0.3.0",
     "node-bourbon": "1.2.3",
     "node-sass": "1.2.3",
@@ -97,9 +98,5 @@
     "stream-spigot": "3.0.4",
     "through-pipes": "0.0.4",
     "through2": "0.6.3"
-  },
-  "devDependencies": {
-    "jasmine-node": "^1.14.5",
-    "mocha": "^2.0.1"
   }
 }
