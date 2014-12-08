@@ -11,6 +11,7 @@ var gulp        = require('gulp'),
 
 var injectAdjacent   = require('../lib/inject/adjacent-files'),
     injectTransform  = require('../lib/inject/relative-transform'),
+    bowerFiles       = require('../lib/inject/bower-files'),
     versionDirectory = require('../lib/release/version-directory'),
     angularity       = require('../index');
 
@@ -18,10 +19,8 @@ gulp.task('release', ['build'], function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'release'));
   runSequence(
     'release:clean',
-    ['release:adjacent', 'release:bower'],
-    'release:versionlib',
+    'release:adjacent',
     'release:inject',
-    'release:versionapp',
     done
   );
 });
@@ -41,42 +40,28 @@ gulp.task('release:adjacent', function () {
     .pipe(gulp.dest(angularity.RELEASE_APP));
 });
 
-// copy bower main elements to versioned directories in release
-gulp.task('release:bower', function () {
-  return angularity.bowerStream({manifest: true})
-    .pipe(wrap([
-      '/* ' + angularity.hr('-', 114),
-      ' * <%= file.relative %>',
-      ' * ' + angularity.hr('-', 114) + ' */',
-      '<%= contents %>'
-    ].join('\n')))
-    .pipe(concat('vendor.js'))
-    .pipe(gulp.dest(angularity.RELEASE_LIB));
-});
-
-// version the release app directory
-gulp.task('release:versionlib', function () {
-  return gulp.src(angularity.RELEASE_LIB + '/**')
-    .pipe(versionDirectory('$', true));
-});
-
 // inject dependencies into html and output to build directory
-gulp.task('release:inject', function () {
-  return gulp.src([angularity.RELEASE_APP + '/**/*.html', '!**/dev/**'])
+gulp.task('release:inject', function() {
+  var bower = bowerFiles()
+    .src('*', { base: true, manifest: true })
+    .pipe(gulp.dest(angularity.RELEASE_LIB));
+  return gulp.src([ angularity.RELEASE_APP + '/**/*.html', '!**/dev/**' ])
     .pipe(plumber())
     .pipe(injectAdjacent('js|css', angularity.RELEASE_APP, {
-      name     : 'inject',
+      name: 'inject',
       transform: injectTransform
     }))
-    .pipe(inject(gulp.src(angularity.RELEASE_LIB.replace('$', '*') + '/**', {read: false}), {
-      name     : 'bower',
+    .pipe(inject(bower, {
+      name: 'bower',
       transform: injectTransform
     }))
     .pipe(gulp.dest(angularity.RELEASE_APP));
 });
 
 // version the release app directory
+/* TODO resolve versioning and CDN release
 gulp.task('release:versionapp', function () {
   return gulp.src(angularity.RELEASE_APP + '/**')
     .pipe(versionDirectory('$', true));
 });
+*/

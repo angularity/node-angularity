@@ -41,8 +41,8 @@ angularity.CDN_LIB = 'html-lib';
 //var project       = require(path.resolve('package.json'));
 angularity.CDN_APP = 'test.version'; //todo fix name
 //angularity.CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
-angularity.RELEASE_LIB = angularity.RELEASE + '/' + angularity.CDN_LIB + '/$';
-angularity.RELEASE_APP = angularity.RELEASE + '/' + angularity.CDN_APP + '/$';
+angularity.RELEASE_LIB = angularity.RELEASE + '/vendor';
+angularity.RELEASE_APP = angularity.RELEASE;
 angularity.JAVASCRIPT_VERSION = angularityConfig.javascriptVersion();
 
 //todo move to tasks
