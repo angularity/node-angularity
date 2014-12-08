@@ -1,10 +1,15 @@
 'use strict';
 
 //todo combine with config.js
-var gulp     = require('gulp'),
-    semiflat = require('gulp-semiflat'),
-    combined = require('combined-stream'),
-    slash    = require('gulp-slash');
+var gulp       = require('gulp'),
+    semiflat   = require('gulp-semiflat'),
+    combined   = require('combined-stream'),
+    slash      = require('gulp-slash'),
+    requireDir = require('require-dir');
+
+// Initiate the angularity configuration,
+// prompt the user if a global config does not exist
+require('./lib/config/config').init();
 
 var browserify       = require('./lib/build/browserify'),
     bowerFiles       = require('./lib/inject/bower-files'),
@@ -77,12 +82,7 @@ angularity.scssSrcStream = function (opts) {
 angularity.testDependencyStream = function (opts) {
   return bowerFiles(angularity.CONSOLE_WIDTH)
     .prepend(browserify.RUNTIME)
-    .js(opts);
-};
-
-angularity.bowerStream = function (opts) {
-  return bowerFiles(angularity.CONSOLE_WIDTH)
-    .all(opts);
+    .src('js', opts);
 };
 
 angularity.htmlPartialsSrcStream = function (opts) {
@@ -98,7 +98,7 @@ angularity.htmlAppSrcStream = function (opts) {
 
 angularity.routes = function () {
   var result = {};
-  [angularity.BOWER,
+  [ angularity.BOWER,
     angularity.JS_SRC,
     angularity.JS_BUILD,
     angularity.JS_LIB_LOCAL,
@@ -120,3 +120,5 @@ angularity.hr = function (char, length, title) {
 };
 
 module.exports = angularity;
+
+requireDir('./tasks');

@@ -7,17 +7,10 @@
  */
 'use strict';
 
-var path = require('path');
-
-var gulp       = require('gulp'),
-    requireDir = require('require-dir');
-
-// Initiate the angularity configuration,
-// prompt the user if a global config does not exist
-require('../lib/config/config').init();
+var path = require('path'),
+    gulp = require('gulp');
 
 require('../index');
-requireDir('../tasks');
 
 var taskName = process.argv[2];
 
@@ -27,7 +20,7 @@ if (typeof taskName === 'undefined') {
 } else if (taskName == '-v') {
   var packagePath = path.join(__dirname, '..', 'package.json');
   var version = require(packagePath).version;
-  console.log('Angularity:', version);
+  console.log('angularity:', version);
 
 } else {
   gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
