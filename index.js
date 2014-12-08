@@ -17,8 +17,8 @@ var browserify       = require('./lib/build/browserify'),
 
 var angularity = {};
 
-angularity.HTTP_PORT = angularityConfig.serverHttpPort();
-angularity.CONSOLE_WIDTH = angularityConfig.consoleWidth();
+angularity.HTTP_PORT = angularityConfig.getServerHttpPort();
+angularity.CONSOLE_WIDTH = angularityConfig.getConsoleWidth();
 
 angularity.BOWER = 'bower_components';
 
@@ -43,7 +43,7 @@ angularity.CDN_APP = 'test.version'; //todo fix name
 //angularity.CDN_APP       = (project.category ? (project.category + '/') : '') + project.name;
 angularity.RELEASE_LIB = angularity.RELEASE + '/vendor';
 angularity.RELEASE_APP = angularity.RELEASE;
-angularity.JAVASCRIPT_VERSION = angularityConfig.javascriptVersion();
+angularity.JAVASCRIPT_VERSION = angularityConfig.getJavascriptVersion();
 
 //todo move to tasks
 angularity.jsLibStream = function (opts) {
