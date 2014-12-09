@@ -91,5 +91,9 @@
     "stream-spigot": "latest",
     "through-pipes": "latest",
     "through2": "latest"
+  },
+  "devDependencies": {
+    "jasmine-node": "latest",
+    "node-jasmine-async": "^0.1.0"
   }
 }
