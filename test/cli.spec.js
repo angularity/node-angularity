@@ -31,7 +31,6 @@ describe('The Angularity global install provides a cli interface.', function () 
     setTimeout(function () {
       expect(stdout).toMatch(/Welcome to Angularity/);
       expect(stdout).toMatch(/No project was found in your current working directory/);
-      expect(stdout).toMatch(/Initialise Angularity/);
       expect(stdout).toMatch(/Generate Project/);
       expect(stdout).toMatch(/Install WebStorm Tools/);
 
