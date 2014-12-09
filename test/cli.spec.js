@@ -37,7 +37,7 @@ describe('The Angularity global install provides a cli interface.', function () 
 
       angularity.stdin.end();
       done();
-    }, 2000);
+    }, 3000);
 
   });
 

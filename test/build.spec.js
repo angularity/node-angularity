@@ -30,6 +30,11 @@ describe('Running the build task on an angularity project.', function () {
       expect(fs.existsSync(path.join(projectTempPath, 'build', 'app', 'main.js'))).toBe(true);
       expect(fs.existsSync(path.join(projectTempPath, 'build', 'app', 'main.js.map'))).toBe(true);
 
+      var mainJSExpectedContent = fs.readFileSync(path.join(projectTemplatePath, 'build', 'app', 'main.js'), 'utf8');
+      var mainJSBuiltContent = fs.readFileSync(path.join(projectTempPath, 'build', 'app', 'main.js'), 'utf8');
+
+      expect(mainJSBuiltContent).toEqual(mainJSExpectedContent);
+
       angularity.stdin.end();
       done();
     });
