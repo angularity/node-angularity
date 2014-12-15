@@ -33,7 +33,7 @@
     "node": ">= 0.9"
   },
   "scripts": {
-    "test": "node ./node_modules/jasmine-node/lib/jasmine-node/cli.js test/"
+    "test": "./node_modules/.bin/jasmine-node test/"
   },
   "dependencies": {
     "asks": "latest",

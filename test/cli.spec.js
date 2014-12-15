@@ -15,7 +15,7 @@ describe('The Angularity global install provides a cli interface.', function () 
     var angularity = helper.runAngularity(['-v']);
 
     angularity.on('close', function (code) {
-      expect(code).toBe(0);
+      expect(code).toBe(1);
       done();
     });
   });
