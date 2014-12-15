@@ -32,9 +32,6 @@
   "engines": {
     "node": ">= 0.9"
   },
-  "scripts": {
-    "test": "pwd && ls && jasmine-node ./test/"
-  },
   "dependencies": {
     "asks": "latest",
     "bower": "latest",

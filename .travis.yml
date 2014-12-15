@@ -5,3 +5,5 @@ before_install:
   - npm install -g npm@2.1.7
   - npm i -g
   - npm i -g jasmine-node
+script:
+  - node ./node_modules/jasmine-node/bin/jasmine-node test
