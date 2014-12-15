@@ -33,7 +33,7 @@
     "node": ">= 0.9"
   },
   "scripts": {
-    "test": "jasmine-node test/"
+    "test": "pwd && ls && jasmine-node ./test/"
   },
   "dependencies": {
     "asks": "latest",
