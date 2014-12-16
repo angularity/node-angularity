@@ -6,4 +6,6 @@ before_install:
   - npm i -g
   - npm i -g jasmine-node
 script:
-  - jasmine-node --verbose ./test
+  - jasmine-node --version
+  - pwd && ls
+  - jasmine-node --verbose --test-dir /home/travis/build/angularity/node-angularity/test
