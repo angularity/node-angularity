@@ -6,4 +6,4 @@ before_install:
   - npm i -g
   - npm i -g jasmine-node
 script:
-  - node ./node_modules/jasmine-node/bin/jasmine-node test
+  - jasmine-node --verbose ./test
