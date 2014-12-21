@@ -1,25 +1,37 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
+/**
+ * The main command line interface for running Angularity
+ * from the npm global install.
+ *
+ * If no arguments are specified it will load an interactive cli menu.
+ */
+'use strict';
 
-'use strict'
-
-var gulp       = require('gulp');
-var gutil      = require('gulp-util');
-var prettyTime = require('gulp/node_modules/pretty-hrtime');
-var chalk      = require('gulp/node_modules/chalk');
+var path = require('path'),
+    gulp = require('gulp');
 
 require('../index');
 
-gulp.on('task_start', function (e) {
-  gutil.log('Starting', '\'' + chalk.cyan(e.task) + '\'...');
-});
+var generator = require('../lib/generator/generator');
+generator.requireProjects();
 
-gulp.on('task_stop', function (e) {
-  var time = prettyTime(e.hrDuration);
-  gutil.log(
-    'Finished', '\'' + chalk.cyan(e.task) + '\'',
-    'after', chalk.magenta(time)
-  );
-});
+var taskName = process.argv[2];
 
-var taskName = process.argv[1];
-gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+// With no arguments, prompt the main menu.
+if (typeof taskName === 'undefined') {
+  require('../lib/cli/mainMenu').defaultPrompt();
+
+// Allow a version command with `angularity -v`
+} else if (taskName === '-v' || taskName === 'v') {
+  var packagePath = path.join(__dirname, '..', 'package.json');
+  var version = require(packagePath).version;
+  console.log('angularity:', version);
+
+// Use the project generator with `angularity generate <name>`
+} else if (taskName === 'generate') {
+  generator.util.generateProject(process.argv[3]);
+
+// Allow the default gulp tasks to be run on the global cli
+} else {
+  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+}

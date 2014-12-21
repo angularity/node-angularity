@@ -1,4 +1,13 @@
-gulp-es6-modular
-================
+# angularity
 
-Gulpfile for building Angular ES6 and SASS from local and bower sources
+![Angularity Logo](http://angularity.github.io/assets/logo.png)
+
+An opinionated node.js build system for ECMAScript 6 AngularJS projects
+
+Angularity is a philosophy of development.
+
+Our focus is maintaining uniformity of development across groups of developers with varying experience levels.
+
+Our contributors hold a collective vision of best-practice AngularJS development and have condensed this into a set of tools and resources known as Angularity.
+
+Documentation: [http://angularity.github.io](http://angularity.github.io)
