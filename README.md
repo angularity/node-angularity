@@ -1,7 +1,7 @@
 # angularity
 ![Angularity Logo](http://angularity.github.io/assets/logo.png)
 
-[![Build Status](https://travis-ci.org/debabrata/node-angularity.svg?branch=master)](https://travis-ci.org/debabrata/node-angularity)
+[![Build Status](https://travis-ci.org/angularity/node-angularity/?branch=master)](https://travis-ci.org/angularity/node-angularity)
 
 An opinionated node.js build system for ECMAScript 6 AngularJS projects
 
