@@ -48,30 +48,29 @@ angularity.JAVASCRIPT_VERSION = angularityConfig.getJavascriptVersion();
 //todo move to tasks
 angularity.jsLibStream = function (opts) {
   return combined.create()
-    .append(gulp.src(angularity.JS_LIB_BOWER + '/**/*.js', opts)                       // bower lib JS
+    .append(gulp.src(angularity.JS_LIB_BOWER + '/**/*.js', opts)                      // bower lib JS
       .pipe(semiflat(angularity.JS_LIB_BOWER)))
-    .append(gulp.src([angularity.JS_LIB_LOCAL + '/**/*.js', '`!**/*.spec.js'], opts)  // local lib JS overwrites
+    .append(gulp.src([angularity.JS_LIB_LOCAL + '/**/*.js', '!**/*.spec.js'], opts)   // local lib JS overwrites
       .pipe(semiflat(angularity.JS_LIB_LOCAL)));
 };
 
 angularity.jsSrcStream = function (opts) {
-  return gulp.src([angularity.JS_SRC + '/**/*.js', '!**/assets/**'], opts)           // local app JS
+  return gulp.src([angularity.JS_SRC + '/**/*.js', '!**/assets/**'], opts)            // local app JS
     .pipe(semiflat(angularity.JS_SRC));
 };
 
 angularity.jsSpecStream = function (opts) {
-  return gulp.src(angularity.JS_LIB_LOCAL + '/**/*.spec.js', opts)                     // local lib SPEC JS
+  return gulp.src(angularity.JS_LIB_LOCAL + '/**/*.spec.js', opts)                    // local lib SPEC JS
     .pipe(semiflat(angularity.JS_LIB_LOCAL));
 };
 
 angularity.scssLibStream = function (opts) {
   return combined.create()
-    .append(gulp.src(angularity.CSS_LIB_BOWER + '/**/*.scss', opts)            // bower lib CSS
+    .append(gulp.src(angularity.CSS_LIB_BOWER + '/**/*.scss', opts)    // bower lib SCSS
       .pipe(semiflat(angularity.CSS_LIB_BOWER)))
-    .append(gulp.src(angularity.CSS_LIB_LOCAL + '/**/*.scss', opts)            // local lib CSS overwrites
+    .append(gulp.src(angularity.CSS_LIB_LOCAL + '/**/*.scss', opts)    // local lib SCSS overwrites
       .pipe(semiflat(angularity.CSS_LIB_LOCAL)))
-    .append(gulp.src(angularity.BOWER + '/**/bootstrap/bootstrap.scss', opts)  // bower bootstrap SASS
-      .pipe(semiflat(angularity.BOWER + '/**/bootstrap')));
+    .append(gulp.src(angularity.BOWER + '/**/*.scss', opts));          // bower vendor SCSS
 };
 
 angularity.scssSrcStream = function (opts) {
@@ -91,8 +90,7 @@ angularity.htmlPartialsSrcStream = function (opts) {
 };
 
 angularity.htmlAppSrcStream = function (opts) {
-  return gulp.src([angularity.HTML_SRC + '/**/*.html',
-    '!**/assets/**', '!**/partials/**'], opts) // ignore partials and assets
+  return gulp.src([angularity.HTML_SRC + '/**/*.html', '!**/assets/**', '!**/partials/**'], opts)
     .pipe(semiflat(angularity.HTML_SRC));
 };
 
