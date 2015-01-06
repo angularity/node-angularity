@@ -1,6 +1,6 @@
 {
   "name": "angularity",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "dependencies": {
     "amdefine": {
       "version": "0.1.0",
@@ -4225,6 +4225,30 @@
       "version": "2.4.1",
       "from": "https://registry.npmjs.org/lodash.noop/-/lodash.noop-2.4.1.tgz",
       "resolved": "https://registry.npmjs.org/lodash.noop/-/lodash.noop-2.4.1.tgz"
+    },
+    "lodash.reduce": {
+      "version": "2.4.1",
+      "from": "lodash.reduce@*",
+      "resolved": "https://registry.npmjs.org/lodash.reduce/-/lodash.reduce-2.4.1.tgz",
+      "dependencies": {
+        "lodash.createcallback": {
+          "version": "2.4.1",
+          "from": "lodash.createcallback@>=2.4.1 <2.5.0",
+          "resolved": "https://registry.npmjs.org/lodash.createcallback/-/lodash.createcallback-2.4.1.tgz",
+          "dependencies": {
+            "lodash._baseisequal": {
+              "version": "2.4.1",
+              "from": "lodash._baseisequal@>=2.4.1 <2.5.0",
+              "resolved": "https://registry.npmjs.org/lodash._baseisequal/-/lodash._baseisequal-2.4.1.tgz"
+            },
+            "lodash.property": {
+              "version": "2.4.1",
+              "from": "lodash.property@>=2.4.1 <2.5.0",
+              "resolved": "https://registry.npmjs.org/lodash.property/-/lodash.property-2.4.1.tgz"
+            }
+          }
+        }
+      }
     },
     "lodash.template": {
       "version": "2.4.1",
