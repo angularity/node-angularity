@@ -39,7 +39,7 @@ switch(taskName) {
 
   // with no arguments, prompt the main menu.
   case undefined:
-    mainMenu.defaultPrompt();
+    mainMenu.prompt();
     break;
 
   // allow a version command with `angularity -v`
