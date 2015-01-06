@@ -10,7 +10,7 @@ var karma          = require('../lib/test/karma'),
     jsHintReporter = require('../lib/build/jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
     config         = require('../lib/config/config'),
-    compileTargets = require('../lib/config/configDefaults').compileTargets,
+    compileTargets = require('../lib/config/defaults').compileTargets,
     angularity     = require('../index');
 
 gulp.task('js', function (done) {
