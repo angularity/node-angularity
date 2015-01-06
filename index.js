@@ -1,6 +1,5 @@
 'use strict';
 
-//todo combine with config.js
 var gulp       = require('gulp'),
     semiflat   = require('gulp-semiflat'),
     combined   = require('combined-stream'),
@@ -9,12 +8,13 @@ var gulp       = require('gulp'),
 
 // Initiate the angularity configuration,
 // prompt the user if a global config does not exist
-require('./lib/config/config').init();
+require('./lib/config/config');
 
 var browserify       = require('./lib/build/browserify'),
     bowerFiles       = require('./lib/inject/bower-files'),
     angularityConfig = require('./lib/config/config');
 
+// TODO combine with config.js??
 var angularity = {};
 
 angularity.HTTP_PORT = angularityConfig.getServerHttpPort();
@@ -45,7 +45,7 @@ angularity.RELEASE_LIB = angularity.RELEASE + '/vendor';
 angularity.RELEASE_APP = angularity.RELEASE;
 angularity.JAVASCRIPT_VERSION = angularityConfig.getJavascriptVersion();
 
-//todo move to tasks
+// TODO move to tasks??
 angularity.jsLibStream = function (opts) {
   return combined.create()
     .append(gulp.src(angularity.JS_LIB_BOWER + '/**/*.js', opts)                      // bower lib JS

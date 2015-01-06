@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "tags": [
     "build",
     "system",
@@ -67,9 +67,10 @@
     "karma-chrome-launcher": "latest",
     "karma-jasmine": "latest",
     "karma-spec-reporter": "latest",
-    "lodash": "latest",
     "lodash.defaults": "latest",
     "lodash.flatten": "latest",
+    "lodash.merge": "latest",
+    "lodash.template": "latest",
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",

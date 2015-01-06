@@ -10,28 +10,36 @@
 var path = require('path'),
     gulp = require('gulp');
 
+var mainMenu = require('../lib/cli/mainMenu');
+
 require('../index');
 
 var generator = require('../lib/generator/generator');
 generator.requireProjects();
 
+// expect the second argument to be the task name
 var taskName = process.argv[2];
+switch(taskName) {
 
-// With no arguments, prompt the main menu.
-if (typeof taskName === 'undefined') {
-  require('../lib/cli/mainMenu').defaultPrompt();
+  // with no arguments, prompt the main menu.
+  case undefined:
+    mainMenu.defaultPrompt();
+    break;
 
-// Allow a version command with `angularity -v`
-} else if (taskName === '-v' || taskName === 'v') {
-  var packagePath = path.join(__dirname, '..', 'package.json');
-  var version = require(packagePath).version;
-  console.log('angularity:', version);
+  // allow a version command with `angularity -v`
+  case 'v':
+  case '-v':
+    var packagePath = path.join(__dirname, '..', 'package.json');
+    var version     = require(packagePath).version;
+    console.log('angularity:', version);
+    break;
 
-// Use the project generator with `angularity generate <name>`
-} else if (taskName === 'generate') {
-  generator.util.generateProject(process.argv[3]);
+  // use the project generator with `angularity generate <name>`
+  case 'generate':
+    generator.util.generateProject(process.argv[3]);
+    break;
 
-// Allow the default gulp tasks to be run on the global cli
-} else {
-  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+  // allow the default gulp tasks to be run on the global cli
+  default:
+    gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
 }
