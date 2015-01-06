@@ -71,6 +71,7 @@
     "lodash.flatten": "latest",
     "lodash.merge": "latest",
     "lodash.template": "latest",
+    "lodash.reduce": "latest",
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
