@@ -8,7 +8,7 @@
 'use strict';
 
 var path       = require('path'),
-    gulp       = require('gulp');
+    gulp       = require('gulp'),
     gutil      = require('gulp-util'),
     chalk      = require('chalk'),
     prettyTime = require('pretty-hrtime');
