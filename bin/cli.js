@@ -7,8 +7,11 @@
  */
 'use strict';
 
-var path = require('path'),
-    gulp = require('gulp');
+var path       = require('path'),
+    gulp       = require('gulp');
+    gutil      = require('gulp-util'),
+    chalk      = require('chalk'),
+    prettyTime = require('pretty-hrtime');
 
 var mainMenu = require('../lib/cli/mainMenu');
 
@@ -16,6 +19,19 @@ require('../index');
 
 var generator = require('../lib/generator/generator');
 generator.requireProjects();
+
+// we need to duplicate some event handlers from the gulp cli since we have bypassed it
+gulp.on('task_start', function (e) {
+  gutil.log('Starting', '\'' + chalk.cyan(e.task) + '\'...');
+});
+
+gulp.on('task_stop', function (e) {
+  var time = prettyTime(e.hrDuration);
+  gutil.log(
+    'Finished', '\'' + chalk.cyan(e.task) + '\'',
+    'after', chalk.magenta(time)
+  );
+});
 
 // expect the second argument to be the task name
 var taskName = process.argv[2];
