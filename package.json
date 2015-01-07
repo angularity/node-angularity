@@ -33,6 +33,7 @@
     "node": ">= 0.9"
   },
   "dependencies": {
+    "6to5ify": "latest",
     "asks": "latest",
     "bower": "latest",
     "bower-files": "latest",
@@ -42,7 +43,6 @@
     "chalk": "latest",
     "combined-stream": "latest",
     "convert-source-map": "latest",
-    "es6ify": "latest",
     "gulp": "latest",
     "gulp-concat": "latest",
     "gulp-inject": "latest",

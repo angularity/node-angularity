@@ -80,7 +80,6 @@ angularity.scssSrcStream = function (opts) {
 
 angularity.testDependencyStream = function (opts) {
   return bowerFiles(angularity.CONSOLE_WIDTH)
-    .prepend(browserify.RUNTIME)
     .src('js', opts);
 };
 

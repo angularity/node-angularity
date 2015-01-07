@@ -4,27 +4,20 @@ var gulp        = require('gulp'),
     jshint      = require('gulp-jshint'),
     rimraf      = require('gulp-rimraf'),
     runSequence = require('run-sequence'),
-    combined    = require('combined-stream');
+    combined    = require('combined-stream'),
+    to5ify      = require('6to5ify');
 
 var karma          = require('../lib/test/karma'),
     jsHintReporter = require('../lib/build/jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
     config         = require('../lib/config/config'),
-    compileTargets = require('../lib/config/defaults').compileTargets,
     angularity     = require('../index');
 
 gulp.task('js', function (done) {
   console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'javascript'));
-
-  var buildTasks = ['js:build'];
-
-  if (angularity.JAVASCRIPT_VERSION === compileTargets.ES6) {
-    buildTasks.push('js:runtime');
-  }
-
   runSequence(
     ['js:clean', 'js:init'],
-    buildTasks,
+    ['js:build'],
     done
   );
 });
@@ -63,12 +56,11 @@ gulp.task('js:init', function () {
 gulp.task('js:unit', function () {
   var preJasmine = bundler.getJasmineTransform({
     '@': function (filename) {
-      return filename + ':0:0';
-    }  // @ is replaced with filename:0:0
+      return filename + ':0:0';   // '@' is replaced with '<filename>:0:0'
+    }
   });
   return angularity.jsSpecStream()
-    .pipe(bundler.compile(preJasmine, compileTargets.ES6 && bundler.es6ifyTransform)
-      .all('test/karma-main.js'))
+    .pipe(bundler.compile(preJasmine, to5ify).all('test/karma-main.js'))
     .pipe(gulp.dest(angularity.JS_BUILD))
     .pipe(karma({
       files     : angularity.testDependencyStream({dev: true}).list,
@@ -82,14 +74,6 @@ gulp.task('js:unit', function () {
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
   return angularity.jsSrcStream({read: false})
-    .pipe(bundler.compile(compileTargets.ES6 && bundler.es6ifyTransform)
-      .each(config.isMinify))
-    .pipe(gulp.dest(angularity.JS_BUILD));
-});
-
-// copy the traceur runtime to the build directory
-// have previously tried to include with bower components gives too many problems
-gulp.task('js:runtime', function () {
-  return gulp.src(browserify.RUNTIME)
+    .pipe(bundler.compile(to5ify).each(config.isMinify))
     .pipe(gulp.dest(angularity.JS_BUILD));
 });
