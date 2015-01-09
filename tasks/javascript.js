@@ -54,13 +54,8 @@ gulp.task('js:init', function () {
 
 // karma unit tests in local library only
 gulp.task('js:unit', function () {
-  var preJasmine = bundler.getJasmineTransform({
-    '@': function (filename) {
-      return filename + ':0:0';   // '@' is replaced with '<filename>:0:0'
-    }
-  });
   return angularity.jsSpecStream()
-    .pipe(bundler.compile(preJasmine, to5ify).all('test/karma-main.js'))
+    .pipe(bundler.compile(to5ify, bundler.jasmineTransform).all('karma-main.js'))
     .pipe(gulp.dest(angularity.JS_BUILD))
     .pipe(karma({
       files     : angularity.testDependencyStream({dev: true}).list,
