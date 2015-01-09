@@ -2,13 +2,13 @@
 
 var path = require('path');
 
-var ideTemplate = require('ide-template');
-var generator = require('../generator').util;
+var ideTemplate = require('ide-template')
+var generator = require('../lib/generator/generator').util;
 
 var webStorm = {};
 
 webStorm.copyFileTemplates = function (javascriptTarget) {
-  var templateFolder = path.join(generator.commonTemplatesPath(), 'idea', 'fileTemplates', javascriptTarget);
+  var templateFolder = generator.templatesPath('idea', 'fileTemplates', javascriptTarget);
   ideTemplate.webStorm.copyFileTemplates(templateFolder);
   return templateFolder
 };

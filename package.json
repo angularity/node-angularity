@@ -76,6 +76,7 @@
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
+    "browserify-ngannotate": "latest",
     "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",

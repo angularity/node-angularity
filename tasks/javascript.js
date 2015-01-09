@@ -5,7 +5,8 @@ var gulp        = require('gulp'),
     rimraf      = require('gulp-rimraf'),
     runSequence = require('run-sequence'),
     combined    = require('combined-stream'),
-    to5ify      = require('6to5ify');
+    to5ify      = require('6to5ify'),
+    ngAnnotate  = require('browserify-ngannotate');
 
 var karma          = require('../lib/test/karma'),
     jsHintReporter = require('../lib/build/jshint-reporter'),
@@ -47,7 +48,6 @@ gulp.task('js:init', function () {
     .append(angularity.jsSrcStream())
     .append(angularity.jsSpecStream())
     .pipe(bundler.sources())
-    .pipe(bundler.reserve())
     .pipe(jshint())
     .pipe(jsHintReporter(angularity.CONSOLE_WIDTH));
 });
@@ -74,6 +74,6 @@ gulp.task('js:unit', function () {
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
   return angularity.jsSrcStream({read: false})
-    .pipe(bundler.compile(to5ify).each(config.isMinify))
+    .pipe(bundler.compile(to5ify, ngAnnotate).each(config.isMinify))
     .pipe(gulp.dest(angularity.JS_BUILD));
 });
