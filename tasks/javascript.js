@@ -8,12 +8,11 @@ var gulp        = require('gulp'),
     to5ify      = require('6to5ify'),
     ngAnnotate  = require('browserify-ngannotate');
 
-var karma          = require('../lib/test/karma'),
+var config         = require('../lib/config/config'),
+    karma          = require('../lib/test/karma'),
     jsHintReporter = require('../lib/build/jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
-    config         = require('../lib/config/config'),
     hr             = require('../lib/util/hr'),
-    config         = require('../lib/config/config'),
     streams        = require('../lib/config/streams');
 
 var CONSOLE_WIDTH = config.getConsoleWidth();

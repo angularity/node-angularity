@@ -4,8 +4,8 @@ var gulp        = require('gulp'),
     gutil       = require('gulp-util'),
     browserSync = require('browser-sync');
 
-var hr      = require('../lib/util/hr'),
-    config  = require('../lib/config/config'),
+var config  = require('../lib/config/config'),
+    hr      = require('../lib/util/hr'),
     streams = require('../lib/config/streams');
 
 var HTTP_PORT     = config.getServerHttpPort();

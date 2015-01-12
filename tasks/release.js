@@ -9,12 +9,12 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence'),
     combined    = require('combined-stream');
 
-var injectAdjacent   = require('../lib/inject/adjacent-files'),
+var config           = require('../lib/config/config'),
+    injectAdjacent   = require('../lib/inject/adjacent-files'),
     injectTransform  = require('../lib/inject/relative-transform'),
     bowerFiles       = require('../lib/inject/bower-files'),
     versionDirectory = require('../lib/release/version-directory'),
     hr               = require('../lib/util/hr'),
-    config           = require('../lib/config/config'),
     streams          = require('../lib/config/streams');
 
 var CONSOLE_WIDTH = config.getConsoleWidth();

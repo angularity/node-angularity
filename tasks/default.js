@@ -1,9 +1,10 @@
 'use strict';
 
 var gulp        = require('gulp'),
-    runSequence = require('run-sequence'),
-    hr          = require('../lib/util/hr'),
-    config      = require('../lib/config/config');
+    runSequence = require('run-sequence');
+
+var config      = require('../lib/config/config'),
+    hr          = require('../lib/util/hr');
 
 var CONSOLE_WIDTH = config.getConsoleWidth();
 

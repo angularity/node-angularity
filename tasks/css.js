@@ -5,8 +5,8 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence'),
     bourbon     = require('node-bourbon');
 
-var nodeSass = require('../lib/build/node-sass'),
-    config   = require('../lib/config/config'),
+var config   = require('../lib/config/config'),
+    nodeSass = require('../lib/build/node-sass'),
     hr       = require('../lib/util/hr'),
     streams  = require('../lib/config/streams'),
     sass;

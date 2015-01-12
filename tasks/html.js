@@ -9,10 +9,10 @@ var gulp        = require('gulp'),
     rimraf      = require('gulp-rimraf'),
     runSequence = require('run-sequence');
 
-var injectAdjacent = require('../lib/inject/adjacent-files'),
+var config         = require('../lib/config/config'),
+    injectAdjacent = require('../lib/inject/adjacent-files'),
     bowerFiles     = require('../lib/inject/bower-files'),
     hr             = require('../lib/util/hr'),
-    config         = require('../lib/config/config'),
     streams        = require('../lib/config/streams');
 
 var CONSOLE_WIDTH = config.getConsoleWidth();
