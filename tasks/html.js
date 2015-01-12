@@ -11,10 +11,14 @@ var gulp        = require('gulp'),
 
 var injectAdjacent = require('../lib/inject/adjacent-files'),
     bowerFiles     = require('../lib/inject/bower-files'),
-    angularity     = require('../index');
+    hr             = require('../lib/util/hr'),
+    config         = require('../lib/config/config'),
+    streams        = require('../lib/config/streams');
+
+var CONSOLE_WIDTH = config.getConsoleWidth();
 
 gulp.task('html', function (done) {
-  console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'html'));
+  console.log(hr('-', CONSOLE_WIDTH, 'html'));
   runSequence(
     'html:clean',
     ['html:partials', 'html:assets'],
@@ -25,13 +29,13 @@ gulp.task('html', function (done) {
 
 // clean the html build directory
 gulp.task('html:clean', function () {
-  return gulp.src([angularity.HTML_BUILD + '/**/*.html*', angularity.HTML_BUILD + '/**/assets/**'], {read: false})
+  return gulp.src([streams.HTML_BUILD + '/**/*.html*', streams.HTML_BUILD + '/**/assets/**'], {read: false})
     .pipe(rimraf());
 });
 
 // convert partials into template js
 gulp.task('html:partials', function () {
-  return angularity.htmlPartialsSrcStream()
+  return streams.htmlPartialsSrcStream()
     .pipe(plumber())
     .pipe(minifyHtml({
       empty : true,
@@ -39,26 +43,26 @@ gulp.task('html:partials', function () {
       quotes: true
     }))
     .pipe(ngHtml2js({
-      moduleName: angularity.PARTIALS_NAME
+      moduleName: streams.PARTIALS_NAME
     }))
-    .pipe(concat(angularity.PARTIALS_NAME + '.html.js'))
-    .pipe(gulp.dest(angularity.JS_BUILD));
+    .pipe(concat(streams.PARTIALS_NAME + '.html.js'))
+    .pipe(gulp.dest(streams.JS_BUILD));
 });
 
 // copy assets to build directory
 gulp.task('html:assets', function () {
-  return gulp.src(angularity.HTML_SRC + '/**/assets/**')
-    .pipe(gulp.dest(angularity.HTML_BUILD));
+  return gulp.src(streams.HTML_SRC + '/**/assets/**')
+    .pipe(gulp.dest(streams.HTML_BUILD));
 });
 
 // inject dependencies into html and output to build directory
 gulp.task('html:inject', function () {
-  return angularity.htmlAppSrcStream()
+  return streams.htmlAppSrcStream()
     .pipe(plumber())
-    .pipe(injectAdjacent('js', angularity.JS_BUILD))
-    .pipe(injectAdjacent('css', angularity.CSS_BUILD))
+    .pipe(injectAdjacent('js', streams.JS_BUILD))
+    .pipe(injectAdjacent('css', streams.CSS_BUILD))
     .pipe(inject(bowerFiles().src(/^(js|css)$/, {read: false}), {
       name: 'bower'
     }))
-    .pipe(gulp.dest(angularity.HTML_BUILD));
+    .pipe(gulp.dest(streams.HTML_BUILD));
 });
