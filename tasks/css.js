@@ -5,12 +5,16 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence'),
     bourbon     = require('node-bourbon');
 
-var nodeSass   = require('../lib/build/node-sass'),
-    angularity = require('../index'),
+var nodeSass = require('../lib/build/node-sass'),
+    config   = require('../lib/config/config'),
+    hr       = require('../lib/util/hr'),
+    streams  = require('../lib/config/streams'),
     sass;
 
+var CONSOLE_WIDTH = config.getConsoleWidth();
+
 gulp.task('css', function (done) {
-  console.log(angularity.hr('-', angularity.CONSOLE_WIDTH, 'css'));
+  console.log(hr('-', CONSOLE_WIDTH, 'css'));
   runSequence(
     ['css:clean', 'css:init'],
     'css:build',
@@ -20,20 +24,20 @@ gulp.task('css', function (done) {
 
 // clean the css build directory
 gulp.task('css:clean', function () {
-  return gulp.src(angularity.CSS_BUILD + '/**/*.css*', {read: false})
+  return gulp.src(streams.CSS_BUILD + '/**/*.css*', {read: false})
     .pipe(rimraf());
 });
 
 // discover css libs
 gulp.task('css:init', function () {
-  sass = nodeSass(angularity.CONSOLE_WIDTH);
-  return angularity.scssLibStream({read: false})
+  sass = nodeSass(CONSOLE_WIDTH);
+  return streams.scssLibStream({read: false})
     .pipe(sass.libraries(bourbon.includePaths));
 });
 
 // compile sass with the previously discovered lib paths
 gulp.task('css:build', function () {
-  return angularity.scssSrcStream({read: false})
+  return streams.scssSrcStream({read: false})
     .pipe(sass.compile())
-    .pipe(gulp.dest(angularity.CSS_BUILD));
+    .pipe(gulp.dest(streams.CSS_BUILD));
 });

@@ -7,9 +7,9 @@
 
 var gulp         = require('gulp'),
     fs           = require('fs'),
-    generator    = require('../../generator'),
-    config       = require('../../../config/config'),
-    configValues = require('../../../config/defaults'),
+    generator    = require('../../lib/generator/generator'),
+    config       = require('../../lib/config/config'),
+    configValues = require('../../lib/config/defaults'),
     template     = require('lodash.template'),
     webStorm     = require('ide-template').webStorm;
 
