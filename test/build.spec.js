@@ -63,8 +63,4 @@ describe('Running the build task on an angularity project.', function () {
     });
   });
 
-  //it('should copy assets to the build.', function (done) {
-  //
-  //});
-
 });
