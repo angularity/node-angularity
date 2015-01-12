@@ -2,16 +2,21 @@
 
 var path = require('path');
 
-var ideTemplate = require('ide-template')
-var generator = require('../lib/generator/generator').util;
+var ideTemplate     = require('ide-template');
 
 var webStorm = {};
 
-webStorm.copyFileTemplates = function (javascriptTarget) {
-  var templateFolder = generator.templatesPath('idea', 'fileTemplates', javascriptTarget);
+/**
+ * Using the generator's ./templates/idea/fileTemplates/<javascriptTarget>
+ * recursively copy the file templates to the local user's webstorm preferences folder.
+ * @param javascriptTarget
+ * @returns {*|string}
+ */
+function copyFileTemplates(javascriptTarget) {
+  var templateFolder = path.join(require('../lib/generator/generator').util.templatesPath(), 'idea', 'fileTemplates', javascriptTarget);
   ideTemplate.webStorm.copyFileTemplates(templateFolder);
   return templateFolder
-};
+}
 
 /**
  * Windows did not let the global npm bin command angularity work the same way as Mac,
@@ -20,7 +25,7 @@ webStorm.copyFileTemplates = function (javascriptTarget) {
  * @param parameters
  * @returns {*}
  */
-webStorm.generateAngularityWebStormTools = function () {
+function generateAngularityWebStormTools() {
   var context = {
     name : 'Angularity',
     tools: [
@@ -35,8 +40,14 @@ webStorm.generateAngularityWebStormTools = function () {
 
   var toolContent = ideTemplate.webStorm.createExternalTool(context);
   ideTemplate.webStorm.writeExternalTool(toolContent, 'Angularity.xml');
-};
+}
 
+/**
+ * Generate an external build command object for an Angularity External tool entry.
+ * The commands support Windows and Unix through angularityExecParam().
+ * @param parameters
+ * @returns {}
+ */
 function angularityToolNode(parameters) {
   return {
     name               : parameters,
@@ -67,6 +78,12 @@ function angularityToolNode(parameters) {
   };
 }
 
+/**
+ * Determine the correct path values for the External Tools based on the OS.
+ * Unix can use the global angularity alias, windows is given absolute paths to the binaries.
+ * @param parameters
+ * @returns {*}
+ */
 function angularityExecParam(parameters) {
 
   if (ideTemplate.util.platform === 'windows') {
@@ -102,4 +119,7 @@ function angularityExecParam(parameters) {
   }
 }
 
-module.exports = webStorm;
+module.exports = {
+  generateAngularityWebStormTools: generateAngularityWebStormTools,
+  copyFileTemplates              : copyFileTemplates
+};
