@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "tags": [
     "build",
     "system",
@@ -33,6 +33,7 @@
     "node": ">= 0.9"
   },
   "dependencies": {
+    "6to5ify": "latest",
     "asks": "latest",
     "bower": "latest",
     "bower-files": "latest",
@@ -42,7 +43,6 @@
     "chalk": "latest",
     "combined-stream": "latest",
     "convert-source-map": "latest",
-    "es6ify": "latest",
     "gulp": "latest",
     "gulp-concat": "latest",
     "gulp-inject": "latest",
@@ -67,13 +67,16 @@
     "karma-chrome-launcher": "latest",
     "karma-jasmine": "latest",
     "karma-spec-reporter": "latest",
-    "lodash": "latest",
     "lodash.defaults": "latest",
     "lodash.flatten": "latest",
+    "lodash.merge": "latest",
+    "lodash.template": "latest",
+    "lodash.reduce": "latest",
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
+    "browserify-ngannotate": "latest",
     "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",

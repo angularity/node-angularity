@@ -7,31 +7,55 @@
  */
 'use strict';
 
-var path = require('path'),
-    gulp = require('gulp');
+var path       = require('path'),
+    gulp       = require('gulp'),
+    gutil      = require('gulp-util'),
+    chalk      = require('chalk'),
+    prettyTime = require('pretty-hrtime');
+
+var mainMenu = require('../lib/cli/mainMenu');
 
 require('../index');
 
 var generator = require('../lib/generator/generator');
 generator.requireProjects();
 
+// we need to duplicate some event handlers from the gulp cli since we have bypassed it
+gulp.on('task_start', function (e) {
+  gutil.log('Starting', '\'' + chalk.cyan(e.task) + '\'...');
+});
+
+gulp.on('task_stop', function (e) {
+  var time = prettyTime(e.hrDuration);
+  gutil.log(
+    'Finished', '\'' + chalk.cyan(e.task) + '\'',
+    'after', chalk.magenta(time)
+  );
+});
+
+// expect the second argument to be the task name
 var taskName = process.argv[2];
+switch(taskName) {
 
-// With no arguments, prompt the main menu.
-if (typeof taskName === 'undefined') {
-  require('../lib/cli/mainMenu').defaultPrompt();
+  // with no arguments, prompt the main menu.
+  case undefined:
+    mainMenu.prompt();
+    break;
 
-// Allow a version command with `angularity -v`
-} else if (taskName === '-v' || taskName === 'v') {
-  var packagePath = path.join(__dirname, '..', 'package.json');
-  var version = require(packagePath).version;
-  console.log('angularity:', version);
+  // allow a version command with `angularity -v`
+  case 'v':
+  case '-v':
+    var packagePath = path.join(__dirname, '..', 'package.json');
+    var version     = require(packagePath).version;
+    console.log('angularity:', version);
+    break;
 
-// Use the project generator with `angularity generate <name>`
-} else if (taskName === 'generate') {
-  generator.util.generateProject(process.argv[3]);
+  // use the project generator with `angularity generate <name>`
+  case 'generate':
+    generator.util.generateProject(process.argv[3]);
+    break;
 
-// Allow the default gulp tasks to be run on the global cli
-} else {
-  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+  // allow the default gulp tasks to be run on the global cli
+  default:
+    gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
 }

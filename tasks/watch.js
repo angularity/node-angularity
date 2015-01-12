@@ -4,37 +4,40 @@ var gulp          = require('gulp'),
     watch         = require('gulp-watch'),
     watchSequence = require('gulp-watch-sequence');
 
-var angularity = require('../index');
+var config  = require('../lib/config/config'),
+    streams = require('../lib/config/streams');
+
+var CONSOLE_WIDTH = config.getConsoleWidth();
 
 gulp.task('watch', ['server'], function () {
 
   // enqueue actions to avoid multiple trigger
   var queue = watchSequence(500, function () {
-    console.log(angularity.hr('\u2591', angularity.CONSOLE_WIDTH));
+    console.log(streams.hr('\u2591', CONSOLE_WIDTH));
   });
 
   // watch statements
   watch([
-    angularity.JS_LIB_BOWER + '/**/*.js',
-    angularity.JS_LIB_LOCAL + '/**/*.js',
-    angularity.JS_SRC + '/**/*.js'
+    streams.JS_LIB_BOWER + '/**/*.js',
+    streams.JS_LIB_LOCAL + '/**/*.js',
+    streams.JS_SRC + '/**/*.js'
   ], {
     name      : 'JS',
     emitOnGlob: false
   }, queue.getHandler('js', 'html', 'reload')); // html will be needed in case previous injection failed
 
   watch([
-    angularity.CSS_LIB_BOWER + '/**/*.scss',
-    angularity.CSS_LIB_LOCAL + '/**/*.scss',
-    angularity.CSS_SRC + '/**/*.scss'
+    streams.CSS_LIB_BOWER + '/**/*.scss',
+    streams.CSS_LIB_LOCAL + '/**/*.scss',
+    streams.CSS_SRC + '/**/*.scss'
   ], {
     name      : 'CSS',
     emitOnGlob: false
   }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
   watch([
-    angularity.BOWER + '/**/*',
-    angularity.HTML_SRC + '/**/*.html'
+    streams.BOWER + '/**/*',
+    streams.HTML_SRC + '/**/*.html'
   ], {
     name      : 'HTML | BOWER',
     emitOnGlob: false
