@@ -89,6 +89,7 @@
     "shelljs": "latest",
     "source-map": "latest",
     "stream-spigot": "latest",
+    "stringify": "latest",
     "through-pipes": "latest",
     "through2": "latest"
   },

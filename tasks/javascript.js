@@ -6,6 +6,7 @@ var gulp        = require('gulp'),
     runSequence = require('run-sequence'),
     combined    = require('combined-stream'),
     to5ify      = require('6to5ify'),
+    stringify   = require('stringify'),
     ngAnnotate  = require('browserify-ngannotate');
 
 var config         = require('../lib/config/config'),
@@ -58,7 +59,7 @@ gulp.task('js:init', function () {
 // karma unit tests in local library only
 gulp.task('js:unit', function () {
   return streams.jsSpecStream()
-    .pipe(bundler.compile(to5ify, bundler.jasmineTransform).all('karma-main.js'))
+    .pipe(bundler.compile(stringify(['.html']), to5ify, ngAnnotate, bundler.jasmineTransform).all('karma-main.js'))
     .pipe(gulp.dest(streams.JS_BUILD))
     .pipe(karma({
       files     : streams.testDependencyStream({dev: true}).list,
@@ -72,6 +73,6 @@ gulp.task('js:unit', function () {
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
   return streams.jsSrcStream({read: false})
-    .pipe(bundler.compile(to5ify, ngAnnotate).each(config.isMinify))
+    .pipe(bundler.compile(stringify(['.html']), to5ify, ngAnnotate).each(config.isMinify))
     .pipe(gulp.dest(streams.JS_BUILD));
 });
