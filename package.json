@@ -35,8 +35,7 @@
   "dependencies": {
     "6to5ify": "latest",
     "asks": "latest",
-    "bower": "latest",
-    "bower-files": "latest",
+    "bower-directory": "latest",
     "browser-sync": "latest",
     "browserify": "latest",
     "browserify-transform-tools": "latest",

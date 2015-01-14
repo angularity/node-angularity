@@ -18,29 +18,28 @@ gulp.task('watch', ['server'], function () {
   });
 
   // watch statements
-  watch([
-    streams.JS_LIB_BOWER + '/**/*.js',
-    streams.JS_LIB_LOCAL + '/**/*.js',
-    streams.JS_SRC + '/**/*.js'
-  ], {
+  watch(streams.getGlob(['**/*.js', '!**/*.spec.js'], [streams.APP, streams.NODE, streams.BOWER]), {
     name      : 'JS',
     emitOnGlob: false
   }, queue.getHandler('js', 'html', 'reload')); // html will be needed in case previous injection failed
 
-  watch([
-    streams.CSS_LIB_BOWER + '/**/*.scss',
-    streams.CSS_LIB_LOCAL + '/**/*.scss',
-    streams.CSS_SRC + '/**/*.scss'
-  ], {
+  watch(streams.getGlob('**/*.scss', [streams.APP, streams.NODE, streams.BOWER]), {
     name      : 'CSS',
     emitOnGlob: false
   }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
-  watch([
-    streams.BOWER + '/**/*',
-    streams.HTML_SRC + '/**/*.html'
-  ], {
-    name      : 'HTML | BOWER',
+  watch([streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict with JS or CSS
+    name      : 'BOWER',
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
+
+  watch(streams.APP + '/**/*.html', {
+    name      : 'HTML',
+    emitOnGlob: false
+  }, queue.getHandler('html', 'reload'));
+
+  watch(streams.getGlob('**/*.spec.js'), {
+    name      : 'TEST',
+    emitOnGlob: false
+  }, queue.getHandler('test'));
 });
