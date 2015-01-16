@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "tags": [
     "build",
     "system",
@@ -35,8 +35,7 @@
   "dependencies": {
     "6to5ify": "latest",
     "asks": "latest",
-    "bower": "latest",
-    "bower-files": "latest",
+    "bower-directory": "latest",
     "browser-sync": "latest",
     "browserify": "latest",
     "browserify-transform-tools": "latest",
@@ -59,7 +58,7 @@
     "gulp-watch": "latest",
     "gulp-watch-sequence": "latest",
     "gulp-wrap": "latest",
-    "html-parser": "^0.7.3",
+    "html-parser": "latest",
     "htmlparser2": "latest",
     "ide-template": "latest",
     "inquirer": "latest",

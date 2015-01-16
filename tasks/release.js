@@ -6,8 +6,8 @@ var gulp        = require('gulp'),
     inject      = require('gulp-inject'),
     plumber     = require('gulp-plumber'),
     rimraf      = require('gulp-rimraf'),
-    runSequence = require('run-sequence'),
-    combined    = require('combined-stream');
+    semiflat    = require('gulp-semiflat'),
+    runSequence = require('run-sequence');
 
 var config           = require('../lib/config/config'),
     injectAdjacent   = require('../lib/inject/adjacent-files'),
@@ -31,35 +31,35 @@ gulp.task('release', ['build'], function (done) {
 
 // clean the html build directory
 gulp.task('release:clean', function () {
-  return gulp.src(streams.RELEASE, {read: false})
+  return gulp.src([streams.RELEASE_BUNDLE, streams.RELEASE_VENDOR], {read: false})
     .pipe(rimraf());
 });
 
 gulp.task('release:adjacent', function () {
-  return combined.create()
-    .append(gulp.src([streams.JS_BUILD + '/**/*.js', '!**/dev/**', '!**/test**']))
-    .append(gulp.src([streams.CSS_BUILD + '/**/*.css', '!**/dev/**', '!**/test**']))
-    .append(gulp.src([streams.HTML_SRC + '/**/*.html', '!**/dev/**', '!**/partials/**']))
-    .append(gulp.src([streams.HTML_SRC + '/**/assets/**']))
-    .pipe(gulp.dest(streams.RELEASE_APP));
+  return gulp.src([streams.BUILD + '/*.js*', streams.BUILD + '/*.css*', streams.BUILD + '/assets/**'])
+    .pipe(semiflat(streams.BUILD))
+    .pipe(gulp.dest(streams.RELEASE_BUNDLE));
 });
 
 // inject dependencies into html and output to build directory
 gulp.task('release:inject', function() {
-  var bower = bowerFiles()
-    .src('*', { base: true, manifest: true })
-    .pipe(gulp.dest(streams.RELEASE_LIB));
-  return gulp.src([ streams.RELEASE_APP + '/**/*.html', '!**/dev/**' ])
+  function bower() {
+    return bowerFiles()
+      .src('*', { base: true, manifest: true })
+      .pipe(gulp.dest(streams.RELEASE_VENDOR));
+  }
+  return gulp.src([streams.APP + '/*.html'])
     .pipe(plumber())
-    .pipe(injectAdjacent('js|css', streams.RELEASE_APP, {
-      name: 'inject',
+    .pipe(gulp.dest(streams.RELEASE_BUNDLE))  // put html in final directory first to get correct inject paths
+    .pipe(injectAdjacent('js|css', {
+      name     : 'inject',
       transform: injectTransform
     }))
-    .pipe(inject(bower, {
-      name: 'bower',
+    .pipe(inject(bower(), {
+      name     : 'bower',
       transform: injectTransform
     }))
-    .pipe(gulp.dest(streams.RELEASE_APP));
+    .pipe(gulp.dest(streams.RELEASE_BUNDLE));
 });
 
 // version the release app directory

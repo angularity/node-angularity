@@ -18,10 +18,16 @@ var config         = require('../lib/config/config'),
 
 var CONSOLE_WIDTH = config.getConsoleWidth();
 
+var TRANSFORMS = [
+  to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
+  stringify({ minify: true }),                // allow import of html to a string
+  ngAnnotate                                  // @ngInject for angular injection points
+];
+
 gulp.task('js', function (done) {
   console.log(hr('-', CONSOLE_WIDTH, 'javascript'));
   runSequence(
-    ['js:clean', 'js:init'],
+    ['js:cleanbuild', 'js:lint'],
     ['js:build'],
     done
   );
@@ -30,39 +36,43 @@ gulp.task('js', function (done) {
 gulp.task('test', function (done) {
   console.log(hr('-', CONSOLE_WIDTH, 'test'));
   runSequence(
-    'js:init',
+    ['js:cleanunit', 'js:lint'],
     'js:unit',
     done
   );
 });
 
-// clean the js build directory
-gulp.task('js:clean', function () {
-  return gulp.src(streams.JS_BUILD + '/**/*.js*', {read: false})
+// clean js from the build directory
+gulp.task('js:cleanbuild', function () {
+  return gulp.src(streams.BUILD + '/**/*.js*', {read: false})
     .pipe(rimraf());
 });
 
-var bundler;
+// clean js from the test directory
+gulp.task('js:cleanunit', function () {
+  return gulp.src(streams.TEST + '/**/*.js*', {read: false})
+    .pipe(rimraf());
+});
 
-// mark sources for browserify and run linter
-gulp.task('js:init', function () {
-  bundler = browserify(CONSOLE_WIDTH);
+// run linter
+gulp.task('js:lint', function () {
   return combined.create()
-    .append(streams.jsLibStream())
-    .append(streams.jsSrcStream())
-    .append(streams.jsSpecStream())
-    .pipe(bundler.sources())
+    .append(streams.jsApp())
+    .append(streams.jsLib())
+    .append(streams.jsSpec())
     .pipe(jshint())
     .pipe(jsHintReporter(CONSOLE_WIDTH));
 });
 
 // karma unit tests in local library only
 gulp.task('js:unit', function () {
-  return streams.jsSpecStream()
-    .pipe(bundler.compile(stringify(['.html']), to5ify, ngAnnotate, bundler.jasmineTransform).all('karma-main.js'))
-    .pipe(gulp.dest(streams.JS_BUILD))
+  return streams.jsSpec()
+    .pipe(browserify
+      .compile(CONSOLE_WIDTH, TRANSFORMS.concat(browserify.jasmineTransform('@')))
+      .all('karma-main.js'))
+    .pipe(gulp.dest(streams.TEST))
     .pipe(karma({
-      files     : streams.testDependencyStream({dev: true}).list,
+      files     : streams.testDependencies({dev: true}).list,
       frameworks: ['jasmine'],
       reporters : ['spec'],
       browsers  : ['Chrome'],
@@ -72,7 +82,9 @@ gulp.task('js:unit', function () {
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
-  return streams.jsSrcStream({read: false})
-    .pipe(bundler.compile(stringify(['.html']), to5ify, ngAnnotate).each(config.isMinify))
-    .pipe(gulp.dest(streams.JS_BUILD));
+  return streams.jsApp({read: false})
+    .pipe(browserify
+      .compile(CONSOLE_WIDTH, TRANSFORMS)
+      .each(config.isMinify))
+    .pipe(gulp.dest(streams.BUILD));
 });

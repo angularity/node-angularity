@@ -3,20 +3,19 @@
 var gulp        = require('gulp'),
     rimraf      = require('gulp-rimraf'),
     runSequence = require('run-sequence'),
-    bourbon     = require('node-bourbon');
+    path        = require('path');
 
 var config   = require('../lib/config/config'),
     nodeSass = require('../lib/build/node-sass'),
     hr       = require('../lib/util/hr'),
-    streams  = require('../lib/config/streams'),
-    sass;
+    streams  = require('../lib/config/streams');
 
 var CONSOLE_WIDTH = config.getConsoleWidth();
 
 gulp.task('css', function (done) {
   console.log(hr('-', CONSOLE_WIDTH, 'css'));
   runSequence(
-    ['css:clean', 'css:init'],
+    'css:clean',
     'css:build',
     done
   );
@@ -24,20 +23,13 @@ gulp.task('css', function (done) {
 
 // clean the css build directory
 gulp.task('css:clean', function () {
-  return gulp.src(streams.CSS_BUILD + '/**/*.css*', {read: false})
+  return gulp.src(streams.BUILD + '/**/*.css*', {read: false})
     .pipe(rimraf());
-});
-
-// discover css libs
-gulp.task('css:init', function () {
-  sass = nodeSass(CONSOLE_WIDTH);
-  return streams.scssLibStream({read: false})
-    .pipe(sass.libraries(bourbon.includePaths));
 });
 
 // compile sass with the previously discovered lib paths
 gulp.task('css:build', function () {
-  return streams.scssSrcStream({read: false})
-    .pipe(sass.compile())
-    .pipe(gulp.dest(streams.CSS_BUILD));
+  return streams.scssApp()
+    .pipe(nodeSass(CONSOLE_WIDTH, [streams.BOWER, streams.NODE]))
+    .pipe(gulp.dest(streams.BUILD));
 });
