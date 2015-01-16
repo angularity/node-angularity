@@ -19,9 +19,9 @@ var config         = require('../lib/config/config'),
 var CONSOLE_WIDTH = config.getConsoleWidth();
 
 var TRANSFORMS = [
-  to5ify.configure({ ignoreRegex: /(?!)/ }),    // convert any es6 to es5 (ignoreRegex is degenerate)
-  stringify(['.htm', '.html']),                 // allow import of html
-  ngAnnotate                                    // @ngInject for angular injection points
+  to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
+  stringify({ minify: true }),                // allow import of html to a string
+  ngAnnotate                                  // @ngInject for angular injection points
 ];
 
 gulp.task('js', function (done) {
