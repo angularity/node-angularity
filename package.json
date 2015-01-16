@@ -58,7 +58,7 @@
     "gulp-watch": "latest",
     "gulp-watch-sequence": "latest",
     "gulp-wrap": "latest",
-    "html-parser": "^0.7.3",
+    "html-parser": "latest",
     "htmlparser2": "latest",
     "ide-template": "latest",
     "inquirer": "latest",

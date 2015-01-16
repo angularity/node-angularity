@@ -3,8 +3,7 @@
 var gulp        = require('gulp'),
     rimraf      = require('gulp-rimraf'),
     runSequence = require('run-sequence'),
-    path        = require('path'),
-    bourbon     = require('node-bourbon');
+    path        = require('path');
 
 var config   = require('../lib/config/config'),
     nodeSass = require('../lib/build/node-sass'),
@@ -30,9 +29,7 @@ gulp.task('css:clean', function () {
 
 // compile sass with the previously discovered lib paths
 gulp.task('css:build', function () {
-  var sass = nodeSass(CONSOLE_WIDTH)
-    .libraries(process.cwd(), streams.NODE, streams.BOWER, bourbon.includePaths);
-  return streams.scssApp({read: false})
-    .pipe(sass.compile())
+  return streams.scssApp()
+    .pipe(nodeSass(CONSOLE_WIDTH, [streams.BOWER, streams.NODE]))
     .pipe(gulp.dest(streams.BUILD));
 });

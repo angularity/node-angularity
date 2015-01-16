@@ -34,6 +34,7 @@ gulp.task('html:clean', function () {
 gulp.task('html:inject', function () {
   return streams.htmlApp()
     .pipe(plumber())
+    .pipe(gulp.dest(streams.BUILD)) // put html in final directory first to get correct inject paths
     .pipe(injectAdjacent('js|css', {
       name: 'inject'
     }))
