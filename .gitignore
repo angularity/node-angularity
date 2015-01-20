@@ -1,3 +1,4 @@
-node_modules
-.idea
-test/test-temp
+/.idea
+/node_modules
+/test/test-temp
+npm-debug.log
