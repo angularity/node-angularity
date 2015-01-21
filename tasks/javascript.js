@@ -21,8 +21,9 @@ var CONSOLE_WIDTH = config.getConsoleWidth();
 var TRANSFORMS = [
   to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
   stringify({ minify: true }),                // allow import of html to a string
-  ngAnnotate                                  // @ngInject for angular injection points
+  config.isMinify && ngAnnotate               // @ngInject for angular injection points
 ];
+// TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
 
 gulp.task('js', function (done) {
   console.log(hr('-', CONSOLE_WIDTH, 'javascript'));
