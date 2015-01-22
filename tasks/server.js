@@ -16,8 +16,8 @@ gulp.task('server', ['build'], function () {
   gutil.log('serving on port:', HTTP_PORT);
   browserSync({
     server  : {
-      baseDir: streams.HTML_BUILD,
-      routes : streams.routes()
+      baseDir: streams.BUILD,
+      routes : streams.ROUTES
     },
     port    : HTTP_PORT,
     logLevel: 'silent',
