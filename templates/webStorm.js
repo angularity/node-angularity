@@ -2,7 +2,9 @@
 
 var path = require('path');
 
-var ideTemplate     = require('ide-template');
+var ideTemplate = require('ide-template');
+
+var isWindows = (['win32', 'win64'].indexOf(ideTemplate.util.platform) >= 0);
 
 /**
  * Using the generator's ./templates/idea/fileTemplates/<javascriptTarget>
@@ -60,7 +62,7 @@ function angularityToolNode(parameters) {
     synchronizeAfterRun: 'true',
     exec               : [ {
         name : 'COMMAND',
-        value: 'angularity.cmd'
+        value: 'angularity' + (isWindows ? '.cmd' : '')
       }, {
         name : 'PARAMETERS',
         value: parameters
