@@ -4,8 +4,6 @@ var path = require('path');
 
 var ideTemplate     = require('ide-template');
 
-var webStorm = {};
-
 /**
  * Using the generator's ./templates/idea/fileTemplates/<javascriptTarget>
  * recursively copy the file templates to the local user's webstorm preferences folder.
@@ -60,63 +58,27 @@ function angularityToolNode(parameters) {
     showConsoleOnStdOut: 'false',
     showConsoleOnStdErr: 'false',
     synchronizeAfterRun: 'true',
-    exec               : angularityExecParam(parameters),
-    filter             : [
-      {
-        name : 'NAME',
-        value: 'File'
-      },
-      {
-        name : 'DESCRIPTION',
-        value: 'Match the standard console output to make error messages clickable.'
-      },
-      {
-        name : 'REGEXP',
-        value: '$FILE_PATH$\\:$LINE$\\:$COLUMN$'
-      }
-    ]
-  };
-}
-
-/**
- * Determine the correct path values for the External Tools based on the OS.
- * Unix can use the global angularity alias, windows is given absolute paths to the binaries.
- * @param parameters
- * @returns {*}
- */
-function angularityExecParam(parameters) {
-
-  if (ideTemplate.util.platform === 'windows') {
-    return [
-      {
+    exec               : [ {
         name : 'COMMAND',
-        value: 'C:\\Program Files\\nodejs\\node.exe'
-      },
-      {
-        name : 'PARAMETERS',
-        value: '&quot;' + path.resolve(__dirname, '..', '..', '..', 'bin', 'cli.js') + '&quot; ' + parameters
-      },
-      {
-        name : 'WORKING_DIRECTORY',
-        value: '$ProjectFileDir$'
-      }
-    ];
-  } else {
-    return [
-      {
-        name : 'COMMAND',
-        value: 'angularity'
-      },
-      {
+        value: 'angularity.cmd'
+      }, {
         name : 'PARAMETERS',
         value: parameters
-      },
-      {
+      }, {
         name : 'WORKING_DIRECTORY',
         value: '$ProjectFileDir$'
-      }
-    ];
-  }
+      } ],
+    filter             : [ {
+        name : 'NAME',
+        value: 'File'
+      }, {
+        name : 'DESCRIPTION',
+        value: 'Match the standard console output to make error messages clickable.'
+      }, {
+        name : 'REGEXP',
+        value: '$FILE_PATH$\\:$LINE$\\:$COLUMN$'
+      } ]
+  };
 }
 
 module.exports = {
