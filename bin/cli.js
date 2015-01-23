@@ -33,29 +33,22 @@ gulp.on('task_stop', function (e) {
   );
 });
 
-// expect the second argument to be the task name
-var taskName = process.argv[2];
-switch(taskName) {
+// gulp tasks can access argv using this same method
+var argv = require('./cli-args').argv;
 
-  // with no arguments, prompt the main menu.
-  case undefined:
-    mainMenu.prompt();
-    break;
+var subCmd = (argv._.length > 0) ? argv._[0] : undefined;
 
-  // allow a version command with `angularity -v`
-  case 'v':
-  case '-v':
-    var packagePath = path.join(__dirname, '..', 'package.json');
-    var version     = require(packagePath).version;
-    console.log('angularity:', version);
-    break;
-
-  // use the project generator with `angularity generate <name>`
-  case 'generate':
-    generator.util.generateProject(process.argv[3]);
-    break;
-
-  // allow the default gulp tasks to be run on the global cli
-  default:
-    gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
+if (argv.v) {
+  var packagePath = path.join(__dirname, '..', 'package.json');
+  var version     = require(packagePath).version;
+  console.log('angularity:', version);
+}
+else if (!subCmd) {
+  mainMenu.prompt();
+}
+else if (subCmd === 'generate') {
+  generator.util.generateProject(argv._[1]);
+}
+else {
+  gulp.start(gulp.hasTask(subCmd) ? subCmd : 'default');
 }

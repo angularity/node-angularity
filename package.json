@@ -38,6 +38,7 @@
     "bower-directory": "latest",
     "browser-sync": "latest",
     "browserify": "latest",
+    "browserify-ngannotate": "latest",
     "browserify-transform-tools": "latest",
     "chalk": "latest",
     "combined-stream": "latest",
@@ -69,13 +70,12 @@
     "lodash.defaults": "latest",
     "lodash.flatten": "latest",
     "lodash.merge": "latest",
-    "lodash.template": "latest",
     "lodash.reduce": "latest",
+    "lodash.template": "latest",
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
-    "browserify-ngannotate": "latest",
     "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
@@ -90,7 +90,8 @@
     "stream-spigot": "latest",
     "stringify": "latest",
     "through-pipes": "latest",
-    "through2": "latest"
+    "through2": "latest",
+    "yargs": "latest"
   },
   "devDependencies": {
     "jasmine-node": "latest",
