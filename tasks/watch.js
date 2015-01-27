@@ -11,7 +11,6 @@ var config  = require('../lib/config/config'),
 var CONSOLE_WIDTH = config.getConsoleWidth();
 
 gulp.task('watch', ['server'], function () {
-
   // enqueue actions to avoid multiple trigger
   var queue = watchSequence(500, function () {
     console.log(hr('\u2591', CONSOLE_WIDTH));
