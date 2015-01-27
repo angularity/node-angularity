@@ -14,7 +14,6 @@ var path       = require('path'),
     prettyTime = require('pretty-hrtime');
 
 var mainMenu = require('../lib/cli/mainMenu');
-
 require('../index');
 
 var generator = require('../lib/generator/generator');
@@ -36,19 +35,16 @@ gulp.on('task_stop', function (e) {
 // gulp tasks can access argv using this same method
 var argv = require('./cli-args').argv;
 
-var subCmd = (argv._.length > 0) ? argv._[0] : undefined;
+var taskName = (!!argv._) ? argv._[0] : undefined;
 
-if (argv.v) {
+if (argv.version) {argv._
   var packagePath = path.join(__dirname, '..', 'package.json');
   var version     = require(packagePath).version;
   console.log('angularity:', version);
 }
-else if (!subCmd) {
+else if (!taskName) {
   mainMenu.prompt();
 }
-else if (subCmd === 'generate') {
-  generator.util.generateProject(argv._[1]);
-}
 else {
-  gulp.start(gulp.hasTask(subCmd) ? subCmd : 'default');
+  gulp.start(gulp.hasTask(taskName) ? taskName : 'default');
 }

@@ -8,7 +8,9 @@ var config  = require('../lib/config/config'),
     hr      = require('../lib/util/hr'),
     streams = require('../lib/config/streams');
 
-var HTTP_PORT     = config.getServerHttpPort();
+var argv = require('../bin/cli-args').argv;
+
+var HTTP_PORT     = argv.port;
 var CONSOLE_WIDTH = config.getConsoleWidth();
 
 gulp.task('server', ['build'], function () {
