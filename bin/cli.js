@@ -37,7 +37,7 @@ var argv = require('./cli-args').argv;
 
 var taskName = (!!argv._) ? argv._[0] : undefined;
 
-if (argv.version) {argv._
+if (argv.version) {
   var packagePath = path.join(__dirname, '..', 'package.json');
   var version     = require(packagePath).version;
   console.log('angularity:', version);
