@@ -76,7 +76,6 @@
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
-    "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
     "q": "latest",
@@ -91,6 +90,7 @@
     "stringify": "latest",
     "through-pipes": "latest",
     "through2": "latest",
+    "wordwrap": "latest",
     "yargs": "latest"
   },
   "devDependencies": {
