@@ -17,10 +17,10 @@ gulp.task('watch', ['server'], function () {
   });
 
   // watch statements
-  watch(streams.getGlob(['**/*.js', '!*.js', '!**/*.spec.js'], [streams.APP, streams.NODE, streams.BOWER]), {
-    name      : 'JS',
+  watch(streams.getGlob(['**/*.js', '**/*.html', '!*.*', '!**/*.spec.*'], [streams.APP, streams.NODE, streams.BOWER]), {
+    name      : 'JS|HTML',
     emitOnGlob: false
-  }, queue.getHandler('js', 'html', 'reload')); // html will be needed in case previous injection failed
+  }, queue.getHandler('js', 'html', 'reload')); // app html will be needed in case previous injection failed
 
   watch(streams.getGlob(['**/*.scss', '!*.scss'], [streams.APP, streams.NODE, streams.BOWER]), {
     name      : 'CSS',
@@ -29,11 +29,6 @@ gulp.task('watch', ['server'], function () {
 
   watch([streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict with JS or CSS
     name      : 'BOWER',
-    emitOnGlob: false
-  }, queue.getHandler('html', 'reload'));
-
-  watch(streams.APP + '/**/*.html', {
-    name      : 'HTML',
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
 
