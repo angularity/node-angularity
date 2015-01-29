@@ -18,13 +18,12 @@ yargs.getInstance('css')
   .usage(wordwrap(2, 80)('The "css" task performs a one time build of the SASS composition root(s).'))
   .example('$0 css', 'Run this task')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 
 gulp.task('css', function (done) {
-  console.log(hr('-', cliArgs().wrap, 'css'));
+  console.log(hr('-', 80, 'css'));
   runSequence(
     'css:clean',
     'css:build',
@@ -41,6 +40,6 @@ gulp.task('css:clean', function () {
 // compile sass with the previously discovered lib paths
 gulp.task('css:build', function () {
   return streams.scssApp()
-    .pipe(nodeSass(cliArgs().wrap, [streams.BOWER, streams.NODE]))
+    .pipe(nodeSass(80, [streams.BOWER, streams.NODE]))
     .pipe(gulp.dest(streams.BUILD));
 });

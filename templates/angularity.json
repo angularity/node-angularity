@@ -1,6 +1,5 @@
 {
   "name": "<%= name %>",
   "version": "<%= version %>",
-  "port":"<%= port %>",
-  "wrap": "<%= wrap %>"
+  "port":"<%= port %>"
 }

@@ -20,9 +20,8 @@ yargs.getInstance('watch')
   .example('$0 watch -p 8080', 'Run this task and serve at http://localhost:8080')
   .example('$0 watch -n', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
-  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', 5555)
+  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', 55555) // TODO default from config
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
@@ -31,7 +30,7 @@ gulp.task('watch', ['server'], function () {
 
   // enqueue actions to avoid multiple trigger
   var queue = watchSequence(500, function () {
-    console.log(hr('\u2591', cliArgs().wrap));
+    console.log(hr('\u2591', 80));
   });
 
   // watch statements

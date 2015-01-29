@@ -15,13 +15,12 @@ yargs.getInstance('build')
   .example('$0 build', 'Run this task')
   .example('$0 build -n', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 
 gulp.task('build', function (done) {
-  console.log(hr('-', cliArgs().wrap, 'build'));
+  console.log(hr('-', 80, 'build'));
   runSequence('js', 'css', 'html', done);
 });

@@ -27,14 +27,13 @@ yargs.getInstance('release')
   .example('$0 release', 'Run this task')
   .example('$0 release -n', 'Run this task but do not minify built javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 
 gulp.task('release', ['build'], function (done) {
-  console.log(hr('-', cliArgs().wrap, 'release'));
+  console.log(hr('-', 80, 'release'));
   runSequence(
     'release:clean',
     'release:adjacent',

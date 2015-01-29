@@ -25,7 +25,6 @@ yargs.getInstance('js')
   .example('$0 js', 'Run this task')
   .example('$0 js -n', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()
   .check(yargs.subCommandCheck)
@@ -39,7 +38,7 @@ var TRANSFORMS = [
 // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
 
 gulp.task('js', function (done) {
-  console.log(hr('-', cliArgs().wrap, 'javascript'));
+  console.log(hr('-', 80, 'javascript'));
   runSequence(
     ['js:cleanbuild', 'js:lint'],
     ['js:build'],
@@ -48,7 +47,7 @@ gulp.task('js', function (done) {
 });
 
 gulp.task('test', function (done) {
-  console.log(hr('-', cliArgs().wrap, 'test'));
+  console.log(hr('-', 80, 'test'));
   runSequence(
     ['js:cleanunit', 'js:lint'],
     'js:unit',
@@ -75,14 +74,14 @@ gulp.task('js:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jsHintReporter(cliArgs().wrap));
+    .pipe(jsHintReporter(80));
 });
 
 // karma unit tests in local library only
 gulp.task('js:unit', function () {
   return streams.jsSpec()
     .pipe(browserify
-      .compile(cliArgs().wrap, TRANSFORMS.concat(browserify.jasmineTransform('@')))
+      .compile(80, TRANSFORMS.concat(browserify.jasmineTransform('@')))
       .all('karma-main.js'))
     .pipe(gulp.dest(streams.TEST))
     .pipe(karma({
@@ -91,14 +90,14 @@ gulp.task('js:unit', function () {
       reporters : ['spec'],
       browsers  : ['Chrome'],
       logLevel  : 'error'
-    }, cliArgs().wrap));
+    }, 80));
 });
 
 // give a single optimised js file in the build directory with source map for each
 gulp.task('js:build', function () {
   return streams.jsApp({read: false})
     .pipe(browserify
-      .compile(cliArgs().wrap, TRANSFORMS)
+      .compile(80, TRANSFORMS)
       .each(!cliArgs().nominify))
     .pipe(gulp.dest(streams.BUILD));
 });

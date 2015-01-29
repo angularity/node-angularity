@@ -1,5 +1,6 @@
 {
-  "port": <%= serverHttpPort %>,
-  "wrap": <%= consoleWidth %><% if (webstormExecutablePath) { %>,
-  "webstormExecutablePath": "<%= webstormExecutablePath %>"<% } %>
+  "port": <%= port %>,
+  "ide": {
+    webstorm: "<%= webstorm-path %>"
+  }
 }

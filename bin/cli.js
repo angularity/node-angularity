@@ -40,7 +40,6 @@ yargs.getInstance()
   .example('$0 <task name>', 'Run the given task')
   .describe('h', 'This help message, or help on a specific task').alias('h', '?').alias('h', 'help')
   .describe('version', 'Display the version of angularity').alias('version', 'v').boolean('version')
-  .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 

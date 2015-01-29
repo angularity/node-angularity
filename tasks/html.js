@@ -22,13 +22,12 @@ yargs.getInstance('html')
     'HTML.'))
   .example('$0 html', 'Run this task')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 
 gulp.task('html', function (done) {
-  console.log(hr('-', cliArgs().wrap, 'html'));
+  console.log(hr('-', 80, 'html'));
   runSequence(
     'html:clean',
     ['html:inject', 'html:assets'],

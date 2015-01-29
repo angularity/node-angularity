@@ -1,17 +1,78 @@
 'use strict';
 
 var gulp        = require('gulp'),
+    gutil       = require('gulp-util'),
     wordwrap    = require('wordwrap'),
-    runSequence = require('run-sequence');
+    runSequence = require('run-sequence'),
+    path        = require('path'),
+    fs          = require('fs'),
+    template    = require('lodash.template'),
+    merge       = require('lodash.merge');
 
-var config = require('../lib/config/config'),
-    yargs  = require('../lib/util/yargs'),
-    hr     = require('../lib/util/hr');
+var config  = require('../lib/config/config'),
+    yargs   = require('../lib/util/yargs'),
+    hr      = require('../lib/util/hr'),
+    streams = require('../lib/config/streams');
 
 var IDE_LIST = ['webstorm'];  // each of these needs to be a gulp-task in its own right
 
 var cliArgs = yargs.resolveInstance;
 
+function needNameWhenSub(argv) {
+  if (argv.subdir && ((argv.name === true) || !(argv.name))) {
+    throw new Error('Valid name must be given when using the subdirectory option.')
+  }
+}
+
+function validatePort(argv) {
+  if (argv.port && isNaN(parseFloat(argv.port)) && (argv.port !== 'random'));
+}
+
+function mkdirIfNotExisting(projectRelativePath) {
+  var absolute = path.resolve(projectRelativePath);
+  var exists   = fs.existsSync(absolute);
+  var isValid  = exists && fs.statSync(absolute).isDirectory();
+  if (!isValid) {
+    if (exists) {
+      fs.unlinkSync(absolute);
+    }
+    fs.mkdirSync(absolute);
+    gutil.log('created directory ' + projectRelativePath);
+  }
+}
+
+function anyFileOfType(ext, subdir) {
+  return fs.readdirSync(path.resolve(subdir || '.'))
+    .some(function testJS(filename) {
+      return (path.extname(filename) === ('.' + ext));
+    });
+}
+
+function writeTemplate(filename, subdir) {
+  var srcPath  = path.join(__dirname, '..', 'templates', filename);
+  var relative = path.join(subdir || '.', filename);
+  var destPath = path.resolve(relative);
+  if (fs.existsSync(srcPath) && !fs.existsSync(destPath)) {
+
+    // augment or adjust yargs parameters
+    var tags   = []
+      .concat(cliArgs().tag)   // yargs will convert multiple --tag flags to an array
+      .filter(Boolean);
+    var port    = (cliArgs().tag === 'random') ? (Math.random() * (65536 - 49152) + 49152) : port;
+    var partial = fs.readFileSync(srcPath).toString();
+    var params  = merge(cliArgs(), {
+      tags: JSON.stringify(tags),
+      port: port
+    });
+
+    // complete the template and write to file
+    var merged  = template(partial, params);
+    fs.writeFileSync(destPath, merged);
+    gutil.log('created file ' + relative);
+  }
+}
+
+var spaces = (new Array(30)).join(' ');
 yargs.getInstance('init')
   .usage(wordwrap(2, 80)([
     'The "init" task initialises a blank project and optionally an IDE environment. The given options initialise ' +
@@ -19,23 +80,21 @@ yargs.getInstance('init')
     '',
     'The following steps are taken. Where a step is gated by a flag it is stated as "--flag [default value]".',
     '',
-    '* project directory exists, else create                  --subdir [false]',
-    '* /app              exists, else create',
-    '* /app/*.html       exists, else create /app/index.html',
-    '* /app/*.scss       exists, else create /app/index.scss',
-    '* angularity.json   exists, else create',
-    '* package.json      exists, else create                  --npm [true]',
-    '* /node_modules     exists, else create                  --npm [true]',
-    '* bower.json        exists, else create                  --bower [true]',
-    '* /bower_components exists, else create                  --bower [true]',
-    '* karma.conf.js     exists, else create                  --karma [true]',
-    '* .jshintrc         exists, else create                  --jshint [true]',
-    '* .gitignore        exists, else create                  --gitignore [true]',
-    '* initialise and launch an IDE                           --ide ["none"]',
+    '* project directory             exists, else create    --subdir [false]',
+    '* /' + (streams.APP             + spaces).slice(0, 28) + ' exists, else create',
+    '* /' + (streams.APP + '/*.html' + spaces).slice(0, 28) + ' exists, else create',
+    '* /' + (streams.APP + '/*.scss' + spaces).slice(0, 28) + ' exists, else create',
+    '* angularity.json               exists, else create',
+    '* package.json, /node_modules   exists, else create    --npm [true]',
+    '* bower.json, /bower_components exists, else create    --bower [true]',
+    '* karma.conf.js                 exists, else create    --karma [true]',
+    '* .jshintrc                     exists, else create    --jshint [true]',
+    '* .gitignore                    exists, else create    --gitignore [true]',
+    '* initialise and launch an IDE                         --ide ["none"]',
     '',
     'Notes:',
     '',
-    '* Where project defaults are supplied, they overwrite any existing value in angularity.json.',
+    '* No properties are set in existing files, delete existing files in order to change properties.',
     '* Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
     '* Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
   ].join('\n')))
@@ -44,8 +103,9 @@ yargs.getInstance('init')
   .describe('s', 'Create a sub-directory with project name').alias('s', 'subdir').default('s', false)
   .describe('n', 'The project name').alias('n', 'name').default('n', 'my-project')
   .describe('v', 'The project version').alias('v', 'version').string('v').default('v', '0.0.0')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
-  .describe('p', 'A port for the development web server').alias('p', 'port').default('p', 5555)
+  .describe('d', 'The project description').alias('d', 'description').default('d', '')
+  .describe('t', 'A project tag').alias('t', 'tag')
+  .describe('p', 'A port for the development web server').alias('p', 'port').default('p', 'random')
   .describe('npm', 'Create package.json').boolean('npm').default('npm', true)
   .describe('bower', 'Create bower.json').boolean('bower').default('bower', true)
   .describe('karma', 'Create karma.conf.js').boolean('karma').default('karma', true)
@@ -54,16 +114,19 @@ yargs.getInstance('init')
   .describe('ide', 'Initialise IDE ' + IDE_LIST.join('|')).boolean('ide').default('ide', 'none')
   .strict()
   .check(yargs.subCommandCheck)
+  .check(needNameWhenSub)
+  .check(validatePort)
   .wrap(80);
 
 gulp.task('init', function (done) {
-  console.log(hr('-', cliArgs().wrap, 'init'));
+  console.log(hr('-', 80, 'init'));
   var ideList = []
     .concat(cliArgs().ide)   // yargs will supply multiple arguments if multiple flags are used
     .filter(function (ide) {
       return (IDE_LIST.indexOf(ide) >= 0);
     });
   var taskList = [
+      cliArgs().subdir && 'init:subdir',
       'init:composition',
       'init:angularity',
       cliArgs().npm && 'init:npm',
@@ -75,26 +138,50 @@ gulp.task('init', function (done) {
     .concat(ideList)
     .filter(Boolean)
     .concat(done);
-  runSequence.apply(runSequence, tasks);
+  runSequence.apply(runSequence, taskList);
 });
 
+/**
+ * Create subdirectory with the project name
+ */
+gulp.task('init:subdir', function () {
+  mkdirIfNotExisting(cliArgs().name);
+  process.chdir(path.resolve(cliArgs().name));  // !! changing cwd !!
+});
+
+/**
+ * Create \app and copy composition root files index.html|js|scss
+ */
 gulp.task('init:composition', function () {
+  mkdirIfNotExisting(streams.APP);
+  ['html', 'js', 'scss']
+    .forEach(function eachExt(ext) {
+      if (!anyFileOfType(ext, streams.APP)) {
+        writeTemplate('index.' + ext, streams.APP);
+      }
+    });
 });
 
 gulp.task('init:angularity', function () {
+  writeTemplate('angularity.json');
 });
 
 gulp.task('init:npm', function () {
+  writeTemplate('package.json');
 });
 
 gulp.task('init:bower', function () {
+  writeTemplate('bower.json');
 });
 
 gulp.task('init:karma', function () {
+  writeTemplate('karma.conf.js');
 });
 
 gulp.task('init:jshint', function () {
+  writeTemplate('.jshintrc');
 });
 
 gulp.task('init:gitignore', function () {
+  writeTemplate('.gitignore');
 });

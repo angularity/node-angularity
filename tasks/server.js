@@ -19,15 +19,14 @@ yargs.getInstance('server')
   .example('$0 server -p 8080', 'Run this task and serve at http://localhost:8080')
   .example('$0 server -n', 'Run this task but do not minify built javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
-  .describe('w', 'Wrap console output at a given width').alias('w', 'wrap').default('w', 80)
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
-  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', 5555)
+  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', 55555) // TODO default from config
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 
 gulp.task('server', ['build'], function () {
-  console.log(hr('-', cliArgs().wrap, 'server'));
+  console.log(hr('-', 80, 'server'));
   gutil.log('serving on port:', cliArgs().port);
   browserSync({
     server  : {
@@ -41,7 +40,7 @@ gulp.task('server', ['build'], function () {
 });
 
 gulp.task('reload', function () {
-  console.log(hr('-', cliArgs().wrap, 'reload'));
+  console.log(hr('-', 80, 'reload'));
   gutil.log('serving on port:', cliArgs().port);
   browserSync.reload();
 });
