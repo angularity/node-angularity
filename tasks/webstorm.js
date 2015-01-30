@@ -7,16 +7,18 @@ var gulp         = require('gulp'),
     fs           = require('fs'),
     path         = require('path'),
     childProcess = require('child_process'),
+    template     = require('lodash.template'),
     ideTemplate  = require('ide-template');
 
-var config = require('../lib/config/config'),
-    yargs  = require('../lib/util/yargs'),
-    hr     = require('../lib/util/hr');
+var config  = require('../lib/config/config'),
+    streams = require('../lib/config/streams'),
+    yargs   = require('../lib/util/yargs'),
+    hr      = require('../lib/util/hr');
 
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
 var IS_WINDOWS    = (['win32', 'win64'].indexOf(ideTemplate.util.platform) >= 0);
 
-var cliArgs = yargs.resolveInstance;
+var cliArgs;
 
 yargs.getInstance('webstorm')
   .usage(wordwrap(2, 80)([
@@ -27,44 +29,84 @@ yargs.getInstance('webstorm')
     '',
     'The following steps are taken. Where a step is gated by a flag it is stated as "--flag [default value]".',
     '',
-    '* Setup project (resources, launch, jshint, watchers..)  --project [true]',
+    '* Setup project (resources, debug config, suppressors)   --project [true]',
     '* Create external tools that launch angularity           --tools [true]',
-    '* Set coding style                                       --style [true]',
+    '* Set coding style rules                                 --rules [true]',
     '* Add code templates                                     --templates [true]',
     '* Launch IDE                                             --launch [true]',
-    '',
-    'Where project defaults are supplied, they overwrite any existing value in angularity.json. Both the npm and ' +
-    'bower packages are initially set private which you will need to clear in order to publish.'
   ].join('\n')))
   .example('$0 webstorm', 'Run this task')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .describe('s', 'Navigate to the sub-directory with the given project name').alias('s', 'subdir')
   .describe('p', 'Setup project').alias('p', 'project').boolean('p').default('p', true)
   .describe('e', 'Install external tools').alias('e', 'tools').boolean('e').default('e', true)
-  .describe('s', 'Set coding style').alias('s', 'style').boolean('s').default('s', true)
+  .describe('r', 'Set style rules').alias('r', 'rules').boolean('r').default('r', true)
   .describe('t', 'Add code templates').alias('t', 'templates').boolean('t').default('t', true)
   .describe('l', 'Launch the IDE following setup').alias('l', 'launch').default('l', true)
   .strict()
   .check(yargs.subCommandCheck)
+  .check(validateSubdirectory)
+  .check(angularityProjectPresent)
+  .check(validateLaunchPath)
   .wrap(80);
 
 gulp.task('webstorm', function (done) {
   console.log(hr('-', 80, 'webstorm'));
-  if (fs.existsSync(path.resolve('angularity.json'))) {
-    var taskList = [
-      cliArgs().project && 'webstorm:project',
-      cliArgs().templates && 'webstorm:templates',
-      cliArgs().tools && 'webstorm:tools',
-      cliArgs().launch && 'webstorm:launch'
-    ].filter(Boolean).concat(done);
-    runSequence.apply(runSequence, taskList);
-  } else {
-    gutil.log('Fail');
-    gutil.log('Current directory is not a valid project. First run the "init" task.')
-  }
+  cliArgs = cliArgs || validateLaunchPath(yargs.resolveInstance());
+  var taskList = [
+    cliArgs.subdir && 'webstorm:subdir',
+    cliArgs.project && 'webstorm:project',
+    cliArgs.templates && 'webstorm:templates',
+    cliArgs.tools && 'webstorm:tools',
+    cliArgs.launch && 'webstorm:launch'
+  ].filter(Boolean).concat(done);
+  runSequence.apply(runSequence, taskList);
+});
+
+gulp.task('webstorm:subdir', function () {
+  process.chdir(path.resolve(cliArgs.subdir));  // !! changing cwd !!
 });
 
 gulp.task('webstorm:project', function () {
-
+  var properties = require(path.resolve('angularity.json'));
+  var context    = {
+    projectName         : properties.name,
+    jshintPath          : '$PROJECT_DIR$/.jshintrc',
+    jsDebugPort         : properties.port,
+    javascriptVersion   : 'es6',
+    contentPaths        : [
+        { content: 'file://' + process.cwd() }
+      ],
+    libraries           : [
+        'jasmine-DefinitelyTyped',
+        'angular'
+      ],
+    selectedDebugName   : properties.name,
+    jsDebugConfiguration: subdirectoriesWithFile(streams.APP, 'index.html')
+      .map(function(directory) {
+        var directoryTerms = directory.split(path.sep).slice(1);
+        return {
+          name   : [properties.name].concat(directoryTerms).join('/'),
+          uri    : 'http://localhost:' + [properties.port].concat(directoryTerms).join('/'),
+          mapping: {
+            url: 'http://localhost:' + properties.port, localFile: '$PROJECT_DIR$'
+          }
+        }
+      }),
+    plainText           : [
+        'file://$PROJECT_DIR$/app-build/index.css',
+        'file://$PROJECT_DIR$/app-build/index.js'
+      ],
+    resourceRoots       : [
+        'file://$PROJECT_DIR$',
+        'file://$PROJECT_DIR$/node_modules',
+        'file://$PROJECT_DIR$/bower_components'
+      ],
+    projectPane         : template(fs.readFileSync(path.join(TEMPLATE_PATH, 'projectPane.xml')), {
+        rootPath: properties
+      })
+  };
+  ideTemplate.webStorm.createProject(process.cwd(), context);
 });
 
 gulp.task('webstorm:templates', function () {
@@ -129,13 +171,63 @@ gulp.task('webstorm:tools', function () {
 });
 
 gulp.task('webstorm:launch', function () {
-  var executablePath = (typeof cliArgs().tools === 'string') ? path.normalise(cliArgs().tools) : executablePath();
-  if (fs.existsSync(executablePath)) {
-    childProcess.exec(executablePath, process.cwd())
+  var executable = (cliArgs.launch === true) ? executablePath() : path.normalize(cliArgs.launch);
+  gutil.log('launching ' + executable)
+  childProcess.spawn(executable, [process.cwd()], { detached: true });
 // TODO review with @impaler
 //  ideTemplate.webStorm.open(project.destination);
-  }
 });
+
+/**
+ * yargs check for a valid --subdir parameter
+ * @param argv
+ */
+function validateSubdirectory(argv) {
+  if (argv.subdir) {
+    var subdir  = path.resolve(argv.subdir);
+    var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
+    if (!isValid) {
+      throw new Error('The specified subdirectory does not exist.')
+    }
+  }
+}
+
+/**
+ * yargs check for the current directory being initialised
+ * @param argv
+ */
+function angularityProjectPresent(argv) {
+  var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
+  if (!fs.existsSync(path.resolve(projectPath))) {
+    throw new Error('Current working directory (or specified subdir) is not a valid project. Try running the "init" command first.')
+  }
+}
+
+/**
+ * yargs check for a valid --launch parameter
+ * Additionally parses true|false strings to boolean literals
+ * @param argv
+ */
+function validateLaunchPath(argv) {
+  switch (argv.launch) {
+    case false:
+    case 'false':
+      argv.launch = false;
+      break;
+    case true:
+    case 'true':
+      if (!fs.existsSync(executablePath())) {
+        throw new Error('Cannot find Webstorm executable, you will have to specify it explicitly.');
+      }
+      argv.launch = true;
+      break;
+    default:
+      if (!fs.existsSync(path.normalize(argv.launch))) {
+        throw new Error('Launch path is not valid or does not exist.');
+      }
+  }
+  return argv;
+}
 
 /**
  * The user preferences directory for webstorm on the current platform
@@ -208,52 +300,31 @@ function maximisePath() {
  */
 function reduceDirectories() {
   return Array.prototype.slice.call(arguments)
-    .map(function () {
-      return path.normalise(candidate);
+    .map(function (candidate) {
+      return path.normalize(candidate);
     })
     .filter(function (candidate) {
       return fs.existsSync(candidate) && fs.statSync(candidate).isDirectory();
-    }).shift();
+    })
+    .shift();
 }
 
-
-
-function projectContext(project) {
-  // Adjust a preset project pane node to have the project tree open at src.
-  var projectPane = fs.readFileSync(__dirname + '/projectPane.xml');
-  projectPane = template(projectPane, {rootPath: project.projectName});
-
-  return {
-    projectName         : project.projectName,
-    jshintPath          : '$PROJECT_DIR$/.jshintrc',
-    jsDebugPort         : project.projectConfig.serverHttpPort,
-    javascriptVersion   : config.ES5,
-    contentPaths        : [
-      {
-        content: 'file://' + project.destination
-      }
-    ],
-    libraries           : ['jasmine-DefinitelyTyped', 'angular'],
-    selectedDebugName   : 'JavaScript Debug.' + project.projectName,
-    jsDebugConfiguration: [
-      {
-        name   : project.projectName,
-        uri    : 'http://localhost:' + project.projectConfig.serverHttpPort + '/app',
-        mapping: {
-          url      : 'http://localhost:' + project.projectConfig.serverHttpPort,
-          localFile: '$PROJECT_DIR$'
-        }
-      }
-    ],
-    plainText           : [
-      'file://$PROJECT_DIR$/build/app/main.css',
-      'file://$PROJECT_DIR$/build/app/main.js'
-    ],
-    resourceRoots       : [
-      'file://$PROJECT_DIR$/src/js-lib',
-      'file://$PROJECT_DIR$/src/css-lib',
-      'file://$PROJECT_DIR$/src/target'
-    ],
-    projectPane         : projectPane
-  };
+/**
+ * Find all subdirectories of the base, recursively
+ * @param base The base directory to start in
+ * @param filename A filename that needs to be found for the path to be added
+ * @return all subdirectories of the base, split by path separator
+ */
+function subdirectoriesWithFile(base, filename) {
+  var result = [];
+  if (fs.existsSync(base) && fs.statSync(base).isDirectory()) {
+    if (fs.existsSync(path.join(base, filename))) {
+      result.push(base);
+    }
+    fs.readdirSync(base)
+      .forEach(function (subdir) {
+        result.push.apply(result, subdirectoriesWithFile(path.join(base, subdir), filename));
+      });
+  }
+  return result;
 }

@@ -19,7 +19,7 @@ var IDE_LIST      = ['webstorm'];  // each of these needs to be a gulp-task in i
 
 var cliArgs = yargs.resolveInstance;
 
-var spaces = (new Array(30)).join(' ');
+var spaces = (new Array(80)).join(' ');
 yargs.getInstance('init')
   .usage(wordwrap(2, 80)([
     'The "init" task initialises a blank project and optionally an IDE environment. The given options initialise ' +
@@ -27,17 +27,17 @@ yargs.getInstance('init')
     '',
     'The following steps are taken. Where a step is gated by a flag it is stated as "--flag [default value]".',
     '',
-    '* project directory             exists, else create    --subdir [false]',
-    '* /' + (streams.APP             + spaces).slice(0, 28) + ' exists, else create',
-    '* /' + (streams.APP + '/*.html' + spaces).slice(0, 28) + ' exists, else create',
-    '* /' + (streams.APP + '/*.scss' + spaces).slice(0, 28) + ' exists, else create',
-    '* angularity.json               exists, else create',
-    '* package.json, /node_modules   exists, else create    --npm [true]',
-    '* bower.json, /bower_components exists, else create    --bower [true]',
-    '* karma.conf.js                 exists, else create    --karma [true]',
-    '* .jshintrc                     exists, else create    --jshint [true]',
-    '* .gitignore                    exists, else create    --gitignore [true]',
-    '* initialise and launch an IDE                         --ide ["none"]',
+    '* project directory     exists, else create    --subdir [false]',
+    '* /' + (streams.APP             + spaces).slice(0, 20) + ' exists, else create',
+    '* /' + (streams.APP + '/*.html' + spaces).slice(0, 20) + ' exists, else create',
+    '* /' + (streams.APP + '/*.scss' + spaces).slice(0, 20) + ' exists, else create',
+    '* angularity.json       exists, else create',
+    '* package.json          exists, else create    --npm [true]',
+    '* bower.json            exists, else create    --bower [true]',
+    '* karma.conf.js         exists, else create    --karma [true]',
+    '* .jshintrc             exists, else create    --jshint [true]',
+    '* .gitignore            exists, else create    --gitignore [true]',
+    '* initialise and launch an IDE                 --ide ["none"]',
     '',
     'Notes:',
     '',
@@ -88,17 +88,11 @@ gulp.task('init', function (done) {
   runSequence.apply(runSequence, taskList);
 });
 
-/**
- * Create subdirectory with the project name
- */
 gulp.task('init:subdir', function () {
   mkdirIfNotExisting(cliArgs().name);
   process.chdir(path.resolve(cliArgs().name));  // !! changing cwd !!
 });
 
-/**
- * Create \app and copy composition root files index.html|js|scss
- */
 gulp.task('init:composition', function () {
   mkdirIfNotExisting(streams.APP);
   ['html', 'js', 'scss']
@@ -140,7 +134,7 @@ function needNameWhenSub(argv) {
 }
 
 function validatePort(argv) {
-  if (argv.port && isNaN(parsInt(argv.port)) && (argv.port !== 'random')) {
+  if (argv.port && isNaN(parseInt(argv.port)) && (argv.port !== 'random')) {
     throw new Error('Port must be a valid integer or the keyword "random"');
   };
 }
@@ -172,7 +166,7 @@ function writeTemplate(filename, subdir) {
   if (fs.existsSync(srcAbsolute) && !fs.existsSync(destAbsolute)) {
 
     // augment or adjust yargs parameters
-    var port = (cliArgs().tag === 'random') ? (Math.random() * (65536 - 49152) + 49152) : port;
+    var port = (cliArgs().port === 'random') ? Math.floor(Math.random() * (65536 - 49152) + 49152) : port;
     var tags = []
       .concat(cliArgs().tag)   // yargs will convert multiple --tag flags to an array
       .filter(Boolean);
