@@ -10,8 +10,6 @@ var config  = require('../lib/config/config'),
     hr      = require('../lib/util/hr'),
     streams = require('../lib/config/streams');
 
-var cliArgs = yargs.resolveInstance;
-
 yargs.getInstance('watch')
   .usage(wordwrap(2, 80)('The "watch" task performs an initial build and then serves the application on localhost at ' +
     'the given port. It then watches the project and performs rebuild of Javascript and/or SASS compositions upon ' +

@@ -14,63 +14,10 @@ var config  = require('../lib/config/config'),
     hr      = require('../lib/util/hr'),
     streams = require('../lib/config/streams');
 
-var IDE_LIST = ['webstorm'];  // each of these needs to be a gulp-task in its own right
+var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'angularity');
+var IDE_LIST      = ['webstorm'];  // each of these needs to be a gulp-task in its own right
 
 var cliArgs = yargs.resolveInstance;
-
-function needNameWhenSub(argv) {
-  if (argv.subdir && ((argv.name === true) || !(argv.name))) {
-    throw new Error('Valid name must be given when using the subdirectory option.')
-  }
-}
-
-function validatePort(argv) {
-  if (argv.port && isNaN(parseFloat(argv.port)) && (argv.port !== 'random'));
-}
-
-function mkdirIfNotExisting(projectRelativePath) {
-  var absolute = path.resolve(projectRelativePath);
-  var exists   = fs.existsSync(absolute);
-  var isValid  = exists && fs.statSync(absolute).isDirectory();
-  if (!isValid) {
-    if (exists) {
-      fs.unlinkSync(absolute);
-    }
-    fs.mkdirSync(absolute);
-    gutil.log('created directory ' + projectRelativePath);
-  }
-}
-
-function anyFileOfType(ext, subdir) {
-  return fs.readdirSync(path.resolve(subdir || '.'))
-    .some(function testJS(filename) {
-      return (path.extname(filename) === ('.' + ext));
-    });
-}
-
-function writeTemplate(filename, subdir) {
-  var srcPath  = path.join(__dirname, '..', 'templates', filename);
-  var relative = path.join(subdir || '.', filename);
-  var destPath = path.resolve(relative);
-  if (fs.existsSync(srcPath) && !fs.existsSync(destPath)) {
-
-    // augment or adjust yargs parameters
-    var tags   = []
-      .concat(cliArgs().tag)   // yargs will convert multiple --tag flags to an array
-      .filter(Boolean);
-    var port    = (cliArgs().tag === 'random') ? (Math.random() * (65536 - 49152) + 49152) : port;
-    var partial = fs.readFileSync(srcPath).toString();
-    var params  = merge(cliArgs(), {
-      tags: JSON.stringify(tags),
-      port: port
-    });
-
-    // complete the template and write to file
-    var merged  = template(partial, params);
-    fs.writeFileSync(destPath, merged);
-    gutil.log('created file ' + relative);
-  }
-}
 
 var spaces = (new Array(30)).join(' ');
 yargs.getInstance('init')
@@ -185,3 +132,59 @@ gulp.task('init:jshint', function () {
 gulp.task('init:gitignore', function () {
   writeTemplate('.gitignore');
 });
+
+function needNameWhenSub(argv) {
+  if (argv.subdir && ((argv.name === true) || !(argv.name))) {
+    throw new Error('Valid name must be given when using the subdirectory option.')
+  }
+}
+
+function validatePort(argv) {
+  if (argv.port && isNaN(parsInt(argv.port)) && (argv.port !== 'random')) {
+    throw new Error('Port must be a valid integer or the keyword "random"');
+  };
+}
+
+function mkdirIfNotExisting(projectRelativePath) {
+  var absolute = path.resolve(projectRelativePath);
+  var exists   = fs.existsSync(absolute);
+  var isValid  = exists && fs.statSync(absolute).isDirectory();
+  if (!isValid) {
+    if (exists) {
+      fs.unlinkSync(absolute);
+    }
+    fs.mkdirSync(absolute);
+    gutil.log('created directory ' + projectRelativePath);
+  }
+}
+
+function anyFileOfType(ext, subdir) {
+  return fs.readdirSync(path.resolve(subdir || '.'))
+    .some(function testJS(filename) {
+      return (path.extname(filename) === ('.' + ext));
+    });
+}
+
+function writeTemplate(filename, subdir) {
+  var srcAbsolute  = path.join(TEMPLATE_PATH, filename);
+  var destRelative = path.join(subdir || '.', filename);
+  var destAbsolute = path.resolve(destRelative);
+  if (fs.existsSync(srcAbsolute) && !fs.existsSync(destAbsolute)) {
+
+    // augment or adjust yargs parameters
+    var port = (cliArgs().tag === 'random') ? (Math.random() * (65536 - 49152) + 49152) : port;
+    var tags = []
+      .concat(cliArgs().tag)   // yargs will convert multiple --tag flags to an array
+      .filter(Boolean);
+    var partial = fs.readFileSync(srcAbsolute).toString();
+    var params  = merge(cliArgs(), {
+      port : port,
+      tags : JSON.stringify(tags)  // must stringify lists
+    });
+
+    // complete the template and write to file
+    var merged  = template(partial, params);
+    fs.writeFileSync(destAbsolute, merged);
+    gutil.log('created file ' + destRelative);
+  }
+}

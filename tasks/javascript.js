@@ -23,7 +23,7 @@ var cliArgs = yargs.resolveInstance;
 yargs.getInstance('js')
   .usage(wordwrap(2, 80)('The "js" task performs a one time build of the javascript composition root(s).'))
   .example('$0 js', 'Run this task')
-  .example('$0 js -n', 'Run this task but do not minify javascript')
+  .example('$0 js -u', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()

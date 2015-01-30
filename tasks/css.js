@@ -12,8 +12,6 @@ var config   = require('../lib/config/config'),
     hr       = require('../lib/util/hr'),
     streams  = require('../lib/config/streams');
 
-var cliArgs = yargs.resolveInstance;
-
 yargs.getInstance('css')
   .usage(wordwrap(2, 80)('The "css" task performs a one time build of the SASS composition root(s).'))
   .example('$0 css', 'Run this task')

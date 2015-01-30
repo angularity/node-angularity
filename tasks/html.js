@@ -15,8 +15,6 @@ var config         = require('../lib/config/config'),
     hr             = require('../lib/util/hr'),
     streams        = require('../lib/config/streams');
 
-var cliArgs = yargs.resolveInstance;
-
 yargs.getInstance('html')
   .usage(wordwrap(2, 80)('The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
     'HTML.'))

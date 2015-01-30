@@ -8,8 +8,6 @@ var config = require('../lib/config/config'),
     yargs  = require('../lib/util/yargs'),
     hr     = require('../lib/util/hr');
 
-var cliArgs = yargs.resolveInstance;
-
 yargs.getInstance('build')
   .usage(wordwrap(2, 80)('The "build" task performs a single build of the javascript and SASS composition root(s).'))
   .example('$0 build', 'Run this task')

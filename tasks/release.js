@@ -19,8 +19,6 @@ var config           = require('../lib/config/config'),
     hr               = require('../lib/util/hr'),
     streams          = require('../lib/config/streams');
 
-var cliArgs = yargs.resolveInstance;
-
 yargs.getInstance('release')
   .usage(wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
     'components to a release directory.'))
