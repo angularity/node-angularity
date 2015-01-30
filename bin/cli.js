@@ -44,20 +44,20 @@ yargs.getInstance()
   .wrap(80);
 
 // find the yargs instance that is most appropriate for the given command line parameters
-var argv = yargs.resolveInstance();
+var cliArgs = yargs.resolveArgv();
 
 // show help
-if (argv.help) {
+if (cliArgs.help) {
   yargs
-    .getInstance(argv.taskName || argv.help)
+    .getInstance(cliArgs.taskName || cliArgs.help)
     .showHelp();
 }
 // run a task
-else if (argv.taskName) {
-  runSequence(argv.taskName);
+else if (cliArgs.taskName) {
+  runSequence(cliArgs.taskName);
 }
 // show the version string
-else if (argv.version) {
+else if (cliArgs.version) {
   var packagePath = path.join(__dirname, '..', 'package.json');
   var version     = require(packagePath).version;
   console.log('angularity:', version);

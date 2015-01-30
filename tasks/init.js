@@ -17,7 +17,7 @@ var config  = require('../lib/config/config'),
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'angularity');
 var IDE_LIST      = ['webstorm'];  // each of these needs to be a gulp-task in its own right
 
-var cliArgs = yargs.resolveInstance;
+var cliArgs;
 
 var spaces = (new Array(80)).join(' ');
 yargs.getInstance('init')
@@ -67,20 +67,21 @@ yargs.getInstance('init')
 
 gulp.task('init', function (done) {
   console.log(hr('-', 80, 'init'));
+  cliArgs = cliArgs || yargs.resolveArgv();
   var ideList = []
-    .concat(cliArgs().ide)   // yargs will supply multiple arguments if multiple flags are used
+    .concat(cliArgs.ide)   // yargs will supply multiple arguments if multiple flags are used
     .filter(function (ide) {
       return (IDE_LIST.indexOf(ide) >= 0);
     });
   var taskList = [
-      cliArgs().subdir && 'init:subdir',
+      cliArgs.subdir && 'init:subdir',
       'init:composition',
       'init:angularity',
-      cliArgs().npm && 'init:npm',
-      cliArgs().bower && 'init:bower',
-      cliArgs().karma && 'init:karma',
-      cliArgs().jshint && 'init:jshint',
-      cliArgs().gitignore && 'init:gitignore'
+      cliArgs.npm && 'init:npm',
+      cliArgs.bower && 'init:bower',
+      cliArgs.karma && 'init:karma',
+      cliArgs.jshint && 'init:jshint',
+      cliArgs.gitignore && 'init:gitignore'
     ]
     .concat(ideList)
     .filter(Boolean)
@@ -89,8 +90,8 @@ gulp.task('init', function (done) {
 });
 
 gulp.task('init:subdir', function () {
-  mkdirIfNotExisting(cliArgs().name);
-  process.chdir(path.resolve(cliArgs().name));  // !! changing cwd !!
+  mkdirIfNotExisting(cliArgs.name);
+  process.chdir(path.resolve(cliArgs.name));  // !! changing cwd !!
 });
 
 gulp.task('init:composition', function () {
@@ -166,12 +167,12 @@ function writeTemplate(filename, subdir) {
   if (fs.existsSync(srcAbsolute) && !fs.existsSync(destAbsolute)) {
 
     // augment or adjust yargs parameters
-    var port = (cliArgs().port === 'random') ? Math.floor(Math.random() * (65536 - 49152) + 49152) : port;
+    var port = (cliArgs.port === 'random') ? Math.floor(Math.random() * (65536 - 49152) + 49152) : port;
     var tags = []
-      .concat(cliArgs().tag)   // yargs will convert multiple --tag flags to an array
+      .concat(cliArgs.tag)   // yargs will convert multiple --tag flags to an array
       .filter(Boolean);
     var partial = fs.readFileSync(srcAbsolute).toString();
-    var params  = merge(cliArgs(), {
+    var params  = merge(cliArgs, {
       port : port,
       tags : JSON.stringify(tags)  // must stringify lists
     });

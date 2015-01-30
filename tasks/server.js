@@ -10,7 +10,7 @@ var config  = require('../lib/config/config'),
     hr      = require('../lib/util/hr'),
     streams = require('../lib/config/streams');
 
-var cliArgs = yargs.resolveInstance;
+var cliArgs;
 
 yargs.getInstance('server')
   .usage(wordwrap(2, 80)('The "server" task performs a one time build and then serves the application on localhost ' +
@@ -27,13 +27,14 @@ yargs.getInstance('server')
 
 gulp.task('server', ['build'], function () {
   console.log(hr('-', 80, 'server'));
-  gutil.log('serving on port:', cliArgs().port);
+  cliArgs = cliArgs || yargs.resolveArgv();
+  gutil.log('serving on port:', cliArgs.port);
   browserSync({
     server  : {
       baseDir: streams.BUILD,
       routes : streams.ROUTES
     },
-    port    : cliArgs().port,
+    port    : cliArgs.port,
     logLevel: 'silent',
     open    : false
   });
@@ -41,6 +42,6 @@ gulp.task('server', ['build'], function () {
 
 gulp.task('reload', function () {
   console.log(hr('-', 80, 'reload'));
-  gutil.log('serving on port:', cliArgs().port);
+  gutil.log('serving on port:', cliArgs.port);
   browserSync.reload();
 });

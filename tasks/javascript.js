@@ -18,57 +18,62 @@ var config         = require('../lib/config/config'),
     hr             = require('../lib/util/hr'),
     streams        = require('../lib/config/streams');
 
-var cliArgs = yargs.resolveInstance;
+var cliArgs;
+var transforms;
 
-yargs.getInstance('js')
-  .usage(wordwrap(2, 80)('The "js" task performs a one time build of the javascript composition root(s).'))
-  .example('$0 js', 'Run this task')
-  .example('$0 js -u', 'Run this task but do not minify javascript')
+yargs.getInstance('javascript')
+  .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
+  .example('$0 javascript', 'Run this task')
+  .example('$0 javascript -u', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
 
-var TRANSFORMS = [
-  to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
-  stringify({ minify: true }),                // allow import of html to a string
-  !cliArgs().unminified && ngAnnotate           // @ngInject for angular injection points
-];
-// TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
+yargs.getInstance('test')
+  .usage(wordwrap(2, 80)('The "test" task performs a one time build and karma test of all .spec.js files in the ' +
+    'project.'))
+  .example('$0 test', 'Run this task')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .strict()
+  .check(yargs.subCommandCheck)
+  .wrap(80);
 
-gulp.task('js', function (done) {
+gulp.task('javascript', function (done) {
   console.log(hr('-', 80, 'javascript'));
+  init();
   runSequence(
-    ['js:cleanbuild', 'js:lint'],
-    ['js:build'],
+    ['javascript:cleanbuild', 'javascript:lint'],
+    ['javascript:build'],
     done
   );
 });
 
 gulp.task('test', function (done) {
   console.log(hr('-', 80, 'test'));
+  init();
   runSequence(
-    ['js:cleanunit', 'js:lint'],
-    'js:unit',
+    ['javascript:cleanunit', 'javascript:lint'],
+    'javascript:unit',
     done
   );
 });
 
-// clean js from the build directory
-gulp.task('js:cleanbuild', function () {
+// clean javascript from the build directory
+gulp.task('javascript:cleanbuild', function () {
   return gulp.src(streams.BUILD + '/**/*.js*', {read: false})
     .pipe(rimraf());
 });
 
-// clean js from the test directory
-gulp.task('js:cleanunit', function () {
+// clean javascript from the test directory
+gulp.task('javascript:cleanunit', function () {
   return gulp.src(streams.TEST + '/**/*.js*', {read: false})
     .pipe(rimraf());
 });
 
 // run linter
-gulp.task('js:lint', function () {
+gulp.task('javascript:lint', function () {
   return combined.create()
     .append(streams.jsApp())
     .append(streams.jsLib())
@@ -78,10 +83,10 @@ gulp.task('js:lint', function () {
 });
 
 // karma unit tests in local library only
-gulp.task('js:unit', function () {
+gulp.task('javascript:unit', function () {
   return streams.jsSpec()
     .pipe(browserify
-      .compile(80, TRANSFORMS.concat(browserify.jasmineTransform('@')))
+      .compile(80, transforms.concat(browserify.jasmineTransform('@')))
       .all('karma-main.js'))
     .pipe(gulp.dest(streams.TEST))
     .pipe(karma({
@@ -93,11 +98,24 @@ gulp.task('js:unit', function () {
     }, 80));
 });
 
-// give a single optimised js file in the build directory with source map for each
-gulp.task('js:build', function () {
+// give a single optimised javascript file in the build directory with source map for each
+gulp.task('javascript:build', function () {
   return streams.jsApp({read: false})
     .pipe(browserify
-      .compile(80, TRANSFORMS)
-      .each(!cliArgs().unminified))
+      .compile(80, transforms)
+      .each(!cliArgs.unminified))
     .pipe(gulp.dest(streams.BUILD));
 });
+
+/**
+ * Initialisation must be deferred until a task actually starts
+ */
+function init() {
+  cliArgs    = cliArgs || yargs.resolveArgv();
+  transforms = [
+    to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
+    stringify({ minify: true }),                // allow import of html to a string
+    !cliArgs.unminified && ngAnnotate           // @ngInject for angular injection points
+  ];
+  // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
+}

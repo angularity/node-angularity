@@ -8,8 +8,6 @@ var config = require('../lib/config/config'),
     yargs  = require('../lib/util/yargs'),
     hr     = require('../lib/util/hr');
 
-var cliArgs = yargs.resolveInstance;
-
 yargs.getInstance('defaults')
   .usage(wordwrap(2, 80)('The "defaults" task writes global or project default settings. Use the keyword "remove" ' +
     'to delete a key from the defaults.'))

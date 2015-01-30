@@ -52,7 +52,7 @@ yargs.getInstance('webstorm')
 
 gulp.task('webstorm', function (done) {
   console.log(hr('-', 80, 'webstorm'));
-  cliArgs = cliArgs || validateLaunchPath(yargs.resolveInstance());
+  cliArgs = cliArgs || validateLaunchPath(yargs.resolveArgv());
   var taskList = [
     cliArgs.subdir && 'webstorm:subdir',
     cliArgs.project && 'webstorm:project',
