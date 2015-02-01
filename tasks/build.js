@@ -20,5 +20,5 @@ yargs.getInstance('build')
 
 gulp.task('build', function (done) {
   console.log(hr('-', 80, 'build'));
-  runSequence('js', 'css', 'html', done);
+  runSequence('javascript', 'css', 'html', done);
 });

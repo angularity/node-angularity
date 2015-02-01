@@ -42,7 +42,7 @@ yargs.getInstance('webstorm')
   .describe('e', 'Install external tools').alias('e', 'tools').boolean('e').default('e', true)
   .describe('r', 'Set style rules').alias('r', 'rules').boolean('r').default('r', true)
   .describe('t', 'Add code templates').alias('t', 'templates').boolean('t').default('t', true)
-  .describe('l', 'Launch the IDE following setup').alias('l', 'launch').default('l', true)
+  .describe('l', 'Launch the IDE following setup').alias('l', 'launch').default('l', true)  // TODO @bholloway default from config
   .strict()
   .check(yargs.subCommandCheck)
   .check(validateSubdirectory)
@@ -95,7 +95,8 @@ gulp.task('webstorm:project', function () {
       }),
     plainText           : [
         'file://$PROJECT_DIR$/app-build/index.css',
-        'file://$PROJECT_DIR$/app-build/index.js'
+        'file://$PROJECT_DIR$/app-build/index.js',
+        'file://$PROJECT_DIR$/app-test/index.js'
       ],
     resourceRoots       : [
         'file://$PROJECT_DIR$',

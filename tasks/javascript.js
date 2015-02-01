@@ -87,7 +87,7 @@ gulp.task('javascript:unit', function () {
   return streams.jsSpec()
     .pipe(browserify
       .compile(80, transforms.concat(browserify.jasmineTransform('@')))
-      .all('karma-main.js'))
+      .all('index.js'))
     .pipe(gulp.dest(streams.TEST))
     .pipe(karma({
       files     : streams.testDependencies({dev: true}).list,

@@ -1,3 +1,7 @@
+/* globals basePath:true, files:true, exclude:true, reporters:true, port:true, colors:true, logLevel:true */
+/* globals autoWatch:true, browsers:true, captureTimeout:true, singleRun:true, reportSlowerThan:true */
+/* globals LOG_DISABLE, LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DEBUG */
+
 // base path, that will be used to resolve files and exclude
 basePath = process.cwd();
 

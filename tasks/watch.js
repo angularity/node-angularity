@@ -19,7 +19,7 @@ yargs.getInstance('watch')
   .example('$0 watch -n', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
-  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', 55555) // TODO default from config
+  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', 55555) // TODO @bholloway default from config
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
