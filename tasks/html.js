@@ -8,8 +8,7 @@ var gulp        = require('gulp'),
     wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence');
 
-var config         = require('../lib/config/config'),
-    injectAdjacent = require('../lib/inject/adjacent-files'),
+var injectAdjacent = require('../lib/inject/adjacent-files'),
     bowerFiles     = require('../lib/inject/bower-files'),
     yargs          = require('../lib/util/yargs'),
     hr             = require('../lib/util/hr'),
@@ -19,7 +18,7 @@ yargs.getInstance('html')
   .usage(wordwrap(2, 80)('The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
     'HTML.'))
   .example('$0 html', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);

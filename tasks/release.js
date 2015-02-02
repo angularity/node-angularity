@@ -10,8 +10,7 @@ var gulp        = require('gulp'),
     wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence');
 
-var config           = require('../lib/config/config'),
-    injectAdjacent   = require('../lib/inject/adjacent-files'),
+var injectAdjacent   = require('../lib/inject/adjacent-files'),
     injectTransform  = require('../lib/inject/relative-transform'),
     bowerFiles       = require('../lib/inject/bower-files'),
     versionDirectory = require('../lib/release/version-directory'),
@@ -24,7 +23,7 @@ yargs.getInstance('release')
     'components to a release directory.'))
   .example('$0 release', 'Run this task')
   .example('$0 release -n', 'Run this task but do not minify built javascript')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()
   .check(yargs.subCommandCheck)

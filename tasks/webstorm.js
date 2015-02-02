@@ -10,15 +10,25 @@ var gulp         = require('gulp'),
     template     = require('lodash.template'),
     ideTemplate  = require('ide-template');
 
-var config  = require('../lib/config/config'),
-    streams = require('../lib/config/streams'),
-    yargs   = require('../lib/util/yargs'),
-    hr      = require('../lib/util/hr');
+var defaults = require('../lib/config/defaults'),
+    platform = require('../lib/config/platform'),
+    streams  = require('../lib/config/streams'),
+    yargs    = require('../lib/util/yargs'),
+    hr       = require('../lib/util/hr');
 
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
-var IS_WINDOWS    = (['win32', 'win64'].indexOf(ideTemplate.util.platform) >= 0);
 
 var cliArgs;
+
+var config = defaults.getInstance('webstorm')
+  .file(platform.userHomeDirectory(), '.angularity')
+  .defaults({
+    'project'  : true,
+    'tools'    : true,
+    'rules'    : true,
+    'templates': true,
+    'launch'   : true
+  });
 
 yargs.getInstance('webstorm')
   .usage(wordwrap(2, 80)([
@@ -27,22 +37,25 @@ yargs.getInstance('webstorm')
     'Where the IDE is installed in a non-standard location the full path to the IDE should be used in place of the ' +
     'boolean in launch.',
     '',
-    'The following steps are taken. Where a step is gated by a flag it is stated as "--flag [default value]".',
+    'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
+    'globally defined using the --defaults option.',
     '',
-    '* Setup project (resources, debug config, suppressors)   --project [true]',
-    '* Create external tools that launch angularity           --tools [true]',
-    '* Set coding style rules                                 --rules [true]',
-    '* Add code templates                                     --templates [true]',
-    '* Launch IDE                                             --launch [true]',
+    '* Setup project (resources, debug config, suppressors)   --project',
+    '* Create external tools that launch angularity           --tools',
+    '* Set coding style rules                                 --rules',
+    '* Add code templates                                     --templates',
+    '* Launch IDE                                             --launch',
   ].join('\n')))
   .example('$0 webstorm', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .example('$0 webstorm -defaults -l \<some-path\>', 'Set an explicit executable path')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
+  .describe('defaults', 'Set defaults')
   .describe('s', 'Navigate to the sub-directory with the given project name').alias('s', 'subdir')
-  .describe('p', 'Setup project').alias('p', 'project').boolean('p').default('p', true)
-  .describe('e', 'Install external tools').alias('e', 'tools').boolean('e').default('e', true)
-  .describe('r', 'Set style rules').alias('r', 'rules').boolean('r').default('r', true)
-  .describe('t', 'Add code templates').alias('t', 'templates').boolean('t').default('t', true)
-  .describe('l', 'Launch the IDE following setup').alias('l', 'launch').default('l', true)  // TODO @bholloway default from config
+  .describe('p', 'Setup project').alias('p', 'project').boolean('p').default('p', config.get('project'))
+  .describe('e', 'Install external tools').alias('e', 'tools').boolean('e').default('e', config.get('tools'))
+  .describe('r', 'Set style rules').alias('r', 'rules').boolean('r').default('r', config.get('rules'))
+  .describe('t', 'Add code templates').alias('t', 'templates').boolean('t').default('t', config.get('templates'))
+  .describe('l', 'Launch the IDE following setup').alias('l', 'launch').default('l', config.get('launch'))
   .strict()
   .check(yargs.subCommandCheck)
   .check(validateSubdirectory)
@@ -53,14 +66,26 @@ yargs.getInstance('webstorm')
 gulp.task('webstorm', function (done) {
   console.log(hr('-', 80, 'webstorm'));
   cliArgs = cliArgs || validateLaunchPath(yargs.resolveArgv());
-  var taskList = [
-    cliArgs.subdir && 'webstorm:subdir',
-    cliArgs.project && 'webstorm:project',
-    cliArgs.templates && 'webstorm:templates',
-    cliArgs.tools && 'webstorm:tools',
-    cliArgs.launch && 'webstorm:launch'
-  ].filter(Boolean).concat(done);
-  runSequence.apply(runSequence, taskList);
+
+  // set defaults
+  if (cliArgs.defaults) {
+    Object.keys(config.set(cliArgs).get()).forEach(function (key) {
+        gutil.log('default ' + key + ': ' + JSON.stringify(config.get(key)));
+      });
+    gutil.log('created file ' + config.commit());
+  }
+
+  // else run the selected items
+  else {
+    var taskList = [
+      cliArgs.subdir && 'webstorm:subdir',
+      cliArgs.project && 'webstorm:project',
+      cliArgs.templates && 'webstorm:templates',
+      cliArgs.tools && 'webstorm:tools',
+      cliArgs.launch && 'webstorm:launch'
+    ].filter(Boolean).concat(done);
+    runSequence.apply(runSequence, taskList);
+  }
 });
 
 gulp.task('webstorm:subdir', function () {
@@ -141,7 +166,7 @@ gulp.task('webstorm:tools', function () {
       synchronizeAfterRun: 'true',
       exec               : [ {
           name : 'COMMAND',
-          value: 'angularity' + (IS_WINDOWS ? '.cmd' : '')
+          value: 'angularity' + (plaform.isWindows ? '.cmd' : '')
         }, {
           name : 'PARAMETERS',
           value: parameters
@@ -235,9 +260,8 @@ function validateLaunchPath(argv) {
  * @returns {string}
  */
 function userPreferencesDirectory() {
-  return (IS_WINDOWS) ?
-    maximisePath(process.env.USERPROFILE, /\.WebStorm\d+/, 'config') :
-    maximisePath(process.env.HOME, 'Library', 'Preferences', /WebStorm\d+/);
+  var home = platform.userHomeDirectory();
+  return maximisePath(home, /\.WebStorm\d+/, 'config') || maximisePath(home, 'Library', 'Preferences', /WebStorm\d+/);
 }
 
 /**
@@ -245,7 +269,7 @@ function userPreferencesDirectory() {
  * @returns {string}
  */
 function executablePath() {
-  return (IS_WINDOWS) ? path.join(
+  return (platform.isWindows) ? path.join(
       reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
       maximisePath(/\WebStorm\d+/, 'config', 'bin'),
       'WebStorm.exe'

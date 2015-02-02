@@ -14,7 +14,8 @@ var path        = require('path'),
 
 var yargs = require('./../lib/util/yargs');
 
-var mainMenu = require('../lib/cli/mainMenu');
+// TODO @bholloway menus
+//var mainMenu = require('../lib/cli/mainMenu');
 require('../index');
 
 // we need to duplicate some event handlers from the gulp cli since we have bypassed it
@@ -40,7 +41,6 @@ yargs.getInstance()
   .example('$0 <task name>', 'Run the given task')
   .describe('h', 'This help message, or help on a specific task').alias('h', '?').alias('h', 'help')
   .describe('version', 'Display the version of angularity').alias('version', 'v').boolean('version')
-  .check(yargs.subCommandCheck)
   .wrap(80);
 
 // find the yargs instance that is most appropriate for the given command line parameters

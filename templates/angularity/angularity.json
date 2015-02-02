@@ -1,5 +1,6 @@
 {
   "name": "<%= name %>",
   "version": "<%= version %>",
-  "port":"<%= port %>"
+  "port": <%= port %>,
+  "master": "<%= master %>"
 }

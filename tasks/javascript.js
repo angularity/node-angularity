@@ -10,8 +10,7 @@ var gulp        = require('gulp'),
     wordwrap    = require('wordwrap'),
     ngAnnotate  = require('browserify-ngannotate');
 
-var config         = require('../lib/config/config'),
-    karma          = require('../lib/test/karma'),
+var karma          = require('../lib/test/karma'),
     jsHintReporter = require('../lib/build/jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
     yargs          = require('../lib/util/yargs'),
@@ -25,7 +24,7 @@ yargs.getInstance('javascript')
   .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
   .example('$0 javascript', 'Run this task')
   .example('$0 javascript -u', 'Run this task but do not minify javascript')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
   .strict()
   .check(yargs.subCommandCheck)
@@ -35,7 +34,7 @@ yargs.getInstance('test')
   .usage(wordwrap(2, 80)('The "test" task performs a one time build and karma test of all .spec.js files in the ' +
     'project.'))
   .example('$0 test', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);

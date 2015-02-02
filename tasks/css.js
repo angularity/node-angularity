@@ -6,8 +6,7 @@ var gulp        = require('gulp'),
     wordwrap    = require('wordwrap'),
     path        = require('path');
 
-var config   = require('../lib/config/config'),
-    nodeSass = require('../lib/build/node-sass'),
+var nodeSass = require('../lib/build/node-sass'),
     yargs    = require('../lib/util/yargs'),
     hr       = require('../lib/util/hr'),
     streams  = require('../lib/config/streams');
@@ -15,7 +14,7 @@ var config   = require('../lib/config/config'),
 yargs.getInstance('css')
   .usage(wordwrap(2, 80)('The "css" task performs a one time build of the SASS composition root(s).'))
   .example('$0 css', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help')
+  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
