@@ -14,7 +14,11 @@ var nodeSass = require('../lib/build/node-sass'),
 yargs.getInstance('css')
   .usage(wordwrap(2, 80)('The "css" task performs a one time build of the SASS composition root(s).'))
   .example('$0 css', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);

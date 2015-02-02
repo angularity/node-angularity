@@ -6,7 +6,6 @@ var gulp        = require('gulp'),
     browserSync = require('browser-sync');
 
 var defaults = require('../lib/config/defaults'),
-    platform = require('../lib/config/platform'),
     yargs    = require('../lib/util/yargs'),
     hr       = require('../lib/util/hr'),
     streams  = require('../lib/config/streams');
@@ -19,24 +18,43 @@ var config = defaults.getInstance()
     port: 55555
   });
 
+var check = yargs.createCheck()
+  .withGate(function (argv) {
+    return !argv.help;
+  })
+  .withTest({
+    port: function (value) {
+      if ((typeof value !== 'number') || isNaN(parseInt(value))) {
+        return 'port must be an integer';
+      }
+    }
+  });
+
 yargs.getInstance('server')
   .usage(wordwrap(2, 80)('The "server" task performs a one time build and then serves the application on localhost ' +
     'at the given port.'))
   .example('$0 server', 'Run this task and serve on the default port')
   .example('$0 server -p 8080', 'Run this task and serve at http://localhost:8080')
   .example('$0 server -n', 'Run this task but do not minify built javascript')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
-  .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
-  .describe('p', 'Define a port for the development web server').alias('p', 'port').default('p', config.get('port'))
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .options('unminified', {
+    describe: 'Inhibit minification of javascript',
+    alias   : 'u',
+    boolean : true,
+    default : false
+  })
+  .options('port', {
+    describe: 'A port for the development web server',
+    alias   : 'p',
+    default : config.get('port')
+  })
   .strict()
   .check(yargs.subCommandCheck)
-  .check(yargs.getCheckFor({
-    port: function (value) {
-      if ((typeof value !== 'number') || isNaN(parseInt(value))) {
-        return 'port must be an integer';
-      }
-    }
-  }))
+  .check(check)
   .wrap(80);
 
 gulp.task('server', ['build'], function () {

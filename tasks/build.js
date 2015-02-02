@@ -11,8 +11,17 @@ yargs.getInstance('build')
   .usage(wordwrap(2, 80)('The "build" task performs a single build of the javascript and SASS composition root(s).'))
   .example('$0 build', 'Run this task')
   .example('$0 build -n', 'Run this task but do not minify javascript')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
-  .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .options('unminified', {
+    describe: 'Inhibit minification of javascript',
+    alias   : 'u',
+    boolean : true,
+    default : false
+  })
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);

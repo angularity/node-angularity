@@ -18,7 +18,11 @@ yargs.getInstance('html')
   .usage(wordwrap(2, 80)('The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
     'HTML.'))
   .example('$0 html', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);

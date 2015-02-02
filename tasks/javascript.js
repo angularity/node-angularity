@@ -34,7 +34,11 @@ yargs.getInstance('test')
   .usage(wordwrap(2, 80)('The "test" task performs a one time build and karma test of all .spec.js files in the ' +
     'project.'))
   .example('$0 test', 'Run this task')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);

@@ -38,52 +38,11 @@ var config = defaults.getInstance('init')
     ide        : 'none'
   });
 
-yargs.getInstance('init')
-  .usage(wordwrap(2, 80)([
-    'The "init" task initialises a blank project and optionally an IDE environment. The given options initialise ' +
-    'project defaults. Where omitted the global default will be in effect for the project.',
-    '',
-    'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
-    'globally defined using the --defaults option.',
-    '',
-    '* project directory     exists, else create    --subdir',
-    '* /' + padded(20)(streams.APP            ) + ' exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.html') + ' exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.scss') + ' exists, else create',
-    '* angularity.json       exists, else create',
-    '* package.json          exists, else create    --npm',
-    '* bower.json            exists, else create    --bower',
-    '* karma.conf.js         exists, else create    --karma',
-    '* .jshintrc             exists, else create    --jshint',
-    '* .gitignore            exists, else create    --gitignore',
-    '* initialise and launch an IDE                 --ide',
-    '',
-    'Notes:',
-    '',
-    '* No properties are set in existing files, delete existing files in order to change properties.',
-    '* Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
-    '* Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
-  ].join('\n')))
-  .example('$0 init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
-  .example('$0 init -defaults -n pending', 'Change the name default to "pending')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
-  .describe('defaults', 'Set defaults')
-  .describe('s', 'Create a sub-directory per name').alias('s', 'subdir').boolean('s').default('s', config.get('subdir'))
-  .describe('n', 'The project name').alias('n', 'name').string('n').default('n', config.get('name'))
-  .describe('v', 'The project version').alias('v', 'version').string('v').default('v', config.get('version'))
-  .describe('d', 'The project description').alias('d', 'description').string('d').default('d', config.get('description'))
-  .describe('t', 'A project tag').alias('t', 'tag').string('t').default('d', config.get('tag'))
-  .describe('p', 'A port for the development web server').alias('p', 'port').default('p', config.get('port'))
-  .describe('m', 'Project properties master').alias('m', 'master').string('m').default('m', config.get('master'))
-  .describe('npm', 'Create package.json').boolean('npm').default('npm', config.get('npm'))
-  .describe('bower', 'Create bower.json').boolean('bower').default('bower', config.get('bower'))
-  .describe('karma', 'Create karma.conf.js').boolean('karma').default('karma', config.get('karma'))
-  .describe('jshint', 'Create .jshintrc').boolean('jshint').default('jshint', config.get('jshint'))
-  .describe('gitignore', 'Create .gitignore').boolean('gitignore').default('gitignore', config.get('gitignore'))
-  .describe('ide', 'Initialise IDE ' + IDE_LIST.join('|')).boolean('ide').default('ide', config.get('ide'))
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(yargs.getCheckFor({
+var check = yargs.createCheck()
+  .withGate(function (argv) {
+    return !argv.help;
+  })
+  .withTest({
     name: function(value) {
       if (typeof value !== 'string') {
         return 'name must be a string';
@@ -161,7 +120,122 @@ yargs.getInstance('init')
         return 'value must be "none" or any one value in ' + MASTER_LIST.join('|');
       }
     }
-  }))
+  })
+  .commit();
+
+yargs.getInstance('init')
+  .usage(wordwrap(2, 80)([
+    'The "init" task initialises a blank project and optionally an IDE environment. The given options initialise ' +
+    'project defaults. Where omitted the global default will be in effect for the project.',
+    '',
+    'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
+    'globally defined or reset using the --defaults option.',
+    '',
+    '* project directory     exists, else create    --subdir',
+    '* /' + padded(20)(streams.APP            ) + ' exists, else create',
+    '* /' + padded(20)(streams.APP + '/*.html') + ' exists, else create',
+    '* /' + padded(20)(streams.APP + '/*.scss') + ' exists, else create',
+    '* angularity.json       exists, else create',
+    '* package.json          exists, else create    --npm',
+    '* bower.json            exists, else create    --bower',
+    '* karma.conf.js         exists, else create    --karma',
+    '* .jshintrc             exists, else create    --jshint',
+    '* .gitignore            exists, else create    --gitignore',
+    '* initialise and launch an IDE                 --ide',
+    '',
+    'Notes:',
+    '',
+    '* No properties are set in existing files, delete existing files in order to change properties.',
+    '* Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
+    '* Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
+  ].join('\n')))
+  .example('$0 init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
+  .example('$0 init --defaults -n pending', 'Change the name default to "pending')
+  .example('$0 init --defaults reset', 'Reset defaults')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .options('defaults', {
+    describe: 'Set defaults',
+    alias   : 'z',
+    string  : true
+  })
+  .options('subdir', {
+    describe: 'Create a sub-directory per name',
+    alias   : 's',
+    boolean : true,
+    default : config.get('subdir')
+  })
+  .options('name', {
+    describe: 'The project name',
+    alias   : 'n',
+    string  : true,
+    default : config.get('name')
+  })
+  .options('version', {
+    describe: 'The project version',
+    alias   : 'v',
+    string  : true,
+    default : config.get('version')
+  })
+  .options('description', {
+    describe: 'The project description',
+    alias   : 'd',
+    string  : true,
+    default : config.get('description')
+  })
+  .options('tag', {
+    describe: 'A project tag',
+    alias   : 't',
+    string  : true,
+    default : config.get('tag')
+  })
+  .options('port', {
+    describe: 'A port for the development web server',
+    alias   : 'p',
+    default : config.get('port')
+  })
+  .options('master', {
+    describe: 'Project properties master',
+    alias   : 'm',
+    string  : true,
+    default : config.get('master')
+  })
+  .options('npm', {
+    describe: 'Create package.json',
+    boolean : true,
+    default : config.get('npm')
+  })
+  .options('bower', {
+    describe: 'Create bower.json',
+    boolean : true,
+    default : config.get('bower')
+  })
+  .options('karma', {
+    describe: 'Create karma.conf.js',
+    boolean : true,
+    default : config.get('karma')
+  })
+  .options('jshint', {
+    describe: 'Create .jshintrc',
+    boolean : true,
+    default : config.get('jshint')
+  })
+  .options('gitignore', {
+    describe: 'Create .gitignore',
+    boolean : true,
+    default : config.get('gitignore')
+  })
+  .options('ide', {
+    describe: 'Initialise IDE ' + IDE_LIST.join('|'),
+    boolean : true,
+    default : config.get('ide')
+  })
+  .strict()
+  .check(yargs.subCommandCheck)
+  .check(check)
   .wrap(80);
 
 gulp.task('init', function (done) {
@@ -170,7 +244,8 @@ gulp.task('init', function (done) {
 
   // set defaults
   if (cliArgs.defaults) {
-    Object.keys(config.set(cliArgs).get())
+    ((cliArgs.defaults === 'reset') ? config.revert() : config.set(cliArgs))
+      .changeList()
       .forEach(function (key) {
         gutil.log('default ' + key + ': ' + JSON.stringify(config.get(key)));
       });

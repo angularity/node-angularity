@@ -30,6 +30,31 @@ var config = defaults.getInstance('webstorm')
     'launch'   : true
   });
 
+var check = yargs.createCheck()
+  .withGate(function (argv) {
+    return !argv.help;
+  })
+  .withTest(validateLaunchPath)
+  .withTest(function angularityProjectPresent(argv) {
+    var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
+    if (!fs.existsSync(path.resolve(projectPath))) {
+      return 'Current working directory (or specified subdir) is not a valid project. Try running the "init" ' +
+        'command first.';
+    }
+  })
+  .withTest({
+    subdir: function (value) {
+      if (value) {
+        var subdir  = path.resolve(argv.subdir);
+        var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
+        if (!isValid) {
+          return 'The specified subdirectory does not exist.';
+        }
+      }
+    }
+  })
+  .commit();
+
 yargs.getInstance('webstorm')
   .usage(wordwrap(2, 80)([
     'The "webstorm" task initialises webstorm for a project in the current working directory and launches the IDE.',
@@ -38,7 +63,7 @@ yargs.getInstance('webstorm')
     'boolean in launch.',
     '',
     'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
-    'globally defined using the --defaults option.',
+    'globally defined or reset using the --defaults option.',
     '',
     '* Setup project (resources, debug config, suppressors)   --project',
     '* Create external tools that launch angularity           --tools',
@@ -47,20 +72,57 @@ yargs.getInstance('webstorm')
     '* Launch IDE                                             --launch',
   ].join('\n')))
   .example('$0 webstorm', 'Run this task')
-  .example('$0 webstorm -defaults -l \<some-path\>', 'Set an explicit executable path')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
-  .describe('defaults', 'Set defaults')
-  .describe('s', 'Navigate to the sub-directory with the given project name').alias('s', 'subdir')
-  .describe('p', 'Setup project').alias('p', 'project').boolean('p').default('p', config.get('project'))
-  .describe('e', 'Install external tools').alias('e', 'tools').boolean('e').default('e', config.get('tools'))
-  .describe('r', 'Set style rules').alias('r', 'rules').boolean('r').default('r', config.get('rules'))
-  .describe('t', 'Add code templates').alias('t', 'templates').boolean('t').default('t', config.get('templates'))
-  .describe('l', 'Launch the IDE following setup').alias('l', 'launch').default('l', config.get('launch'))
+  .example('$0 webstorm --defaults -l \<some-path\>', 'Set a default executable path')
+  .example('$0 webstorm --defaults reset', 'Reset defaults')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .options('defaults', {
+    describe: 'Set defaults',
+    alias   : 'z',
+    string  : true
+  })
+  .options('subdir', {
+    describe: 'Navigate to the sub-directory with the given project name',
+    alias   : 's',
+    boolean : true,
+    default : config.get('subdir')
+  })
+  .options('project', {
+    describe: 'Setup project',
+    alias   : 'p',
+    boolean : true,
+    default : config.get('project')
+  })
+  .options('tools', {
+    describe: 'Install external tools',
+    alias   : 't',
+    boolean : true,
+    default : config.get('tools')
+  })
+  .options('rules', {
+    describe: 'Set style rules',
+    alias   : 'r',
+    boolean : true,
+    default : config.get('rules')
+  })
+  .options('templates', {
+    describe: 'Add code templates',
+    alias   : 't',
+    boolean : true,
+    default : config.get('templates')
+  })
+  .options('launch', {
+    describe: 'Launch the IDE following setup',
+    alias   : 'l',
+    boolean : true,
+    default : config.get('launch')
+  })
   .strict()
   .check(yargs.subCommandCheck)
-  .check(validateSubdirectory)
-  .check(angularityProjectPresent)
-  .check(validateLaunchPath)
+  .check(check)
   .wrap(80);
 
 gulp.task('webstorm', function (done) {
@@ -69,10 +131,12 @@ gulp.task('webstorm', function (done) {
 
   // set defaults
   if (cliArgs.defaults) {
-    Object.keys(config.set(cliArgs).get()).forEach(function (key) {
+    ((cliArgs.defaults === 'reset') ? config.revert() : config.set(cliArgs))
+      .changeList()
+      .forEach(function (key) {
         gutil.log('default ' + key + ': ' + JSON.stringify(config.get(key)));
       });
-    gutil.log('created file ' + config.commit());
+    gutil.log('wrote file ' + config.commit());
   }
 
   // else run the selected items
@@ -205,31 +269,6 @@ gulp.task('webstorm:launch', function () {
 });
 
 /**
- * yargs check for a valid --subdir parameter
- * @param argv
- */
-function validateSubdirectory(argv) {
-  if (argv.subdir) {
-    var subdir  = path.resolve(argv.subdir);
-    var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
-    if (!isValid) {
-      throw new Error('The specified subdirectory does not exist.')
-    }
-  }
-}
-
-/**
- * yargs check for the current directory being initialised
- * @param argv
- */
-function angularityProjectPresent(argv) {
-  var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
-  if (!fs.existsSync(path.resolve(projectPath))) {
-    throw new Error('Current working directory (or specified subdir) is not a valid project. Try running the "init" command first.')
-  }
-}
-
-/**
  * yargs check for a valid --launch parameter
  * Additionally parses true|false strings to boolean literals
  * @param argv
@@ -243,13 +282,14 @@ function validateLaunchPath(argv) {
     case true:
     case 'true':
       if (!fs.existsSync(executablePath())) {
-        throw new Error('Cannot find Webstorm executable, you will have to specify it explicitly.');
+        return 'Cannot find Webstorm executable, you will have to specify it explicitly.';
+      } else {
+        argv.launch = true;
+        break;
       }
-      argv.launch = true;
-      break;
     default:
       if (!fs.existsSync(path.normalize(argv.launch))) {
-        throw new Error('Launch path is not valid or does not exist.');
+        return 'Launch path is not valid or does not exist.';
       }
   }
   return argv;
@@ -269,7 +309,7 @@ function userPreferencesDirectory() {
  * @returns {string}
  */
 function executablePath() {
-  return (platform.isWindows) ? path.join(
+  return (platform.isWindows()) ? path.join(
       reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
       maximisePath(/\WebStorm\d+/, 'config', 'bin'),
       'WebStorm.exe'

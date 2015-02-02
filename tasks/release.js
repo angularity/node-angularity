@@ -23,8 +23,17 @@ yargs.getInstance('release')
     'components to a release directory.'))
   .example('$0 release', 'Run this task')
   .example('$0 release -n', 'Run this task but do not minify built javascript')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
-  .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .options('unminified', {
+    describe: 'Inhibit minification of javascript',
+    alias   : 'u',
+    boolean : true,
+    default : false
+  })
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
