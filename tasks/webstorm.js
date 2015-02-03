@@ -45,7 +45,7 @@ var check = yargs.createCheck()
   .withTest({
     subdir: function (value) {
       if (value) {
-        var subdir  = path.resolve(argv.subdir);
+        var subdir  = path.resolve(value);
         var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
         if (!isValid) {
           return 'The specified subdirectory does not exist.';
@@ -60,7 +60,7 @@ yargs.getInstance('webstorm')
     'The "webstorm" task initialises webstorm for a project in the current working directory and launches the IDE.',
     '',
     'Where the IDE is installed in a non-standard location the full path to the IDE should be used in place of the ' +
-    'boolean in launch.',
+    'boolean in --launch.',
     '',
     'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
     'globally defined or reset using the --defaults option.',
@@ -85,9 +85,9 @@ yargs.getInstance('webstorm')
     string  : true
   })
   .options('subdir', {
-    describe: 'Navigate to the sub-directory with the given project name',
+    describe: 'Navigate to the sub-directory specified',
     alias   : 's',
-    boolean : true,
+    string  : true,
     default : config.get('subdir')
   })
   .options('project', {
@@ -230,7 +230,7 @@ gulp.task('webstorm:tools', function () {
       synchronizeAfterRun: 'true',
       exec               : [ {
           name : 'COMMAND',
-          value: 'angularity' + (plaform.isWindows ? '.cmd' : '')
+          value: 'angularity' + (platform.isWindows ? '.cmd' : '')
         }, {
           name : 'PARAMETERS',
           value: parameters

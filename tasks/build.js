@@ -10,7 +10,7 @@ var yargs  = require('../lib/util/yargs'),
 yargs.getInstance('build')
   .usage(wordwrap(2, 80)('The "build" task performs a single build of the javascript and SASS composition root(s).'))
   .example('$0 build', 'Run this task')
-  .example('$0 build -n', 'Run this task but do not minify javascript')
+  .example('$0 build -u', 'Run this task but do not minify javascript')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],

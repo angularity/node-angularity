@@ -17,7 +17,6 @@ var defaults = require('../lib/config/defaults'),
 
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'angularity');
 var IDE_LIST      = ['webstorm'];  // each of these needs to be a gulp-task in its own right
-var MASTER_LIST   = ['angularity', 'npm', 'bower'];
 
 var cliArgs;
 
@@ -29,7 +28,6 @@ var config = defaults.getInstance('init')
     description: '',
     tag        : [ ],
     port       : 'random',
-    master     : 'angularity.json',
     npm        : true,
     bower      : true,
     karma      : true,
@@ -112,13 +110,6 @@ var check = yargs.createCheck()
           return 'value must be "none" or one or more values in ' + IDE_LIST.join('|');
         }
       });
-    },
-    master: function (value) {
-      if (typeof value !== 'string') {
-        return 'ide must be a string';
-      } else if ((['none'].concat(MASTER_LIST).indexOf(value) >= 0)) {
-        return 'value must be "none" or any one value in ' + MASTER_LIST.join('|');
-      }
     }
   })
   .commit();
@@ -196,12 +187,6 @@ yargs.getInstance('init')
     describe: 'A port for the development web server',
     alias   : 'p',
     default : config.get('port')
-  })
-  .options('master', {
-    describe: 'Project properties master',
-    alias   : 'm',
-    string  : true,
-    default : config.get('master')
   })
   .options('npm', {
     describe: 'Create package.json',
