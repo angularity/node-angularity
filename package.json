@@ -43,7 +43,7 @@
     "chalk": "latest",
     "combined-stream": "latest",
     "convert-source-map": "latest",
-    "css-sprite": "latest",
+    "css-sprite": "bguiz/css-sprite#absolute-path-fix",
     "gulp": "latest",
     "gulp-changed": "latest",
     "gulp-concat": "latest",
