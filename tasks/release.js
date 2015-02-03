@@ -21,8 +21,8 @@ var injectAdjacent   = require('../lib/inject/adjacent-files'),
 yargs.getInstance('release')
   .usage(wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
     'components to a release directory.'))
-  .example('$0 release', 'Run this task')
-  .example('$0 release -n', 'Run this task but do not minify built javascript')
+  .example('angularity release', 'Run this task')
+  .example('angularity release -n', 'Run this task but do not minify built javascript')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],

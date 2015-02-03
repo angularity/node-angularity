@@ -34,9 +34,9 @@ var check = yargs.createCheck()
 yargs.getInstance('server')
   .usage(wordwrap(2, 80)('The "server" task performs a one time build and then serves the application on localhost ' +
     'at the given port.'))
-  .example('$0 server', 'Run this task and serve on the default port')
-  .example('$0 server -p 8080', 'Run this task and serve at http://localhost:8080')
-  .example('$0 server -n', 'Run this task but do not minify built javascript')
+  .example('angularity server', 'Run this task and serve on the default port')
+  .example('angularity server -p 8080', 'Run this task and serve at http://localhost:8080')
+  .example('angularity server -n', 'Run this task but do not minify built javascript')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],

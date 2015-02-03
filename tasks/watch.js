@@ -33,9 +33,9 @@ yargs.getInstance('watch')
   .usage(wordwrap(2, 80)('The "watch" task performs an initial build and then serves the application on localhost at ' +
     'the given port. It then watches the project and performs rebuild of Javascript and/or SASS compositions upon ' +
     'change. This is followed by HTML injection and browser reload.'))
-  .example('$0 watch', 'Run this task')
-  .example('$0 watch -p 8080', 'Run this task and serve at http://localhost:8080')
-  .example('$0 watch -n', 'Run this task but do not minify javascript')
+  .example('angularity watch', 'Run this task')
+  .example('angularity watch -p 8080', 'Run this task and serve at http://localhost:8080')
+  .example('angularity watch -n', 'Run this task but do not minify javascript')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],

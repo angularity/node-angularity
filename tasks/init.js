@@ -140,9 +140,9 @@ yargs.getInstance('init')
     '* Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
     '* Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
   ].join('\n')))
-  .example('$0 init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
-  .example('$0 init --defaults -n pending', 'Change the name default to "pending')
-  .example('$0 init --defaults reset', 'Reset defaults')
+  .example('angularity init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
+  .example('angularity init --defaults -n pending', 'Change the name default to "pending')
+  .example('angularity init --defaults reset', 'Reset defaults')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],

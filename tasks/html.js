@@ -17,7 +17,7 @@ var injectAdjacent = require('../lib/inject/adjacent-files'),
 yargs.getInstance('html')
   .usage(wordwrap(2, 80)('The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
     'HTML.'))
-  .example('$0 html', 'Run this task')
+  .example('angularity html', 'Run this task')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],

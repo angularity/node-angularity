@@ -71,9 +71,9 @@ yargs.getInstance('webstorm')
     '* Add code templates                                     --templates',
     '* Launch IDE                                             --launch',
   ].join('\n')))
-  .example('$0 webstorm', 'Run this task')
-  .example('$0 webstorm --defaults -l \<some-path\>', 'Set a default executable path')
-  .example('$0 webstorm --defaults reset', 'Reset defaults')
+  .example('angularity webstorm', 'Run this task')
+  .example('angularity webstorm --defaults -l \<some-path\>', 'Set a default executable path')
+  .example('angularity webstorm --defaults reset', 'Reset defaults')
   .options('help', {
     describe: 'This help message',
     alias   : [ 'h', '?' ],
