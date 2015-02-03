@@ -8,6 +8,7 @@
 var path        = require('path'),
     gulp        = require('gulp'),
     gutil       = require('gulp-util'),
+    wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence'),
     chalk       = require('chalk'),
     prettyTime  = require('pretty-hrtime');
@@ -33,8 +34,12 @@ gulp.on('task_stop', function (e) {
 
 // describe the top level arguments
 yargs.getInstance()
-  .usage('Angularity is an opinionated build tool for AngularJS projects.\n\nTasks include:\n  ' +
-    yargs.listTasks().join(', '))
+  .usage(wordwrap(2, 80)([
+    'Angularity is an opinionated build tool for AngularJS projects.',
+    '',
+    'Tasks include:',
+    yargs.listTasks().join(', ')
+  ].join('\n')))
   .example('$0', 'Interactive menu')
   .example('$0 -v', 'Display the version of angularity')
   .example('$0 -h <task name>', 'Get help on a particular task')

@@ -17,6 +17,7 @@ var config = defaults.getInstance()
   });
 
 var check = yargs.createCheck()
+  // don't check if we are just accessing help
   .withGate(function (argv) {
     return !argv.help;
   })
@@ -68,7 +69,7 @@ gulp.task('watch', ['server'], function () {
   watch(streams.getGlob(['**/*.js', '**/*.html', '!*.*', '!**/*.spec.*'], [streams.APP, streams.NODE, streams.BOWER]), {
     name      : 'JS|HTML',
     emitOnGlob: false
-  }, queue.getHandler('js', 'html', 'reload')); // app html will be needed in case previous injection failed
+  }, queue.getHandler('javascript', 'html', 'reload')); // app html will be needed in case previous injection failed
 
   watch(streams.getGlob(['**/*.scss', '!*.scss'], [streams.APP, streams.NODE, streams.BOWER]), {
     name      : 'CSS',

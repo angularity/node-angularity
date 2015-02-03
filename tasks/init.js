@@ -37,6 +37,7 @@ var config = defaults.getInstance('init')
   });
 
 var check = yargs.createCheck()
+  // don't check if we are just accessing help
   .withGate(function (argv) {
     return !argv.help;
   })

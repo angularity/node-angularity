@@ -31,17 +31,11 @@ var config = defaults.getInstance('webstorm')
   });
 
 var check = yargs.createCheck()
+  // don't check if we are just accessing help
   .withGate(function (argv) {
-    return !argv.help;
+    return !(argv.help);
   })
   .withTest(validateLaunchPath)
-  .withTest(function angularityProjectPresent(argv) {
-    var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
-    if (!fs.existsSync(path.resolve(projectPath))) {
-      return 'Current working directory (or specified subdir) is not a valid project. Try running the "init" ' +
-        'command first.';
-    }
-  })
   .withTest({
     subdir: function (value) {
       if (value) {
@@ -51,6 +45,17 @@ var check = yargs.createCheck()
           return 'The specified subdirectory does not exist.';
         }
       }
+    }
+  })
+  // don't check for a project if we are just setting defaults
+  .withGate(function (argv) {
+    return !(argv.defaults);
+  })
+  .withTest(function angularityProjectPresent(argv) {
+    var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
+    if (!fs.existsSync(path.resolve(projectPath))) {
+      return 'Current working directory (or specified subdir) is not a valid project. Try running the "init" ' +
+        'command first.';
     }
   })
   .commit();
