@@ -7,20 +7,39 @@ var gulp        = require('gulp'),
     plumber     = require('gulp-plumber'),
     rimraf      = require('gulp-rimraf'),
     semiflat    = require('gulp-semiflat'),
+    wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence');
 
-var config           = require('../lib/config/config'),
-    injectAdjacent   = require('../lib/inject/adjacent-files'),
+var injectAdjacent   = require('../lib/inject/adjacent-files'),
     injectTransform  = require('../lib/inject/relative-transform'),
     bowerFiles       = require('../lib/inject/bower-files'),
     versionDirectory = require('../lib/release/version-directory'),
+    yargs            = require('../lib/util/yargs'),
     hr               = require('../lib/util/hr'),
     streams          = require('../lib/config/streams');
 
-var CONSOLE_WIDTH = config.getConsoleWidth();
+yargs.getInstance('release')
+  .usage(wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
+    'components to a release directory.'))
+  .example('$0 release', 'Run this task')
+  .example('$0 release -n', 'Run this task but do not minify built javascript')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .options('unminified', {
+    describe: 'Inhibit minification of javascript',
+    alias   : 'u',
+    boolean : true,
+    default : false
+  })
+  .strict()
+  .check(yargs.subCommandCheck)
+  .wrap(80);
 
 gulp.task('release', ['build'], function (done) {
-  console.log(hr('-', CONSOLE_WIDTH, 'release'));
+  console.log(hr('-', 80, 'release'));
   runSequence(
     'release:clean',
     'release:adjacent',
