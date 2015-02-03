@@ -316,8 +316,8 @@ function userPreferencesDirectory() {
  */
 function executablePath() {
   if (platform.isWindows()) {
-    return maximisePath(reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
-  		/^WebStorm\s*[.\d]+$/, 'bin', 'Webstorm.exe');
+    return path.join(maximisePath(reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
+  		/^WebStorm\s*[.\d]+$/, 'bin'), 'Webstorm.exe');
   } else {
     return '/Applications/WebStorm.app/Contents/MacOS/webide';
   }
