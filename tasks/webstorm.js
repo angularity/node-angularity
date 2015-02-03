@@ -62,8 +62,8 @@ yargs.getInstance('webstorm')
     'Where the IDE is installed in a non-standard location the full path to the IDE should be used in place of the ' +
     'boolean in --launch.',
     '',
-    'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
-    'globally defined or reset using the --defaults option.',
+    'The following steps are taken. Some steps are gated by respective a flag. Default options may be globally ' +
+    'defined or reset using the --defaults option.',
     '',
     '* Setup project (resources, debug config, suppressors)   --project',
     '* Create external tools that launch angularity           --tools',

@@ -119,8 +119,8 @@ yargs.getInstance('init')
     'The "init" task initialises a blank project and optionally an IDE environment. The given options initialise ' +
     'project defaults. Where omitted the global default will be in effect for the project.',
     '',
-    'The following steps are taken. Where a step is gated by a flag it is stated as "--flag". Defaults may be ' +
-    'globally defined or reset using the --defaults option.',
+    'The following steps are taken. Some steps are gated by respective a flag. Default options may be globally ' +
+    'defined or reset using the --defaults option.',
     '',
     '* project directory     exists, else create    --subdir',
     '* /' + padded(20)(streams.APP            ) + ' exists, else create',
