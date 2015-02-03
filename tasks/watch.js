@@ -22,11 +22,12 @@ var check = yargs.createCheck()
   })
   .withTest({
     port: function (value) {
-      if ((typeof value !== 'number') || isNaN(parseInt(value))) {
+      if ((typeof value !== 'number') || isNaN(parseInt(value)) || (Math.round(value) !== value)) {
         return 'port must be an integer';
       }
     }
-  });
+  })
+  .commit();
 
 yargs.getInstance('watch')
   .usage(wordwrap(2, 80)('The "watch" task performs an initial build and then serves the application on localhost at ' +

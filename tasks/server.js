@@ -24,11 +24,12 @@ var check = yargs.createCheck()
   })
   .withTest({
     port: function (value) {
-      if ((typeof value !== 'number') || isNaN(parseInt(value))) {
+      if ((typeof value !== 'number') || isNaN(parseInt(value)) || (Math.round(value) !== value)) {
         return 'port must be an integer';
       }
     }
-  });
+  })
+  .commit();
 
 yargs.getInstance('server')
   .usage(wordwrap(2, 80)('The "server" task performs a one time build and then serves the application on localhost ' +
@@ -59,8 +60,14 @@ yargs.getInstance('server')
 
 gulp.task('server', ['build'], function () {
   console.log(hr('-', 80, 'server'));
-  cliArgs = cliArgs || yargs.resolveArgv();
+
+  // find the yargs instance that is most appropriate for the given command line parameters
+  cliArgs = yargs.resolveArgv();
+
+  // debug message
   gutil.log('serving on port:', cliArgs.port);
+
+  // start serving with browser sync
   browserSync({
     server  : {
       baseDir: streams.BUILD,

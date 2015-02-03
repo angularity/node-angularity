@@ -215,7 +215,7 @@ yargs.getInstance('init')
   })
   .options('ide', {
     describe: 'Initialise IDE ' + IDE_LIST.join('|'),
-    boolean : true,
+    string  : true,
     default : config.get('ide')
   })
   .strict()
@@ -225,7 +225,9 @@ yargs.getInstance('init')
 
 gulp.task('init', function (done) {
   console.log(hr('-', 80, 'init'));
-  cliArgs = cliArgs || yargs.resolveArgv();
+
+  // find the yargs instance that is most appropriate for the given command line parameters
+  cliArgs = yargs.resolveArgv();
 
   // set defaults
   if (cliArgs.defaults) {

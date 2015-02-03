@@ -117,7 +117,7 @@ yargs.getInstance('webstorm')
   .options('launch', {
     describe: 'Launch the IDE following setup',
     alias   : 'l',
-    boolean : true,
+    string  : true,
     default : config.get('launch')
   })
   .strict()
@@ -127,7 +127,12 @@ yargs.getInstance('webstorm')
 
 gulp.task('webstorm', function (done) {
   console.log(hr('-', 80, 'webstorm'));
-  cliArgs = cliArgs || validateLaunchPath(yargs.resolveArgv());
+
+  // find the yargs instance that is most appropriate for the given command line parameters
+  cliArgs = validateLaunchPath(yargs.resolveArgv());
+  if (cliArgs.taskName === 'init') {
+    cliArgs = config.get(); // default arguments when called by the "init" task
+  }
 
   // set defaults
   if (cliArgs.defaults) {
@@ -230,7 +235,7 @@ gulp.task('webstorm:tools', function () {
       synchronizeAfterRun: 'true',
       exec               : [ {
           name : 'COMMAND',
-          value: 'angularity' + (platform.isWindows ? '.cmd' : '')
+          value: 'angularity' + (platform.isWindows() ? '.cmd' : '')
         }, {
           name : 'PARAMETERS',
           value: parameters
@@ -253,7 +258,7 @@ gulp.task('webstorm:tools', function () {
   var destPath = path.join(userPreferencesDirectory(), 'tools', 'Angularity.xml');
   var content  = ideTemplate.webStorm.createExternalTool({
     name : 'Angularity',
-    tools: ['test', 'watch', 'watch -unminified', 'build', 'build -unminified', 'release'].map(createNode)
+    tools: ['test', 'watch', 'watch --unminified', 'build', 'build --unminified', 'release'].map(createNode)
   });
   fs.writeFileSync(destPath, content);
 // TODO review with @impaler
