@@ -267,8 +267,12 @@ gulp.task('webstorm:tools', function () {
 
 gulp.task('webstorm:launch', function () {
   var executable = (cliArgs.launch === true) ? executablePath() : path.normalize(cliArgs.launch);
-  gutil.log('launching ' + executable)
-  childProcess.spawn(executable, [process.cwd()], { detached: true });
+  if (fs.existsSync(executable)) {
+    gutil.log('launching ' + executable)
+    childProcess.spawn(executable, [process.cwd()], { detached: true });
+  } else {
+    gutil.log('cannot find the webstorm executable, please specify path in --launch')
+  }
 // TODO review with @impaler
 //  ideTemplate.webStorm.open(project.destination);
 });
@@ -319,11 +323,7 @@ function executablePath() {
       reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
       maximisePath(/\WebStorm\s*\d+/, 'config', 'bin')
     ];
-    if (terms.every(Boolean)) {
-      return path.join.apply(path, terms);
-    } else {
-      return null;
-    }
+    return path.join.apply(path, terms.filter(Boolean));
   } else {
     return '/Applications/WebStorm.app/Contents/MacOS/webide';
   }
