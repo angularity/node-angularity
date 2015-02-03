@@ -310,7 +310,8 @@ function validateLaunchPath(argv) {
  */
 function userPreferencesDirectory() {
   var home = platform.userHomeDirectory();
-  return maximisePath(home, /\.WebStorm\d+/, 'config') || maximisePath(home, 'Library', 'Preferences', /WebStorm\d+/);
+  return maximisePath(home, /\.WebStorm\s*\d+/, 'config') ||
+    maximisePath(home, 'Library', 'Preferences', /WebStorm\s*\d+/);
 }
 
 /**
