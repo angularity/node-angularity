@@ -336,11 +336,11 @@ function executablePath() {
  */
 function maximisePath() {
   function compare(a, b) {
-    var intA = parseInt(/\d+/.exec(a));
-    var intB = parseInt(/\d+/.exec(b));
-    if        (isNaN(intA) || (intB > intA)) {
+    var numA = parseFloat(/[.\d]+/.exec(a)[0]);
+    var numB = parseFloat(/[.\d]+/.exec(b)[0]);
+    if        (isNaN(numA) || (numB > numA)) {
       return +1;
-    } else if (isNaN(intB) || (intA > intB)) {
+    } else if (isNaN(numB) || (numA > numB)) {
       return -1;
     } else {
       return 0;
@@ -404,4 +404,5 @@ function subdirectoriesWithFile(base, filename) {
       });
   }
   return result;
+}
 }
