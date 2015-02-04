@@ -311,8 +311,8 @@ function validateLaunchPath(argv) {
  */
 function userPreferencesDirectory() {
   var home = platform.userHomeDirectory();
-  return maximisePath(home, /^\.WebStorm\s*[.\d]+$/, 'config') ||
-    maximisePath(home, 'Library', 'Preferences', /^WebStorm\s*[.\d]+$/);
+  return maximisePath(home, /^\.WebStorm\s*[.\d]+$/, 'config') ||         // windows|unix
+    maximisePath(home, 'Library', 'Preferences', /^WebStorm\s*[.\d]+$/);  // darwin
 }
 
 /**
@@ -321,10 +321,16 @@ function userPreferencesDirectory() {
  */
 function executablePath() {
   if (platform.isWindows()) {
-    return path.join(maximisePath(reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
-  		/^WebStorm\s*[.\d]+$/, 'bin'), 'Webstorm.exe');
-  } else {
+    return path.join(maximisePath(
+      reduceDirectories('C:/Program Files/JetBrains', 'C:/Program Files (x86)/JetBrains'),
+  		/^WebStorm\s*[.\d]+$/, 'bin'),
+      'Webstorm.exe');
+  } else if (platform.isMacOS()) {
     return '/Applications/WebStorm.app/Contents/MacOS/webide';
+  } else if (platform.isUnix()) {
+    return path.join('opt/webstorm/bin/webstorm.sh');
+  } else {
+    return null;
   }
 }
 
@@ -404,5 +410,4 @@ function subdirectoriesWithFile(base, filename) {
       });
   }
   return result;
-}
 }
