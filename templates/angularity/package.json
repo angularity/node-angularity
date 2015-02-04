@@ -1,0 +1,9 @@
+{
+  "name": "<%= name %>",
+  "version": "<%= version %>",
+  "description": "<%= description %>",
+  "private": true,
+  "tags": <%= tags %>,
+  "dependencies": { },
+  "devDependencies": { }
+}

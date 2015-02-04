@@ -5,18 +5,30 @@ var gulp        = require('gulp'),
     inject      = require('gulp-inject'),
     plumber     = require('gulp-plumber'),
     rimraf      = require('gulp-rimraf'),
+    wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence');
 
-var config         = require('../lib/config/config'),
-    injectAdjacent = require('../lib/inject/adjacent-files'),
+var injectAdjacent = require('../lib/inject/adjacent-files'),
     bowerFiles     = require('../lib/inject/bower-files'),
+    yargs          = require('../lib/util/yargs'),
     hr             = require('../lib/util/hr'),
     streams        = require('../lib/config/streams');
 
-var CONSOLE_WIDTH = config.getConsoleWidth();
+yargs.getInstance('html')
+  .usage(wordwrap(2, 80)('The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
+    'HTML.'))
+  .example('angularity html', 'Run this task')
+  .options('help', {
+    describe: 'This help message',
+    alias   : [ 'h', '?' ],
+    boolean : true
+  })
+  .strict()
+  .check(yargs.subCommandCheck)
+  .wrap(80);
 
 gulp.task('html', function (done) {
-  console.log(hr('-', CONSOLE_WIDTH, 'html'));
+  console.log(hr('-', 80, 'html'));
   runSequence(
     'html:clean',
     ['html:inject', 'html:assets'],

@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "tags": [
     "build",
     "system",
@@ -76,7 +76,6 @@
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
-    "node-bourbon": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
     "q": "latest",
@@ -91,6 +90,7 @@
     "stringify": "latest",
     "through-pipes": "latest",
     "through2": "latest",
+    "wordwrap": "latest",
     "yargs": "latest"
   },
   "devDependencies": {
