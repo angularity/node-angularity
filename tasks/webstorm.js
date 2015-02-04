@@ -212,14 +212,30 @@ gulp.task('webstorm:project', function () {
 gulp.task('webstorm:templates', function () {
   var srcDirectory  = path.join(TEMPLATE_PATH, 'fileTemplates');
   var destDirectory = path.join(userPreferencesDirectory(), 'fileTemplates');
+  var removed       = [ ];
+  var added         = [ ];
+  fs.readdirSync(destDirectory)
+    .forEach(function eachTemplate(filename) {
+      if (/^angularity/.test(path.basename(filename))) {
+        removed.push(filename);
+        fs.unlinkSync(path.join(destDirectory, filename));
+      }
+    });
   fs.readdirSync(srcDirectory)
     .forEach(function eachTemplate(filename) {
       var srcPath  = path.join(srcDirectory, filename);
       var destPath = path.join(destDirectory, filename);
-      if (!fs.existsSync(destPath)) {
-        gutil.log('wrote template ' + filename);
-        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+      added.push(filename);
+      fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+    });
+  removed.forEach(function (filename) {
+      var isRemove = (added.indexOf(filename) < 0);
+      if (isRemove) {
+        gutil.log('removed template ' + filename);
       }
+    });
+  added.forEach(function (filename) {
+      gutil.log('wrote template ' + filename);
     });
 // TODO review with @impaler
 //  ideTemplate.webStorm.copyFileTemplates(fileTemplatePath);
