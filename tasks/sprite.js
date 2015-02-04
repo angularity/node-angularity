@@ -13,7 +13,6 @@ var projectOfFileInstance = projectOfFile.cachedInstance('angularity-sprite', pr
 
 gulp.task('sprite', [], function() {
   var list = {};
-  var mainProjectName = projectOfFileInstance.name(path.join(process.cwd(), 'package.json'));
 
   return configStreams.imageHtmlApp()
     .pipe(through.obj(function transformFn(file, encoding, done) {
@@ -61,12 +60,7 @@ gulp.task('sprite', [], function() {
           var lib = list[libName];
           for (var imgName in lib) {
             if (lib.hasOwnProperty(imgName)) {
-              if (libName === mainProjectName) {
-                mainGlob.push('**!(node_modules|bower_components)/'+imgName+'.png');
-              }
-              else {
-                mainGlob.push('**/'+libName+'/**/'+imgName+'.png');
-              }
+              mainGlob.push('**/'+imgName+'.png');
             }
           }
         }
@@ -74,20 +68,42 @@ gulp.task('sprite', [], function() {
 
       //Use the specific glob to create a "child" gulp stream
       //`stream` is referenced by means of closure is the parents gulp stream
-      //into which the matched image files are pushed
-      configStreams.imageApp(undefined, mainGlob)
+      //into which the matched image files are pushed.
+      //In addition, some of the filtering is defered to here,
+      //because gulp.src only accepts globs,
+      //but we need an custom filter function -
+      //so gulp.src is run with {read:false} option first,
+      //then subsequently a much more specific glob is constructed,
+      //and gulp.src with {read:true} option is run
+      var selectedImageFiles = [];
+      configStreams.imageApp({ read: false }, mainGlob)
         .on('data', function(file) {
           //Prefix the file name of all images with the project name so as to create
           //disambiguation between sprites from mutliple dependencies.
           //The need to manipulate file names is inherent from the spriting library
           //using file names to generate CSS classes for each sprite.
           var imageProjectName = projectOfFileInstance.name(file.path);
-          file.path = path.join(
-              process.cwd(), 'sprite', imageProjectName + '--' + path.basename(file.path));
-          stream.push(file);
+          var imageName = path.basename(file.path, '.png');
+          if (list[imageProjectName] && list[imageProjectName][imageName])
+          {
+            selectedImageFiles.push(file);
+          }
         })
         .on('end', function() {
-          done();
+          var filteredGlob = selectedImageFiles.map(function(file) {
+            return path.relative(file.base, file.path);
+          });
+          configStreams.imageApp(undefined, filteredGlob)
+            .on('data', function(file) {
+              var imageProjectName = projectOfFileInstance.name(file.path);
+              file.base = process.cwd();
+              file.path = path.join(
+                  process.cwd(), 'sprite', imageProjectName + '--' + path.basename(file.path));
+              stream.push(file);
+            })
+            .on('end', function() {
+              done();
+            })
         });
     }))
     .pipe(
