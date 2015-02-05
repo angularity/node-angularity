@@ -3,6 +3,7 @@
 var path = require('path');
 
 var gulp = require('gulp');
+var gulpIf = require('gulp-if');
 var cssSprite = require('css-sprite');
 var through = require('through2');
 var projectOfFile = require('project-of-file');
@@ -25,11 +26,11 @@ gulp.task('sprite', [], function() {
       //TODO investigate if a token-based parser would be a more apt solution
       var contents = file.contents.toString();
       var match, matches = [];
-      var regex = /\<i\s[^\>]*class\=[\"\']sprite-[\w-]+--[\w-]+[\"\'][^\>]*\>/gim ;
+      var regex = /\<i\s[^\>]*class\=[\"\']sprite\ssprite-[\w-]+--[\w-]+[\"\'][^\>]*\>/gim ;
       var matches = contents.match(regex);
       if (matches && matches.length > 0) {
         matches = matches.map(function(tag) {
-          var info = (tag).match( /\<i\s[^\>]*class\=[\"\']sprite-([\w-]+)--([\w-]+)[\"\'][^\>]*\>/im );
+          var info = (tag).match( /\<i\s[^\>]*class\=[\"\']sprite\ssprite-([\w-]+)--([\w-]+)[\"\'][^\>]*\>/im );
           return {
             lib: info[1],
             img: info[2],
@@ -112,12 +113,17 @@ gulp.task('sprite', [], function() {
         name: 'sprite',
         style: '_sprite.scss',
         processor: 'scss',
-        cssPath: configStreams.BUILD + '/sprite/',
+        cssPath: 'sprite',
         // "generate both retina and standard sprites. src images have to be in retina resolution"
         retina: true,
         orientation: 'binary-tree',
         template: path.join(__dirname, 'sprites.scss.mustache'),
+        prefix: 'sprite',
       })
     )
-    .pipe(gulp.dest(configStreams.BUILD + '/sprite/'));
+    .pipe(
+      gulpIf('*.scss',
+        gulp.dest(configStreams.APP + '/sprite/'),
+        gulp.dest(configStreams.BUILD + '/sprite/'))
+    );
 });

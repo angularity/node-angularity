@@ -28,7 +28,7 @@ gulp.task('css:clean', function () {
 });
 
 // compile sass with the previously discovered lib paths
-gulp.task('css:build', function () {
+gulp.task('css:build', ['sprite'], function () {
   return streams.scssApp()
     .pipe(nodeSass(CONSOLE_WIDTH, [streams.BOWER, streams.NODE]))
     .pipe(gulp.dest(streams.BUILD));
