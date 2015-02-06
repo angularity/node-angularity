@@ -23,6 +23,7 @@ var cliArgs;
 var config = defaults.getInstance('init')
   .file(platform.userHomeDirectory(), '.angularity')
   .defaults({
+    subdir     : true,
     name       : 'my-project',
     version    : '0.0.0',
     description: '',
@@ -123,23 +124,29 @@ yargs.getInstance('init')
     'The following steps are taken. Some steps are gated by respective a flag. Default options may be globally ' +
     'defined or reset using the --defaults option.',
     '',
-    '* project directory     exists, else create    --subdir',
-    '* /' + padded(20)(streams.APP            ) + ' exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.html') + ' exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.scss') + ' exists, else create',
-    '* angularity.json       exists, else create',
-    '* package.json          exists, else create    --npm',
-    '* bower.json            exists, else create    --bower',
-    '* karma.conf.js         exists, else create    --karma',
-    '* .jshintrc             exists, else create    --jshint',
-    '* .gitignore            exists, else create    --gitignore',
-    '* initialise and launch an IDE                 --ide',
+    '* project directory    exists, else create    --subdir',
+    '* /' + padded(20)(streams.APP            ) + 'exists, else create',
+    '* /' + padded(20)(streams.APP + '/*.html') + 'exists, else create',
+    '* /' + padded(20)(streams.APP + '/*.scss') + 'exists, else create',
+    '* angularity.json      exists, else create',
+    '* package.json         exists, else create    --npm',
+    '* bower.json           exists, else create    --bower',
+    '* karma.conf.js        exists, else create    --karma',
+    '* .jshintrc            exists, else create    --jshint',
+    '* .gitignore           exists, else create    --gitignore',
+    '* run IDE task                                --ide',
     '',
-    'Notes:',
+    'By default, a subdirectory is created for the project',
     '',
-    '* No properties are set in existing files, delete existing files in order to change properties.',
-    '* Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
-    '* Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
+    'Where run on an exising project existing files will not be altered, delete existing files in order to change ' +
+    'properties.',
+    '',
+    'Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
+    '',
+    'Available IDE tasks include:',
+    IDE_LIST.join(', '),
+    '',
+    'Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
   ].join('\n')))
   .example('angularity init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
   .example('angularity init --defaults -n pending', 'Change the name default to "pending')
@@ -215,7 +222,7 @@ yargs.getInstance('init')
     default : config.get('gitignore')
   })
   .options('ide', {
-    describe: 'Initialise IDE ' + IDE_LIST.join('|'),
+    describe: 'Run an IDE initialisation task',
     string  : true,
     default : config.get('ide')
   })
