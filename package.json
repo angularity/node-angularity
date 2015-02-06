@@ -49,6 +49,7 @@
     "gulp-concat": "latest",
     "gulp-if": "latest",
     "gulp-inject": "latest",
+    "gulp-newer": "latest",
     "gulp-jshint": "latest",
     "gulp-load-plugins": "latest",
     "gulp-minify-html": "latest",
