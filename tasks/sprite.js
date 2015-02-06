@@ -16,7 +16,13 @@ var projectOfFileInstance = projectOfFile.cachedInstance('angularity-sprite', pr
 /*
  * using regular expressions, identify possible sprite image file names,
  * and the projects which they should belong to
+ *
  * TODO investigate if a token-based parser would be a more apt solution
+ *
+ * @param {Object} Pass in an empty object for starters,
+ *    this is actually the output object
+ * @param {vynil-fs file} A single HTML file which gets searched for
+ *    expressions that identify sprites
  */
 function identifySpritesInHtmlFile(list, file) {
   var contents = file.contents.toString();
@@ -49,6 +55,12 @@ function identifySpritesInHtmlFile(list, file) {
  * create a very specific set of glob strings based on project and image names
  * NOTE that should there be an overlap (e.g. when there are multiple dependencies with the same name)
  * the behaviour is indeterminate
+ *
+ * @param {Object} list The object containing project names and file names
+ *   produced by `constructFirstPassGlob`
+ * @param {Array} mainGlob An array of glob strings.
+ *   This is actually the output variable,
+ *   globs are created based on file names from the `list` object.
  */
 function constructFirstPassGlob(list, mainGlob) {
   for (var libName in list) {
@@ -61,7 +73,6 @@ function constructFirstPassGlob(list, mainGlob) {
       }
     }
   }
-  return mainGlob;
 }
 
 /*
@@ -69,6 +80,14 @@ function constructFirstPassGlob(list, mainGlob) {
  * disambiguation between sprites from mutliple dependencies.
  * The need to manipulate file names is inherent from the spriting library
  * using file names to generate CSS classes for each sprite.
+ *
+ * @param {Array} selectedImageFiles an array of vynil-fs files
+ *   This array is actually the output target.
+ *   The passed in `file` parameter is added to the this `identifySpritesInHtmlFile`
+ *   if it passes the test based on the contents of `list`
+ * @param {Object} list The object containing project names and file names
+ *   produced by `constructFirstPassGlob`
+ * @param {vynil-fs file} A single file
  */
 function filterSecondPassFiles(selectedImageFiles, list, file) {
   var imageProjectName = projectOfFileInstance.name(file.path);
@@ -112,6 +131,8 @@ function htmlToSpriteImages() {
    * so gulp.src is run with {read:false} option first,
    * then subsequently a much more specific glob is constructed,
    * and gulp.src with {read:true} option is run
+   *
+   * @param {Function} done Callback function, should be passed in when invoked via through2
    */
   function flushFn(done) {
     var stream = this;
