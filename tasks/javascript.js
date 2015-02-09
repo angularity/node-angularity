@@ -1,5 +1,7 @@
 'use strict';
 
+var path        = require('path');
+
 var gulp        = require('gulp'),
     jshint      = require('gulp-jshint'),
     rimraf      = require('gulp-rimraf'),
@@ -11,8 +13,6 @@ var gulp        = require('gulp'),
     ngAnnotate  = require('browserify-ngannotate');
 
 var karma          = require('../lib/test/karma'),
-    //TODO @bguiz dynamically load reporter, default to this when not specified
-    jsHintReporter = require('angularity-jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
     yargs          = require('../lib/util/yargs'),
     hr             = require('../lib/util/hr'),
@@ -21,12 +21,19 @@ var karma          = require('../lib/test/karma'),
 var cliArgs;
 var transforms;
 
+var defaultJshintReporterName = 'angularity-jshint-reporter';
 yargs.getInstance('javascript')
   .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
   .example('angularity javascript', 'Run this task')
   .example('angularity javascript -u', 'Run this task but do not minify javascript')
   .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
   .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
+  .options('reporter', {
+    describe: 'Specify a custom JsHint reporter to use. Expects it to be `npm install`ed',
+    alias: ['r'],
+    default: defaultJshintReporterName,
+    string:true,
+  })
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
@@ -43,6 +50,37 @@ yargs.getInstance('test')
   .strict()
   .check(yargs.subCommandCheck)
   .wrap(80);
+
+//Dynamically load reporter
+var jsHintReporter;
+function getJsHintReporter() {
+  if (jsHintReporter) {
+    return jsHintReporter;
+  }
+
+  //find the appropriate yargs instance for this subtask
+  var cliArgs = yargs.resolveArgv();
+  var reporterName = cliArgs.reporter;
+  if (reporterName === defaultJshintReporterName) {
+    jsHintReporter = require(defaultJshintReporterName);
+  }
+  else {
+    var reporterPath = path.join(process.cwd(), 'node_modules', reporterName);
+    try {
+      jsHintReporter = require(reporterPath);
+      if (typeof jsHintReporter === 'string') {
+        //In JsHint convention, the `index.js` file exports a string which jshint itself should require
+        //e.g. `module.exports = require('path').join(__dirname, 'reporter.js');`
+        jsHintReporter = jshint.reporter(require(jsHintReporter));
+      }
+    }
+    catch (ex) {
+      throw 'Attempt to require reporter from path '+reporterPath+' with no success.';
+    }
+  }
+
+  return jsHintReporter;
+}
 
 gulp.task('javascript', function (done) {
   console.log(hr('-', 80, 'javascript'));
@@ -83,7 +121,7 @@ gulp.task('javascript:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jsHintReporter(80));
+    .pipe(getJsHintReporter());
 });
 
 // karma unit tests in local library only
