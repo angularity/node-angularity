@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "6to5ify": "latest",
+    "angularity-jshint-reporter": "latest",
     "asks": "latest",
     "bower-directory": "latest",
     "browser-sync": "latest",

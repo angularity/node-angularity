@@ -11,7 +11,8 @@ var gulp        = require('gulp'),
     ngAnnotate  = require('browserify-ngannotate');
 
 var karma          = require('../lib/test/karma'),
-    jsHintReporter = require('../lib/build/jshint-reporter'),
+    //TODO @bguiz dynamically load reporter, default to this when not specified
+    jsHintReporter = require('angularity-jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
     yargs          = require('../lib/util/yargs'),
     hr             = require('../lib/util/hr'),
