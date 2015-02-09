@@ -20,7 +20,6 @@ var karma          = require('../lib/test/karma'),
 var cliArgs;
 var transforms;
 
-var defaultJshintReporterName = 'angularity-jshint-reporter';
 yargs.getInstance('javascript')
   .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
   .example('angularity javascript', 'Run this task')
@@ -36,16 +35,10 @@ yargs.getInstance('javascript')
     boolean: true,
     default: false,
   })
-  .options('reporter', {
-    describe: 'Specify a custom JsHint reporter to use.\n'+
-      'Expects it to be `npm install`ed in your project.\n'+
-      'Otherwise, specify the absolute path to be required.',
-    alias: ['r'],
-    default: defaultJshintReporterName,
-    string:true,
-  })
+  .options(jshintReporter.yargsOption[0], jshintReporter.yargsOption[1])
   .strict()
   .check(yargs.subCommandCheck)
+  .check(jshintReporter.yargsCheck)
   .wrap(80);
 
 yargs.getInstance('test')
@@ -101,7 +94,7 @@ gulp.task('javascript:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jshintReporter.get(reporterName, defaultJshintReporterName));
+    .pipe(jshintReporter.get(reporterName));
 });
 
 // karma unit tests in local library only
