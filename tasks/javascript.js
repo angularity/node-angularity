@@ -35,11 +35,18 @@ yargs.getInstance('javascript')
     boolean: true,
     default: false,
   })
-  .options(jshintReporter.yargsOption[0], jshintReporter.yargsOption[1])
+  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(jshintReporter.yargsCheck)
   .wrap(80);
+
+//TODO @bguiz jsHintReporter module should only need to be imported by this module
+//however, at the moment, the other gulp tasks use different yargs instances
+//and therefore the options and checks need to repeated in each one,
+//making the code tightly couple when they should not be.
+//Proper solution would be to have yargs.getInstance modified to
+//mixin options and checks from dependent/ prequisite yargs instances
 
 yargs.getInstance('test')
   .usage(wordwrap(2, 80)('The "test" task performs a one time build and '+
@@ -88,13 +95,12 @@ gulp.task('javascript:cleanunit', function () {
 
 // run linter
 gulp.task('javascript:lint', function () {
-  var reporterName = yargs.resolveArgv().reporter;
   return combined.create()
     .append(streams.jsApp())
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jshintReporter.get(reporterName));
+    .pipe(jshintReporter.get(cliArgs.reporter));
 });
 
 // karma unit tests in local library only
