@@ -1,0 +1,15 @@
+environment:
+  nodejs_version: "0.11"
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm install -g npm@2.1.7
+  - npm i -g
+  - npm i -g jasmine-node
+
+test_script:
+  - jasmine-node --version
+  - pwd && ls
+  - jasmine-node --verbose
+
+build: off
