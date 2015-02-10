@@ -1,9 +1,8 @@
 'use strict';
+var Q = require('q');
 var spawn = require('child_process').spawn;
 
-var helper = {};
-
-helper.runAngularity = function (args, cwd) {
+function runAngularityProcess(args, cwd) {
   args = args || [];
   cwd = cwd || __dirname;
 
@@ -11,6 +10,35 @@ helper.runAngularity = function (args, cwd) {
   angularity.stdout.setEncoding('utf8');
 
   return angularity;
-};
+}
 
-module.exports = helper;
+function runAngularity(args, cwd) {
+  var deferred = Q.defer();
+
+  var stdout = '',
+      stderr = '';
+
+  var angularityProcess = runAngularityProcess(args, cwd);
+
+  angularityProcess.stdout.on('data', function (data) {
+    stdout += data;
+  });
+
+  angularityProcess.stderr.on('data', function (data) {
+    stderr += data;
+  });
+
+  angularityProcess.on('exit', function (code) {
+    deferred.resolve({
+      code: code,
+      stdout: stdout,
+      stderr: stderr
+    });
+  });
+
+  return deferred.promise;
+}
+
+module.exports = {
+  runAngularity: runAngularity
+};

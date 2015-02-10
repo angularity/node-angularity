@@ -68,7 +68,7 @@ else if (cliArgs.version) {
   console.log('angularity:', version);
 }
 // interactive menu
-else {
-  // TODO @bholloway menus
-  // mainMenu.prompt();
-}
+// TODO @bholloway reimplement after yargs refactor regression
+// else {
+//   mainMenu.prompt();
+// }
