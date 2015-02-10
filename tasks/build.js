@@ -29,8 +29,6 @@ yargs.getInstance('build')
   .check(jshintReporter.yargsCheck)
   .wrap(80);
 
-gulp.task('taskName', ['prerequisiteTask1Name', 'bar'], function() {});
-
 gulp.task('build', function (done) {
   console.log(hr('-', 80, 'build'));
   runSequence('javascript', 'css', 'html', done);
