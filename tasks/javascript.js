@@ -11,11 +11,11 @@ var gulp        = require('gulp'),
     ngAnnotate  = require('browserify-ngannotate');
 
 var karma          = require('../lib/test/karma'),
-    jsHintReporter = require('../lib/build/jshint-reporter'),
     browserify     = require('../lib/build/browserify'),
     yargs          = require('../lib/util/yargs'),
     hr             = require('../lib/util/hr'),
-    streams        = require('../lib/config/streams');
+    streams        = require('../lib/config/streams'),
+    jshintReporter = require('../lib/util/jshint-reporter');
 
 var cliArgs;
 var transforms;
@@ -24,15 +24,33 @@ yargs.getInstance('javascript')
   .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
   .example('angularity javascript', 'Run this task')
   .example('angularity javascript -u', 'Run this task but do not minify javascript')
-  .describe('h', 'This help message').alias('h', '?').alias('h', 'help').boolean('h')
-  .describe('u', 'Inhibit minification of javascript').alias('u', 'unminified').boolean('u').default('u', false)
+  .options('help', {
+    describe: 'This help message',
+    alias: ['h', '?'],
+    boolean: true,
+  })
+  .options('unminified', {
+    describe: 'Inhibit minification of javascript',
+    alias: ['u'],
+    boolean: true,
+    default: false,
+  })
+  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
+  .check(jshintReporter.yargsCheck)
   .wrap(80);
 
+//TODO @bguiz jsHintReporter module should only need to be imported by this module
+//however, at the moment, the other gulp tasks use different yargs instances
+//and therefore the options and checks need to repeated in each one,
+//making the code tightly couple when they should not be.
+//Proper solution would be to have yargs.getInstance modified to
+//mixin options and checks from dependent/ prequisite yargs instances
+
 yargs.getInstance('test')
-  .usage(wordwrap(2, 80)('The "test" task performs a one time build and karma test of all .spec.js files in the ' +
-    'project.'))
+  .usage(wordwrap(2, 80)('The "test" task performs a one time build and '+
+    'karma test of all .spec.js files in the project.'))
   .example('angularity test', 'Run this task')
   .options('help', {
     describe: 'This help message',
@@ -82,7 +100,7 @@ gulp.task('javascript:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jsHintReporter(80));
+    .pipe(jshintReporter.get(cliArgs.reporter));
 });
 
 // karma unit tests in local library only

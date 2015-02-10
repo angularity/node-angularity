@@ -4,8 +4,9 @@ var gulp        = require('gulp'),
     wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence');
 
-var yargs  = require('../lib/util/yargs'),
-    hr     = require('../lib/util/hr');
+var yargs            = require('../lib/util/yargs'),
+    jshintReporter   = require('../lib/util/jshint-reporter'),
+    hr               = require('../lib/util/hr');
 
 yargs.getInstance('build')
   .usage(wordwrap(2, 80)('The "build" task performs a single build of the javascript and SASS composition root(s).'))
@@ -22,8 +23,10 @@ yargs.getInstance('build')
     boolean : true,
     default : false
   })
+  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
+  .check(jshintReporter.yargsCheck)
   .wrap(80);
 
 gulp.task('build', function (done) {
