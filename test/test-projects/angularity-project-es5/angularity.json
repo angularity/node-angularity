@@ -1,8 +1,0 @@
-{
-    "name": "angularity-project-es5",
-    "version": "0.0.1",
-    "serverHttpPort": "4008",
-    "consoleWidth": "80",
-    "javascriptVersion": "ES5",
-    "angularityVersion": "0.0.16"
-}

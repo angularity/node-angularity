@@ -68,6 +68,7 @@ else if (cliArgs.version) {
   console.log('angularity:', version);
 }
 // interactive menu
-else {
-  mainMenu.prompt();
-}
+//todo reimplement after yargs refactor regression
+//else {
+//  mainMenu.prompt();
+//}
