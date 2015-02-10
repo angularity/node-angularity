@@ -1,21 +1,24 @@
 'use strict';
 
-var gulp        = require('gulp'),
-    jshint      = require('gulp-jshint'),
-    rimraf      = require('gulp-rimraf'),
-    runSequence = require('run-sequence'),
-    combined    = require('combined-stream'),
-    to5ify      = require('6to5ify'),
-    stringify   = require('stringify'),
-    wordwrap    = require('wordwrap'),
-    ngAnnotate  = require('browserify-ngannotate');
+var path            = require('path');
 
-var karma          = require('../lib/test/karma'),
-    browserify     = require('../lib/build/browserify'),
-    yargs          = require('../lib/util/yargs'),
-    hr             = require('../lib/util/hr'),
-    streams        = require('../lib/config/streams'),
-    jshintReporter = require('../lib/util/jshint-reporter');
+var gulp            = require('gulp'),
+    jshint          = require('gulp-jshint'),
+    rimraf          = require('gulp-rimraf'),
+    runSequence     = require('run-sequence'),
+    combined        = require('combined-stream'),
+    to5ify          = require('6to5ify'),
+    stringify       = require('stringify'),
+    through         = require('through2'),
+    wordwrap        = require('wordwrap'),
+    ngAnnotate      = require('browserify-ngannotate');
+
+var karma           = require('../lib/test/karma'),
+    browserify      = require('../lib/build/browserify'),
+    yargs           = require('../lib/util/yargs'),
+    hr              = require('../lib/util/hr'),
+    streams         = require('../lib/config/streams'),
+    jshintReporter  = require('../lib/util/jshint-reporter');
 
 var cliArgs;
 var transforms;
@@ -105,15 +108,70 @@ gulp.task('javascript:lint', function () {
     .pipe(jshintReporter.get(cliArgs.reporter));
 });
 
+function karmaSpecFile() {
+  var files = [];
+
+  function transformFn(file, encoding, done) {
+    if (!file || !file.path) {
+      throw 'Files must have paths';
+    }
+    var stream = this;
+    //filter out all files (nothing added back to the stream)
+    //but we save file paths for later use in the flush function
+    files.push(file.path);
+    done();
+  }
+
+  function flushFn(done) {
+    var stream = this;
+    var contentAppend =
+      '\n\nfiles = (files || []).concat(' +
+      JSON.stringify(files, null, '  ') +
+      ');\n';
+    console.log('contentAppend', contentAppend);
+
+    //aggregate and append to karma.conf.js in the project root folder
+    gulp
+      .src(path.join(process.cwd(), 'karma.conf.js'))
+      .on('data', function(karmaConfigFile) {
+        var contents = karmaConfigFile.contents.toString();
+        contents += contentAppend;
+        karmaConfigFile.contents = new Buffer(contents);
+        stream.push(karmaConfigFile);
+      })
+      .on('end', function() {
+        done();
+      });
+  }
+
+  return through.obj(transformFn, flushFn);
+}
+
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
-  return streams.jsSpec()
-    .pipe(browserify
-      .compile(80, transforms.concat(browserify.jasmineTransform('@')))
-      .all('index.js'))
+  return combined.create()
+    .append(
+      streams
+        .testDependencies({
+          dev: true,
+          read: false
+        })
+        .on('data', function(file) {
+          console.log('test dependency file:', file.path);
+        })
+    )
+    .append(
+      streams
+        .jsSpec()
+        .pipe(browserify
+          .compile(80, transforms.concat(browserify.jasmineTransform('@')))
+          .all('index.js'))
+        .pipe(gulp.dest(streams.TEST))
+    )
+    .pipe(karmaSpecFile())
     .pipe(gulp.dest(streams.TEST))
     .pipe(karma({
-      files     : streams.testDependencies({dev: true}).list,
+      // files     : .list,
       frameworks: ['jasmine'],
       reporters : ['spec'],
       browsers  : ['Chrome'],
