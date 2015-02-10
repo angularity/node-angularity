@@ -19,13 +19,27 @@ describe('The Angularity global install provides a cli interface.', function () 
   });
 
   it('should show the correct version number on the -v argument.', function (done) {
-    helper.runAngularity(['-v'])
-      .then(function (result) {
-        var packagePath = path.resolve(__dirname, '..', 'package.json');
-        var version = require(packagePath).version;
+    var packagePath = path.resolve(__dirname, '..', 'package.json');
+    var version = require(packagePath).version;
 
-        expect(result.stdout).toBe('angularity: ' + version + '\n');
-        expect(result.code).toBe(0);
+    helper.runAngularityAlias(['-v', '--version'])
+      .then(function (results) {
+        results.forEach(function (result) {
+          expect(result.stdout).toBe('angularity: ' + version + '\n');
+          expect(result.code).toEqual(0);
+        });
+        done();
+      });
+  });
+
+  it('should correctly display a help menu with the --help argument.', function (done) {
+    helper.runAngularityAlias(['-h', '--help'])
+      .then(function (results) {
+        results.forEach(function (result) {
+          expect(result.stderr).toMatch(/Angularity is an opinionated build tool for AngularJS projects/);
+          expect(result.stderr).toMatch(/Examples:/);
+          expect(result.stderr).toMatch(/Options:/);
+        });
         done();
       });
   });
