@@ -57,7 +57,9 @@ yargs.getInstance('test')
     alias   : [ 'h', '?' ],
     boolean : true
   })
+  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
   .strict()
+  .check(yargs.subCommandCheck)
   .check(yargs.subCommandCheck)
   .wrap(80);
 
