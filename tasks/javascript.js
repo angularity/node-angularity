@@ -4,7 +4,7 @@ var path            = require('path'),
     fs              = require('fs');
 
 var gulp            = require('gulp'),
-    gulpIf          = require('gulp-if'),
+    gulpFilter      = require('gulp-filter'),
     jshint          = require('gulp-jshint'),
     rimraf          = require('gulp-rimraf'),
     gutil           = require('gulp-util'),
@@ -127,7 +127,8 @@ gulp.task('javascript:unit', function () {
         .pipe(browserify
           .compile(80, transforms.concat(browserify.jasmineTransform('@')))
           .all('index.js'))
-        .pipe(gulpIf('*.js', gulp.dest(streams.TEST)))
+        .pipe(gulpFilter('*.js'))
+        .pipe(gulp.dest(streams.TEST))
     )
     .pipe(karma.createConfig())
     .pipe(gulp.dest(streams.TEST))
