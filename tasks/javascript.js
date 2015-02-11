@@ -1,21 +1,27 @@
 'use strict';
 
-var gulp        = require('gulp'),
-    jshint      = require('gulp-jshint'),
-    rimraf      = require('gulp-rimraf'),
-    runSequence = require('run-sequence'),
-    combined    = require('combined-stream'),
-    to5ify      = require('6to5ify'),
-    stringify   = require('stringify'),
-    wordwrap    = require('wordwrap'),
-    ngAnnotate  = require('browserify-ngannotate');
+var path            = require('path'),
+    fs              = require('fs');
 
-var karma          = require('../lib/test/karma'),
-    browserify     = require('../lib/build/browserify'),
-    yargs          = require('../lib/util/yargs'),
-    hr             = require('../lib/util/hr'),
-    streams        = require('../lib/config/streams'),
-    jshintReporter = require('../lib/util/jshint-reporter');
+var gulp            = require('gulp'),
+    gulpFilter      = require('gulp-filter'),
+    jshint          = require('gulp-jshint'),
+    rimraf          = require('gulp-rimraf'),
+    gutil           = require('gulp-util'),
+    runSequence     = require('run-sequence'),
+    combined        = require('combined-stream'),
+    to5ify          = require('6to5ify'),
+    stringify       = require('stringify'),
+    through         = require('through2'),
+    wordwrap        = require('wordwrap'),
+    ngAnnotate      = require('browserify-ngannotate');
+
+var karma           = require('../lib/test/karma'),
+    browserify      = require('../lib/build/browserify'),
+    yargs           = require('../lib/util/yargs'),
+    hr              = require('../lib/util/hr'),
+    streams         = require('../lib/config/streams'),
+    jshintReporter  = require('../lib/util/jshint-reporter');
 
 var cliArgs;
 var transforms;
@@ -57,8 +63,10 @@ yargs.getInstance('test')
     alias   : [ 'h', '?' ],
     boolean : true
   })
+  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
+  .check(jshintReporter.yargsCheck)
   .wrap(80);
 
 gulp.task('javascript', function (done) {
@@ -105,18 +113,26 @@ gulp.task('javascript:lint', function () {
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
-  return streams.jsSpec()
-    .pipe(browserify
-      .compile(80, transforms.concat(browserify.jasmineTransform('@')))
-      .all('index.js'))
+  return combined.create()
+    .append(
+      streams
+        .testDependencies({
+          dev: true,
+          read: false
+        })
+    )
+    .append(
+      streams
+        .jsSpec()
+        .pipe(browserify
+          .compile(80, transforms.concat(browserify.jasmineTransform('@')))
+          .all('index.js'))
+        .pipe(gulp.dest(streams.TEST))
+        .pipe(gulpFilter('*.js'))
+    )
+    .pipe(karma.createConfig())
     .pipe(gulp.dest(streams.TEST))
-    .pipe(karma({
-      files     : streams.testDependencies({dev: true}).list,
-      frameworks: ['jasmine'],
-      reporters : ['spec'],
-      browsers  : ['Chrome'],
-      logLevel  : 'error'
-    }, 80));
+    .pipe(karma.run(80));
 });
 
 // give a single optimised javascript file in the build directory with source map for each
