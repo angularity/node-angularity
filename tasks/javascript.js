@@ -1,10 +1,13 @@
 'use strict';
 
-var path            = require('path');
+var path            = require('path'),
+    fs              = require('fs');
 
 var gulp            = require('gulp'),
+    gulpIf          = require('gulp-if'),
     jshint          = require('gulp-jshint'),
     rimraf          = require('gulp-rimraf'),
+    gutil           = require('gulp-util'),
     runSequence     = require('run-sequence'),
     combined        = require('combined-stream'),
     to5ify          = require('6to5ify'),
@@ -108,45 +111,6 @@ gulp.task('javascript:lint', function () {
     .pipe(jshintReporter.get(cliArgs.reporter));
 });
 
-function karmaSpecFile() {
-  var files = [];
-
-  function transformFn(file, encoding, done) {
-    if (!file || !file.path) {
-      throw 'Files must have paths';
-    }
-    var stream = this;
-    //filter out all files (nothing added back to the stream)
-    //but we save file paths for later use in the flush function
-    files.push(file.path);
-    done();
-  }
-
-  function flushFn(done) {
-    var stream = this;
-    var contentAppend =
-      '\n\nfiles = (files || []).concat(' +
-      JSON.stringify(files, null, '  ') +
-      ');\n';
-    console.log('contentAppend', contentAppend);
-
-    //aggregate and append to karma.conf.js in the project root folder
-    gulp
-      .src(path.join(process.cwd(), 'karma.conf.js'))
-      .on('data', function(karmaConfigFile) {
-        var contents = karmaConfigFile.contents.toString();
-        contents += contentAppend;
-        karmaConfigFile.contents = new Buffer(contents);
-        stream.push(karmaConfigFile);
-      })
-      .on('end', function() {
-        done();
-      });
-  }
-
-  return through.obj(transformFn, flushFn);
-}
-
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
   return combined.create()
@@ -156,9 +120,6 @@ gulp.task('javascript:unit', function () {
           dev: true,
           read: false
         })
-        .on('data', function(file) {
-          console.log('test dependency file:', file.path);
-        })
     )
     .append(
       streams
@@ -166,17 +127,11 @@ gulp.task('javascript:unit', function () {
         .pipe(browserify
           .compile(80, transforms.concat(browserify.jasmineTransform('@')))
           .all('index.js'))
-        .pipe(gulp.dest(streams.TEST))
+        .pipe(gulpIf('*.js', gulp.dest(streams.TEST)))
     )
-    .pipe(karmaSpecFile())
+    .pipe(karma.createConfig())
     .pipe(gulp.dest(streams.TEST))
-    .pipe(karma({
-      // files     : .list,
-      frameworks: ['jasmine'],
-      reporters : ['spec'],
-      browsers  : ['Chrome'],
-      logLevel  : 'error'
-    }, 80));
+    .pipe(karma.run(80));
 });
 
 // give a single optimised javascript file in the build directory with source map for each
