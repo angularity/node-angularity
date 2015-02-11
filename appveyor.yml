@@ -21,7 +21,7 @@ install:
   - jasmine-node --version
 
 test_script:
-  - pwd && ls
+  - echo %cd% && dir
   - jasmine-node --verbose
 
 build: off
