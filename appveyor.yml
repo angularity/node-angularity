@@ -1,14 +1,26 @@
 environment:
-  nodejs_version: "0.10"
+  - nodejs_version: "0.10"
+  - nodejs_version: "0.11"
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - nodejs_version: "0.11"
 
 install:
   - ps: Install-Product node $env:nodejs_version
-  - npm install -g npm@2.1.7
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - npm -g install npm@2
+  - set PATH=%APPDATA%\npm;%PATH%
   - npm i -g
   - npm i -g jasmine-node
+  - node -v
+  - npm -v
+  - jasmine-node --version
 
 test_script:
-  - jasmine-node --version
   - pwd && ls
   - jasmine-node --verbose
 
