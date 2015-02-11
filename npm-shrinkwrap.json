@@ -2176,6 +2176,59 @@
         }
       }
     },
+    "gulp-if": {
+      "version": "1.2.5",
+      "from": "gulp-if@*",
+      "resolved": "https://registry.npmjs.org/gulp-if/-/gulp-if-1.2.5.tgz",
+      "dependencies": {
+        "gulp-match": {
+          "version": "0.2.1",
+          "from": "gulp-match@>=0.2.1 <0.3.0",
+          "resolved": "https://registry.npmjs.org/gulp-match/-/gulp-match-0.2.1.tgz"
+        },
+        "ternary-stream": {
+          "version": "1.2.3",
+          "from": "ternary-stream@>=1.2.0 <2.0.0",
+          "resolved": "https://registry.npmjs.org/ternary-stream/-/ternary-stream-1.2.3.tgz",
+          "dependencies": {
+            "merge-stream": {
+              "version": "0.1.7",
+              "from": "merge-stream@>=0.1.6 <0.2.0",
+              "resolved": "https://registry.npmjs.org/merge-stream/-/merge-stream-0.1.7.tgz"
+            },
+            "fork-stream": {
+              "version": "0.0.4",
+              "from": "fork-stream@>=0.0.4 <0.1.0",
+              "resolved": "https://registry.npmjs.org/fork-stream/-/fork-stream-0.0.4.tgz"
+            },
+            "through2": {
+              "version": "0.6.3",
+              "from": "through2@>=0.6.3 <0.7.0",
+              "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.3.tgz",
+              "dependencies": {
+                "readable-stream": {
+                  "version": "1.0.33",
+                  "from": "readable-stream@>=1.0.33-1 <1.1.0-0",
+                  "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
+                  "dependencies": {
+                    "string_decoder": {
+                      "version": "0.10.31",
+                      "from": "string_decoder@>=0.10.0 <0.11.0",
+                      "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
+                    }
+                  }
+                },
+                "xtend": {
+                  "version": "4.0.0",
+                  "from": "xtend@>=4.0.0 <4.1.0-0",
+                  "resolved": "https://registry.npmjs.org/xtend/-/xtend-4.0.0.tgz"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "gulp-inject": {
       "version": "1.0.2",
       "from": "https://registry.npmjs.org/gulp-inject/-/gulp-inject-1.0.2.tgz",
