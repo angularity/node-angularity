@@ -21,7 +21,6 @@ install:
   - jasmine-node --version
 
 test_script:
-  - echo %cd% && dir
-  - jasmine-node --verbose
+  - jasmine-node --verbose --test-dir C:\projects\node-angularity\node-angularity\test
 
 build: off
