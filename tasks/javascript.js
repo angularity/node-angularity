@@ -66,7 +66,7 @@ yargs.getInstance('test')
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
-  .check(yargs.subCommandCheck)
+  .check(jshintReporter.yargsCheck)
   .wrap(80);
 
 gulp.task('javascript', function (done) {
@@ -127,8 +127,8 @@ gulp.task('javascript:unit', function () {
         .pipe(browserify
           .compile(80, transforms.concat(browserify.jasmineTransform('@')))
           .all('index.js'))
-        .pipe(gulpFilter('*.js'))
         .pipe(gulp.dest(streams.TEST))
+        .pipe(gulpFilter('*.js'))
     )
     .pipe(karma.createConfig())
     .pipe(gulp.dest(streams.TEST))
