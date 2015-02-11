@@ -1,6 +1,39 @@
 'use strict';
-var Q = require('q');
-var spawn = require('child_process').spawn;
+var Q      = require('q'),
+    path   = require('path'),
+    fs     = require('fs'),
+    rimraf = require('rimraf'),
+    spawn  = require('child_process').spawn;
+
+/**
+ * Shortcut to a temporary absolute path to perform integration tests.
+ * @type {*|String}
+ */
+var testPath = path.resolve(__dirname, '..', 'test-temp');
+
+/**
+ * Shortcut to create a temporary test path based on name.
+ * @param folderName
+ * @returns {*|string}
+ */
+function resolveTestTempPath(folderName) {
+  var testTempPath = path.join(testPath, String(folderName));
+
+  if (!fs.existsSync(testPath))
+    fs.mkdirSync(testPath);
+
+  if (!fs.existsSync(testTempPath))
+    fs.mkdirSync(testTempPath);
+
+  return testTempPath;
+}
+
+/**
+ * Shortcut to delete all the content of the testPath folder.
+ */
+function cleanTestTemp() {
+  rimraf.sync(testPath);
+}
 
 /**
  * Shortcut to run multiple global angularity commands,
@@ -88,6 +121,9 @@ function runAngularityProcess(args, config) {
 }
 
 module.exports = {
-  runAngularity: runAngularity,
-  runAngularityAlias: runAngularityAlias
+  testPath           : testPath,
+  cleanTestTemp      : cleanTestTemp,
+  resolveTestTempPath: resolveTestTempPath,
+  runAngularity      : runAngularity,
+  runAngularityAlias : runAngularityAlias
 };

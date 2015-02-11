@@ -21,6 +21,6 @@ install:
   - jasmine-node --version
 
 test_script:
-  - jasmine-node --verbose test
+  - npm test
 
 build: off

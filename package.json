@@ -15,7 +15,7 @@
     "es6ify"
   ],
   "scripts": {
-    "test": "jasmine-node ./test"
+    "test": "jasmine-node test"
   },
   "author": "Ben Holloway, Chris Decoster, Brendan Graetz",
   "license": "MIT",

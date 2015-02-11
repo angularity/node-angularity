@@ -1,12 +1,7 @@
 'use strict';
 
-var fs = require('fs');
 var path = require('path');
-
-require('shelljs/global');
-
 var helper = require('./helpers/helper');
-var testPath = path.join(__dirname, 'test-temp');
 
 describe('The Angularity global install provides a cli interface.', function () {
 
