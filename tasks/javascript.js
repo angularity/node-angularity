@@ -113,6 +113,7 @@ gulp.task('javascript:lint', function () {
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
+  var reporters = [];
   return combined.create()
     .append(
       streams
@@ -130,9 +131,9 @@ gulp.task('javascript:unit', function () {
         .pipe(gulp.dest(streams.TEST))
         .pipe(gulpFilter('*.js'))
     )
-    .pipe(karma.createConfig())
+    .pipe(karma.createConfig(reporters))
     .pipe(gulp.dest(streams.TEST))
-    .pipe(karma.run(80));
+    .pipe(karma.run(reporters, 80));
 });
 
 // give a single optimised javascript file in the build directory with source map for each
