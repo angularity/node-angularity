@@ -357,6 +357,8 @@ function executablePath() {
  * @returns {string} A true concatentated path where found, else undefined
  */
 function maximisePath() {
+
+  // rank a vs b based on any numeric component in their string
   function compare(a, b) {
     var numA = parseFloat(/[.\d]+/.exec(a)[0]);
     var numB = parseFloat(/[.\d]+/.exec(b)[0]);
@@ -368,27 +370,31 @@ function maximisePath() {
       return 0;
     }
   }
-  function eachDirectoryItem(base, pattern) {
-    return function eachDirectoryItem(item) {
-      var resolved    = path.resolve(path.join(base, item));
-      var isDirectory = fs.statSync(resolved).isDirectory();
-      var isMatch = (typeof pattern === 'string') ? (item === pattern) :
-        ('test' in pattern) ? pattern.test(item) : false;
-      return isDirectory && isMatch;
-    };
-  }
+
+  // ensure each element in the path exists or match where there is a pattern
   var elements = Array.prototype.slice.call(arguments);
   for (var i = 1; i < elements.length; i++) {
     var directory = path.resolve(path.join.apply(path, elements.slice(0, i)));
-    var matches   = fs.readdirSync(directory)
-      .filter(eachDirectoryItem(directory, elements[i]))
-      .sort(compare);
-    if (matches.length === 0) {
+    if (!fs.existsSync(directory)) {
       return null;
+    } else if ((typeof elements[i] !== 'string') && ('test' in elements[i])) {
+      var matches = fs.readdirSync(directory)
+        .filter(function eachDirectoryItem(item) {
+          var resolved = path.resolve(path.join(directory, item));
+          return elements[i].test(item) && fs.statSync(resolved).isDirectory();
+        })
+        .sort(compare);
+      if (matches.length === 0) {
+        return null;
+      } else {
+        elements[i] = matches[0];
+      }
     } else {
-      elements[i] = matches[0];
+      elements[i] = String(elements[i]);
     }
   }
+
+  // now join them all together
   return path.resolve(elements.join(path.sep));
 }
 
