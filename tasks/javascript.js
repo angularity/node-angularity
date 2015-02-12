@@ -120,7 +120,7 @@ gulp.task('javascript:unit', function () {
     reporters = Array;
   }
   else if (typeof reporters === 'string' &&
-      reporters !== karma.yargsOption.value.default) {
+    reporters !== karma.yargsOption.value.default) {
     reporters = [reporters];
   }
   else {
