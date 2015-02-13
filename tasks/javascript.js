@@ -119,7 +119,6 @@ gulp.task('javascript:lint', function () {
 gulp.task('javascript:unit', function () {
   var reporters = cliArgs.karmareporter;
   if (reporters.constructor === Array) {
-    reporters = reporters;
   }
   else if (typeof reporters === 'string' &&
     reporters !== karma.yargsOption.value.default) {

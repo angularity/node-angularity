@@ -62,6 +62,7 @@ yargs.getInstance('server')
   .check(yargs.subCommandCheck)
   .check(check)
   .check(jshintReporter.yargsCheck)
+  .check(karma.yargsCheck)
   .wrap(80);
 
 gulp.task('server', ['build'], function () {
