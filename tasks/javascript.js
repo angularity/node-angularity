@@ -42,9 +42,11 @@ yargs.getInstance('javascript')
     default: false,
   })
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
+  .options(karma.yargsOption.key, karma.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(jshintReporter.yargsCheck)
+  .check(karma.yargsCheck)
   .wrap(80);
 
 //TODO @bguiz jsHintReporter module should only need to be imported by this module
