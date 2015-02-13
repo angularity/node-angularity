@@ -14,7 +14,10 @@
     "browserify",
     "es6ify"
   ],
-  "author": "Ben Holloway, Chris Decoster",
+  "scripts": {
+    "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
+  },
+  "author": "Ben Holloway, Chris Decoster, Brendan Graetz",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -34,6 +37,7 @@
   },
   "dependencies": {
     "6to5ify": "latest",
+    "angularity-jshint-reporter": "latest",
     "asks": "latest",
     "bower-directory": "latest",
     "browser-sync": "latest",
@@ -45,6 +49,7 @@
     "convert-source-map": "latest",
     "gulp": "latest",
     "gulp-concat": "latest",
+    "gulp-filter": "latest",
     "gulp-inject": "latest",
     "gulp-jshint": "latest",
     "gulp-load-plugins": "latest",
@@ -94,7 +99,6 @@
     "yargs": "latest"
   },
   "devDependencies": {
-    "jasmine-node": "latest",
-    "node-jasmine-async": "^0.1.0"
+    "jasmine-node": "latest"
   }
 }

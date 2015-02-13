@@ -16,7 +16,7 @@ var path        = require('path'),
 var yargs = require('./../lib/util/yargs');
 
 // TODO @bholloway menus
-//var mainMenu = require('../lib/cli/mainMenu');
+// var mainMenu = require('../lib/cli/mainMenu');
 require('../index');
 
 // we need to duplicate some event handlers from the gulp cli since we have bypassed it
@@ -68,6 +68,7 @@ else if (cliArgs.version) {
   console.log('angularity:', version);
 }
 // interactive menu
-else {
-  mainMenu.prompt();
-}
+// TODO @bholloway reimplement after yargs refactor regression
+// else {
+//   mainMenu.prompt();
+// }
