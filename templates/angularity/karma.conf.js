@@ -19,9 +19,14 @@ module.exports = function(config) {
     // list of files to exclude
     exclude: [],
 
+    // register any plugins which are not siblings of karma in angularity global
+    // installation and thus need to be registered manually
+    // append to existing value to preserve plugins loaded automatically
+    plugins: [].concat(config.plugins, /*ANGULARITY_PLUGIN_LIST*/),
+
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress', 'junit', 'teamcity'
-    reporter: [],
+    reporters: [].concat(/*ANGULARITY_REPORTER_LIST*/),
 
     // web server port
     port: <%= port %>,

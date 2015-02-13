@@ -64,9 +64,11 @@ yargs.getInstance('test')
     boolean : true
   })
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
+  .options(karma.yargsOption.key, karma.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(jshintReporter.yargsCheck)
+  .check(karma.yargsCheck)
   .wrap(80);
 
 gulp.task('javascript', function (done) {
@@ -113,6 +115,17 @@ gulp.task('javascript:lint', function () {
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
+  var reporters = cliArgs.karmareporter;
+  if (reporters.constructor === Array) {
+    reporters = Array;
+  }
+  else if (typeof reporters === 'string' &&
+    reporters !== karma.yargsOption.value.default) {
+    reporters = [reporters];
+  }
+  else {
+    reporters = [];
+  }
   return combined.create()
     .append(
       streams
@@ -130,9 +143,9 @@ gulp.task('javascript:unit', function () {
         .pipe(gulp.dest(streams.TEST))
         .pipe(gulpFilter('*.js'))
     )
-    .pipe(karma.createConfig())
+    .pipe(karma.createConfig(reporters))
     .pipe(gulp.dest(streams.TEST))
-    .pipe(karma.run(80));
+    .pipe(karma.run(reporters, 80));
 });
 
 // give a single optimised javascript file in the build directory with source map for each
