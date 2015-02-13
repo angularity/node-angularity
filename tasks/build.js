@@ -6,6 +6,7 @@ var gulp        = require('gulp'),
 
 var yargs            = require('../lib/util/yargs'),
     jshintReporter   = require('../lib/util/jshint-reporter'),
+    karma            = require('../lib/test/karma'),
     hr               = require('../lib/util/hr');
 
 yargs.getInstance('build')
@@ -24,9 +25,11 @@ yargs.getInstance('build')
     default : false
   })
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
+  .options(karma.yargsOption.key, karma.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(jshintReporter.yargsCheck)
+  .check(karma.yargsCheck)
   .wrap(80);
 
 gulp.task('build', function (done) {

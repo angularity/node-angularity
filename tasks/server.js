@@ -9,6 +9,7 @@ var defaults         = require('../lib/config/defaults'),
     yargs            = require('../lib/util/yargs'),
     hr               = require('../lib/util/hr'),
     jshintReporter   = require('../lib/util/jshint-reporter'),
+    karma            = require('../lib/test/karma'),
     streams          = require('../lib/config/streams');
 
 var cliArgs;
@@ -56,10 +57,12 @@ yargs.getInstance('server')
     default : config.get('port')
   })
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
+  .options(karma.yargsOption.key, karma.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(check)
   .check(jshintReporter.yargsCheck)
+  .check(karma.yargsCheck)
   .wrap(80);
 
 gulp.task('server', ['build'], function () {
