@@ -123,23 +123,30 @@ yargs.getInstance('init')
     'The following steps are taken. Some steps are gated by respective a flag. Default options may be globally ' +
     'defined or reset using the --defaults option.',
     '',
-    '* project directory     exists, else create    --subdir',
-    '* /' + padded(20)(streams.APP            ) + ' exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.html') + ' exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.scss') + ' exists, else create',
-    '* angularity.json       exists, else create',
-    '* package.json          exists, else create    --npm',
-    '* bower.json            exists, else create    --bower',
-    '* karma.conf.js         exists, else create    --karma',
-    '* .jshintrc             exists, else create    --jshint',
-    '* .gitignore            exists, else create    --gitignore',
-    '* initialise and launch an IDE                 --ide',
+    '* project directory exists, else create',
+    '* /app              exists, else create',
+    '* /app/*.html       exists, else create',
+    '* /app/*.scss       exists, else create',
+    '* angularity.json   exists, else create',
+    '* package.json      exists, else create    --npm',
+    '* bower.json        exists, else create    --bower',
+    '* karma.conf.js     exists, else create    --karma',
+    '* .jshintrc         exists, else create    --jshint',
+    '* .gitignore        exists, else create    --gitignore',
+    '* run IDE task                             --ide',
     '',
-    'Notes:',
+    'If a package.json is present initialisation will occur in the current directory. Otherwise a sub-directory is' +
+    'created per the project name',
     '',
-    '* No properties are set in existing files, delete existing files in order to change properties.',
-    '* Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
-    '* Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
+    'Where run on an exising project existing files will not be altered, delete existing files in order to change ' +
+    'properties.',
+    '',
+    'Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
+    '',
+    'Available IDE tasks include:',
+    IDE_LIST.join(', '),
+    '',
+    'Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
   ].join('\n')))
   .example('angularity init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
   .example('angularity init --defaults -n pending', 'Change the name default to "pending')
@@ -153,12 +160,6 @@ yargs.getInstance('init')
     describe: 'Set defaults',
     alias   : 'z',
     string  : true
-  })
-  .options('subdir', {
-    describe: 'Create a sub-directory per name',
-    alias   : 's',
-    boolean : true,
-    default : config.get('subdir')
   })
   .options('name', {
     describe: 'The project name',
@@ -215,7 +216,7 @@ yargs.getInstance('init')
     default : config.get('gitignore')
   })
   .options('ide', {
-    describe: 'Initialise IDE ' + IDE_LIST.join('|'),
+    describe: 'Run an IDE initialisation task',
     string  : true,
     default : config.get('ide')
   })
@@ -248,7 +249,7 @@ gulp.task('init', function (done) {
         return (IDE_LIST.indexOf(ide) >= 0);
       });
     var taskList = [
-        cliArgs.subdir && 'init:subdir',
+        'init:subdir',
         'init:composition',
         'init:angularity',
         cliArgs.npm && 'init:npm',
@@ -265,8 +266,11 @@ gulp.task('init', function (done) {
 });
 
 gulp.task('init:subdir', function () {
-  mkdirIfNotExisting(cliArgs.name);
-  process.chdir(path.resolve(cliArgs.name));  // !! changing cwd !!
+  var hasPackageJson = fs.existsSync(path.resolve('package.json'));
+  if (!hasPackageJson) {
+    mkdirIfNotExisting(cliArgs.name);
+    process.chdir(path.resolve(cliArgs.name));  // !! changing cwd !!
+  }
 });
 
 gulp.task('init:composition', function () {

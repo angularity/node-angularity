@@ -17,7 +17,6 @@ var injectAdjacent   = require('../lib/inject/adjacent-files'),
     yargs            = require('../lib/util/yargs'),
     hr               = require('../lib/util/hr'),
     jshintReporter   = require('../lib/util/jshint-reporter'),
-    karma            = require('../lib/test/karma'),
     streams          = require('../lib/config/streams');
 
 yargs.getInstance('release')
@@ -37,11 +36,9 @@ yargs.getInstance('release')
     default : false
   })
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .options(karma.yargsOption.key, karma.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(jshintReporter.yargsCheck)
-  .check(karma.yargsCheck)
   .wrap(80);
 
 gulp.task('release', ['build'], function (done) {

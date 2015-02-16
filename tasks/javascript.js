@@ -7,12 +7,10 @@ var gulp            = require('gulp'),
     gulpFilter      = require('gulp-filter'),
     jshint          = require('gulp-jshint'),
     rimraf          = require('gulp-rimraf'),
-    gutil           = require('gulp-util'),
     runSequence     = require('run-sequence'),
     combined        = require('combined-stream'),
     to5ify          = require('6to5ify'),
     stringify       = require('stringify'),
-    through         = require('through2'),
     wordwrap        = require('wordwrap'),
     ngAnnotate      = require('browserify-ngannotate');
 
@@ -33,20 +31,18 @@ yargs.getInstance('javascript')
   .options('help', {
     describe: 'This help message',
     alias: ['h', '?'],
-    boolean: true,
+    boolean: true
   })
   .options('unminified', {
     describe: 'Inhibit minification of javascript',
     alias: ['u'],
     boolean: true,
-    default: false,
+    default: false
   })
   .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .options(karma.yargsOption.key, karma.yargsOption.value)
   .strict()
   .check(yargs.subCommandCheck)
   .check(jshintReporter.yargsCheck)
-  .check(karma.yargsCheck)
   .wrap(80);
 
 //TODO @bguiz jsHintReporter module should only need to be imported by this module
@@ -117,16 +113,11 @@ gulp.task('javascript:lint', function () {
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
-  var reporters = cliArgs.karmareporter;
-  if (reporters.constructor === Array) {
-  }
-  else if (typeof reporters === 'string' &&
-    reporters !== karma.yargsOption.value.default) {
-    reporters = [reporters];
-  }
-  else {
-    reporters = [];
-  }
+  var reporters = [].concat(cliArgs.karmareporter)
+    .filter(function isString(value) {
+      // TODO @bguiz remove the second operand when you extract the reporter
+      return (typeof value === 'string') && (value !== karma.yargsOption.value.default);
+    });
   return combined.create()
     .append(
       streams
