@@ -260,7 +260,6 @@ gulp.task('init', function (done) {
         'init:angularity',
         cliArgs.npm && 'init:npm',
         cliArgs.bower && 'init:bower',
-        cliArgs.bower && 'init:bower',
         cliArgs.karma && 'init:karma',
         cliArgs.jshint && 'init:jshint',
         cliArgs.gitignore && 'init:gitignore'

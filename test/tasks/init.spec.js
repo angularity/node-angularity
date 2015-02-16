@@ -41,9 +41,6 @@ describe('The Angularity init task should correctly initialise all the files nee
         //'init:jshint'
         expect(fs.existsSync(path.join(initTempPath, '.jshintrc'))).toBe(true);
 
-        //'init:gitignore'
-        expect(fs.existsSync(path.join(initTempPath, '.gitignore'))).toBe(true);
-
         //'init:composition'
         var appPath = path.join(initTempPath, 'app');
         expect(fs.existsSync(path.join(appPath, 'index.html'))).toBe(true);
