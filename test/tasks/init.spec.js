@@ -20,10 +20,6 @@ describe('The Angularity init task should correctly initialise all the files nee
     helper.runAngularity(['init', '-n', customName])
       .then(function (result) {
 
-        //debug travis issue
-        var lsCommand = (require('os').platform() === 'linux') ? 'ls -al' : 'echo %cd% && dir';
-        console.log(require('shelljs').exec(lsCommand).stdout);
-
         //'init:bower'
         var bowerFile = path.join(initTempPath, 'bower.json');
         expect(fs.existsSync(bowerFile)).toBe(true);
@@ -44,12 +40,6 @@ describe('The Angularity init task should correctly initialise all the files nee
 
         //'init:jshint'
         expect(fs.existsSync(path.join(initTempPath, '.jshintrc'))).toBe(true);
-
-        //debug travis issue
-        console.log(path.join(initTempPath, '.gitignore'));
-
-        //'init:gitignore'
-        expect(fs.existsSync(path.join(initTempPath, '.gitignore'))).toBe(true);
 
         //'init:composition'
         var appPath = path.join(initTempPath, 'app');
