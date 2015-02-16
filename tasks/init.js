@@ -304,11 +304,11 @@ gulp.task('init:karma', function () {
 });
 
 gulp.task('init:jshint', function () {
-  writeTemplate('.jshintrc');
+  copyTemplateSync('.jshintrc');
 });
 
 gulp.task('init:gitignore', function () {
-  writeTemplate('.gitignore');
+  copyTemplateSync('.gitignore');
 });
 
 function padded(length) {
@@ -357,6 +357,17 @@ function writeTemplate(filename, subdir) {
     // complete the template and write to file
     var merged  = template(partial, params);
     fs.writeFileSync(destAbsolute, merged);
+    gutil.log('created file ' + destRelative);
+  }
+}
+
+function copyTemplateSync(filename, subdir) {
+  var srcAbsolute = path.join(TEMPLATE_PATH, filename);
+  var destRelative = path.join(subdir || '.', filename);
+  var destAbsolute = path.resolve(destRelative);
+  if (fs.existsSync(srcAbsolute) && !fs.existsSync(destAbsolute)) {
+    var templateContent = fs.readFileSync(srcAbsolute).toString();
+    fs.writeFileSync(destAbsolute, templateContent);
     gutil.log('created file ' + destRelative);
   }
 }
