@@ -12,16 +12,19 @@ describe('The Angularity init task should correctly initialise all the files nee
   });
 
   it('should correctly initialise a project with a custom name.', function (done) {
-    var initTempPath = helper.resolveTestTempPath('init-temp');
-    process.chdir(initTempPath);
+    var temporaryPath = helper.resolveTestTempPath('init-temp');
+    process.chdir(temporaryPath);
 
     var customName = 'todo';
 
     helper.runAngularity(['init', '-n', customName])
       .then(function (result) {
 
+        //By default a subdirectory with the custom name is used
+        var initProjectFolder = path.join(temporaryPath, customName);
+
         //'init:bower'
-        var bowerFile = path.join(initTempPath, 'bower.json');
+        var bowerFile = path.join(initProjectFolder, 'bower.json');
         expect(fs.existsSync(bowerFile)).toBe(true);
 
         var bowerFileContent = require(bowerFile);
@@ -30,19 +33,19 @@ describe('The Angularity init task should correctly initialise all the files nee
         expect(bowerFileContent.private).toEqual(true);
 
         //'init:npm'
-        expect(fs.existsSync(path.join(initTempPath, 'package.json'))).toBe(true);
+        expect(fs.existsSync(path.join(initProjectFolder, 'package.json'))).toBe(true);
 
         //'init:karma'
-        expect(fs.existsSync(path.join(initTempPath, 'karma.conf.js'))).toBe(true);
+        expect(fs.existsSync(path.join(initProjectFolder, 'karma.conf.js'))).toBe(true);
 
         //'init:angularity'
-        expect(fs.existsSync(path.join(initTempPath, 'angularity.json'))).toBe(true);
+        expect(fs.existsSync(path.join(initProjectFolder, 'angularity.json'))).toBe(true);
 
         //'init:jshint'
-        expect(fs.existsSync(path.join(initTempPath, '.jshintrc'))).toBe(true);
+        expect(fs.existsSync(path.join(initProjectFolder, '.jshintrc'))).toBe(true);
 
         //'init:composition'
-        var appPath = path.join(initTempPath, 'app');
+        var appPath = path.join(initProjectFolder, 'app');
         expect(fs.existsSync(path.join(appPath, 'index.html'))).toBe(true);
         expect(fs.existsSync(path.join(appPath, 'index.js'))).toBe(true);
         expect(fs.existsSync(path.join(appPath, 'index.scss'))).toBe(true);
