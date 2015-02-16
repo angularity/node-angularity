@@ -23,7 +23,6 @@ var cliArgs;
 var config = defaults.getInstance('init')
   .file(platform.userHomeDirectory(), '.angularity')
   .defaults({
-    subdir     : true,
     name       : 'my-project',
     version    : '0.0.0',
     description: '',
@@ -124,19 +123,20 @@ yargs.getInstance('init')
     'The following steps are taken. Some steps are gated by respective a flag. Default options may be globally ' +
     'defined or reset using the --defaults option.',
     '',
-    '* project directory    exists, else create    --subdir',
-    '* /' + padded(20)(streams.APP            ) + 'exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.html') + 'exists, else create',
-    '* /' + padded(20)(streams.APP + '/*.scss') + 'exists, else create',
-    '* angularity.json      exists, else create',
-    '* package.json         exists, else create    --npm',
-    '* bower.json           exists, else create    --bower',
-    '* karma.conf.js        exists, else create    --karma',
-    '* .jshintrc            exists, else create    --jshint',
-    '* .gitignore           exists, else create    --gitignore',
-    '* run IDE task                                --ide',
+    '* project directory exists, else create',
+    '* /app              exists, else create',
+    '* /app/*.html       exists, else create',
+    '* /app/*.scss       exists, else create',
+    '* angularity.json   exists, else create',
+    '* package.json      exists, else create    --npm',
+    '* bower.json        exists, else create    --bower',
+    '* karma.conf.js     exists, else create    --karma',
+    '* .jshintrc         exists, else create    --jshint',
+    '* .gitignore        exists, else create    --gitignore',
+    '* run IDE task                             --ide',
     '',
-    'By default, a subdirectory is created for the project',
+    'If a package.json is present initialisation will occur in the current directory. Otherwise a sub-directory is' +
+    'created per the project name',
     '',
     'Where run on an exising project existing files will not be altered, delete existing files in order to change ' +
     'properties.',
@@ -160,12 +160,6 @@ yargs.getInstance('init')
     describe: 'Set defaults',
     alias   : 'z',
     string  : true
-  })
-  .options('subdir', {
-    describe: 'Create a sub-directory per name',
-    alias   : 's',
-    boolean : true,
-    default : config.get('subdir')
   })
   .options('name', {
     describe: 'The project name',
@@ -255,7 +249,7 @@ gulp.task('init', function (done) {
         return (IDE_LIST.indexOf(ide) >= 0);
       });
     var taskList = [
-        cliArgs.subdir && 'init:subdir',
+        'init:subdir',
         'init:composition',
         'init:angularity',
         cliArgs.npm && 'init:npm',
@@ -272,8 +266,11 @@ gulp.task('init', function (done) {
 });
 
 gulp.task('init:subdir', function () {
-  mkdirIfNotExisting(cliArgs.name);
-  process.chdir(path.resolve(cliArgs.name));  // !! changing cwd !!
+  var hasPackageJson = fs.existsSync(path.resolve('package.json'));
+  if (!hasPackageJson) {
+    mkdirIfNotExisting(cliArgs.name);
+    process.chdir(path.resolve(cliArgs.name));  // !! changing cwd !!
+  }
 });
 
 gulp.task('init:composition', function () {
