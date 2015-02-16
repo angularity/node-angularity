@@ -371,25 +371,36 @@ function maximisePath() {
     }
   }
 
-  // ensure each element in the path exists or match where there is a pattern
+  // ensure each element in the path exists
+  // where it is a regex then match it and replace the element with a string
   var elements = Array.prototype.slice.call(arguments);
   for (var i = 1; i < elements.length; i++) {
+
+    // the directory is elements 0 .. i-1 joined
     var directory = path.resolve(path.join.apply(path, elements.slice(0, i)));
+
+    // no directory implies failure
     if (!fs.existsSync(directory)) {
       return null;
-    } else if ((typeof elements[i] !== 'string') && ('test' in elements[i])) {
-      var matches = fs.readdirSync(directory)
-        .filter(function eachDirectoryItem(item) {
+    }
+    // regex element is matched
+    else if ((typeof elements[i] !== 'string') && ('test' in elements[i])) {
+
+      // find all matches, with the highest numeric index first
+      var matches = fs.readdirSync(directory).filter(function eachDirectoryItem(item) {
           var resolved = path.resolve(path.join(directory, item));
           return elements[i].test(item) && fs.statSync(resolved).isDirectory();
-        })
-        .sort(compare);
+        }).sort(compare);
+
+      // no match implies failure, else use the item with the highest numeric index
       if (matches.length === 0) {
         return null;
       } else {
         elements[i] = matches[0];
       }
-    } else {
+    }
+    // anything else is cast to string
+    else {
       elements[i] = String(elements[i]);
     }
   }
