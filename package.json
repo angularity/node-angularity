@@ -69,6 +69,7 @@
     "ide-template": "latest",
     "inquirer": "latest",
     "karma": "latest",
+    "karma-angularity-reporter": "latest",
     "karma-chrome-launcher": "latest",
     "karma-jasmine": "latest",
     "karma-spec-reporter": "latest",
