@@ -17,7 +17,7 @@ describe('The Angularity build task should correctly build an existing project.'
   });
 
   afterEach(function () {
-    helper.cleanTestTemp();
+    //helper.cleanTestTemp();
   });
 
   beforeEach(function () {
@@ -29,15 +29,15 @@ describe('The Angularity build task should correctly build an existing project.'
     process.chdir(buildFolder);
   });
 
-  it('should successfully build the minimal-es5 project\'s js.', function (done) {
+  iit('should successfully build the minimal-es5 project\'s js.', function (done) {
     helper.runAngularity('build')
       .then(function (result) {
         var expectedJSBundle = path.join(expectedBuildFolder, 'app-build', 'index.js');
         var builtJSBundle = path.join(buildFolder, 'app-build', 'index.js');
         expect(builtJSBundle).diffFilePatch(expectedJSBundle);
 
-        var expectedJSBundleSourceMap = path.join(expectedBuildFolder, 'app-build', 'index.js');
-        var builtJSBundleSourceMap = path.join(buildFolder, 'app-build', 'index.js');
+        var expectedJSBundleSourceMap = path.join(expectedBuildFolder, 'app-build', 'index.js.map');
+        var builtJSBundleSourceMap = path.join(buildFolder, 'app-build', 'index.js.map');
         expect(builtJSBundleSourceMap).diffFilePatch(expectedJSBundleSourceMap);
 
         done();

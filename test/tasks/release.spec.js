@@ -37,8 +37,8 @@ describe('The Angularity release task should correctly build a release version.'
         var builtJSBundle = path.join(buildFolder, 'app-release', 'index.js');
         expect(builtJSBundle).diffFilePatch(expectedJSBundle);
 
-        var expectedJSBundleSourceMap = path.join(expectedBuildFolder, 'app-release', 'index.js');
-        var builtJSBundleSourceMap = path.join(buildFolder, 'app-release', 'index.js');
+        var expectedJSBundleSourceMap = path.join(expectedBuildFolder, 'app-release', 'index.js.map');
+        var builtJSBundleSourceMap = path.join(buildFolder, 'app-release', 'index.js.map');
         expect(builtJSBundleSourceMap).diffFilePatch(expectedJSBundleSourceMap);
 
         done();
