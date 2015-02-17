@@ -32,15 +32,6 @@ describe('The Angularity build task should correctly build an existing project.'
   it('should successfully build the minimal-es5 project\'s js.', function (done) {
     helper.runAngularity('build')
       .then(function (result) {
-        console.log('-args-----');
-        console.log(result.args);
-        console.log('-stdout-----');
-        console.log(result.stdout);
-        console.log('-stderr-----');
-        console.log(result.stderr);
-        console.log('-code-----');
-        console.log(result.code);
-
         var expectedJSBundle = path.join(expectedBuildFolder, 'app-build', 'index.js');
         var builtJSBundle = path.join(buildFolder, 'app-build', 'index.js');
         expect(builtJSBundle).diffFilePatch(expectedJSBundle);
