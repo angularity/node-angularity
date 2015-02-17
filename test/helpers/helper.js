@@ -12,6 +12,20 @@ var Q      = require('q'),
 var testPath = path.resolve(__dirname, '..', 'test-temp');
 
 /**
+ * Shortcut to resolve the absolute path to the expected files for integration tests.
+ * @param folderName
+ * @returns {*}
+ */
+function expectedFolder(folderName) {
+  var expectedFolder = path.resolve(__dirname, '..', 'expected', folderName);
+
+  if (!fs.existsSync(expectedFolder))
+    console.error('helper.expectedFolder() the folderName', folderName, 'is not located in', expectedFolder);
+
+  return expectedFolder;
+}
+
+/**
  * Shortcut to create a temporary test path based on name.
  * @param folderName
  * @returns {*|string}
@@ -123,6 +137,7 @@ function runAngularityProcess(args, config) {
 module.exports = {
   testPath           : testPath,
   cleanTestTemp      : cleanTestTemp,
+  expectedFolder      : expectedFolder,
   resolveTestTempPath: resolveTestTempPath,
   runAngularity      : runAngularity,
   runAngularityAlias : runAngularityAlias

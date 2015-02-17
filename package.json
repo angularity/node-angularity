@@ -99,6 +99,7 @@
     "yargs": "latest"
   },
   "devDependencies": {
-    "jasmine-node": "latest"
+    "jasmine-node": "latest",
+    "jasmine-diff-matchers": "^1.0.2"
   }
 }
