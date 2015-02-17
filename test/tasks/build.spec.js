@@ -36,10 +36,6 @@ describe('The Angularity build task should correctly build an existing project.'
         var builtJSBundle = path.join(buildFolder, 'app-build', 'index.js');
         expect(builtJSBundle).diffFilePatch(expectedJSBundle);
 
-        var expectedJSBundleSourceMap = path.join(expectedBuildFolder, 'app-build', 'index.js.map');
-        var builtJSBundleSourceMap = path.join(buildFolder, 'app-build', 'index.js.map');
-        expect(builtJSBundleSourceMap).diffFilePatch(expectedJSBundleSourceMap);
-
         done();
       });
   });
@@ -50,10 +46,6 @@ describe('The Angularity build task should correctly build an existing project.'
         var expectedCSS = path.join(expectedBuildFolder, 'app-build', 'index.css');
         var buildCSS = path.join(buildFolder, 'app-build', 'index.css');
         expect(buildCSS).diffFilePatch(expectedCSS);
-
-        var expectedCSSSourceMap = path.join(expectedBuildFolder, 'app-build', 'index.css.map');
-        var buildCSSSourceMap = path.join(buildFolder, 'app-build', 'index.css.map');
-        expect(buildCSSSourceMap).diffFilePatch(expectedCSSSourceMap);
 
         done();
       });
