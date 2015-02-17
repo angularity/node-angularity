@@ -1,7 +1,2 @@
 /.idea
-/bower_components/*
-/node_modules/*
-/app-build
-/app-release
-/app-test
 npm-debug.log
