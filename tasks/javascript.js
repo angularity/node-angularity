@@ -132,7 +132,6 @@ gulp.task('javascript:unit', function () {
           .compile(80, transforms.concat(browserify.jasmineTransform('@')))
           .all('index.js'))
         .pipe(gulp.dest(streams.TEST))
-        .pipe(gulpFilter('*.js'))
     )
     .pipe(karma.createConfig(reporters))
     .pipe(gulp.dest(streams.TEST))
