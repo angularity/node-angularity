@@ -217,8 +217,8 @@ gulp.task('webstorm:templates', function () {
     gutil.log('Failed to locate Webstorm templates. Expected directory:')
     gutil.log('  ' + destDirectory)
   } else {
-    var removed       = [ ];
-    var added         = [ ];
+    var removed = [ ];
+    var added   = [ ];
     fs.readdirSync(destDirectory).forEach(function eachTemplate(filename) {
         if (/^angularity/.test(path.basename(filename))) {
           removed.push(filename);
