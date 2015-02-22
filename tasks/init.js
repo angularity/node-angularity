@@ -101,6 +101,11 @@ var check = yargs.createCheck()
       if (typeof value !== 'boolean') {
         return 'gitignore must be a boolean';
       }
+    },
+    editorconfig : function (value) {
+      if (typeof value !== 'boolean') {
+        return 'editorconfig must be a boolean';
+      }
     }
   })
   .commit();
@@ -123,6 +128,7 @@ yargs.getInstance('init')
     '* karma.conf.js     exists, else create    --karma',
     '* .jshintrc         exists, else create    --jshint',
     '* .gitignore        exists, else create    --gitignore',
+    '* .editorconfig     exists, else create    --editorconfig',
     '',
     'If a package.json is present initialisation will occur in the current directory. Otherwise a sub-directory is' +
     'created per the project name',
@@ -284,6 +290,10 @@ gulp.task('init:jshint', function () {
 
 gulp.task('init:gitignore', function () {
   copyTemplateSync('.gitignore');
+});
+
+gulp.task('init:editorconfig', function () {
+  copyTemplateSync('.editorconfig');
 });
 
 function padded(length) {
