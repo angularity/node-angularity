@@ -23,17 +23,18 @@ var cliArgs;
 var config = defaults.getInstance('init')
   .file(platform.userHomeDirectory(), '.angularity')
   .defaults({
-    name       : 'my-project',
-    version    : '0.0.0',
-    description: '',
-    tag        : [ ],
-    port       : 'random',
-    npm        : true,
-    bower      : true,
-    karma      : true,
-    jshint     : true,
-    gitignore  : true,
-    ide        : 'none'
+    name        : 'my-project',
+    version     : '0.0.0',
+    description : '',
+    tag         : [],
+    port        : 'random',
+    npm         : true,
+    bower       : true,
+    karma       : true,
+    jshint      : true,
+    gitignore   : true,
+    editorconfig: true,
+    ide         : 'none'
   });
 
 var check = yargs.createCheck()
@@ -133,6 +134,7 @@ yargs.getInstance('init')
     '* karma.conf.js     exists, else create    --karma',
     '* .jshintrc         exists, else create    --jshint',
     '* .gitignore        exists, else create    --gitignore',
+    '* .editorconfig     exists, else create    --editorconfig',
     '* run IDE task                             --ide',
     '',
     'If a package.json is present initialisation will occur in the current directory. Otherwise a sub-directory is' +
@@ -215,6 +217,11 @@ yargs.getInstance('init')
     boolean : true,
     default : config.get('gitignore')
   })
+  .options('editorconfig', {
+    describe: 'Create .editorconfig',
+    boolean : true,
+    default : config.get('editorconfig')
+  })
   .options('ide', {
     describe: 'Run an IDE initialisation task',
     string  : true,
@@ -256,7 +263,8 @@ gulp.task('init', function (done) {
         cliArgs.bower && 'init:bower',
         cliArgs.karma && 'init:karma',
         cliArgs.jshint && 'init:jshint',
-        cliArgs.gitignore && 'init:gitignore'
+        cliArgs.gitignore && 'init:gitignore',
+        cliArgs.editorconfig && 'init:editorconfig'
       ]
       .concat(ideList)
       .filter(Boolean)
@@ -305,6 +313,10 @@ gulp.task('init:jshint', function () {
 
 gulp.task('init:gitignore', function () {
   copyTemplateSync('.gitignore');
+});
+
+gulp.task('init:editorconfig', function () {
+  copyTemplateSync('.editorconfig');
 });
 
 function padded(length) {
