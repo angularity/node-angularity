@@ -16,7 +16,6 @@ var defaults = require('../lib/config/defaults'),
     streams  = require('../lib/config/streams');
 
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'angularity');
-var IDE_LIST      = ['webstorm'];  // each of these needs to be a gulp-task in its own right
 
 var cliArgs;
 
@@ -33,8 +32,7 @@ var config = defaults.getInstance('init')
     karma       : true,
     jshint      : true,
     gitignore   : true,
-    editorconfig: true,
-    ide         : 'none'
+    editorconfig: true
   });
 
 var check = yargs.createCheck()
@@ -103,23 +101,14 @@ var check = yargs.createCheck()
       if (typeof value !== 'boolean') {
         return 'gitignore must be a boolean';
       }
-    },
-    ide : function (value) {
-      [ ].concat(value).forEach(function (value) {
-        if (typeof value !== 'string') {
-          return 'ide must be a string';
-        } else if ((['none'].concat(IDE_LIST).indexOf(value) >= 0)) {
-          return 'value must be "none" or one or more values in ' + IDE_LIST.join('|');
-        }
-      });
     }
   })
   .commit();
 
 yargs.getInstance('init')
   .usage(wordwrap(2, 80)([
-    'The "init" task initialises a blank project and optionally an IDE environment. The given options initialise ' +
-    'project defaults. Where omitted the global default will be in effect for the project.',
+    'The "init" task initialises a blank project. The given options initialise project defaults. Where omitted the ' +
+    'global default will be in effect for the project.',
     '',
     'The following steps are taken. Some steps are gated by respective a flag. Default options may be globally ' +
     'defined or reset using the --defaults option.',
@@ -134,8 +123,6 @@ yargs.getInstance('init')
     '* karma.conf.js     exists, else create    --karma',
     '* .jshintrc         exists, else create    --jshint',
     '* .gitignore        exists, else create    --gitignore',
-    '* .editorconfig     exists, else create    --editorconfig',
-    '* run IDE task                             --ide',
     '',
     'If a package.json is present initialisation will occur in the current directory. Otherwise a sub-directory is' +
     'created per the project name',
@@ -143,12 +130,7 @@ yargs.getInstance('init')
     'Where run on an exising project existing files will not be altered, delete existing files in order to change ' +
     'properties.',
     '',
-    'Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
-    '',
-    'Available IDE tasks include:',
-    IDE_LIST.join(', '),
-    '',
-    'Any given IDE is initialised per its task defaults. Use the task separately to review these options.'
+    'Both the npm and bower packages are initially set private which you will need to clear in order to publish.'
   ].join('\n')))
   .example('angularity init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
   .example('angularity init --defaults -n pending', 'Change the name default to "pending')
@@ -222,11 +204,6 @@ yargs.getInstance('init')
     boolean : true,
     default : config.get('editorconfig')
   })
-  .options('ide', {
-    describe: 'Run an IDE initialisation task',
-    string  : true,
-    default : config.get('ide')
-  })
   .strict()
   .check(yargs.subCommandCheck)
   .check(check)
@@ -250,11 +227,6 @@ gulp.task('init', function (done) {
 
   // else run the selected items
   else {
-    var ideList = []
-      .concat(cliArgs.ide)   // yargs will supply multiple arguments if multiple flags are used
-      .filter(function (ide) {
-        return (IDE_LIST.indexOf(ide) >= 0);
-      });
     var taskList = [
         'init:subdir',
         'init:composition',
@@ -266,7 +238,6 @@ gulp.task('init', function (done) {
         cliArgs.gitignore && 'init:gitignore',
         cliArgs.editorconfig && 'init:editorconfig'
       ]
-      .concat(ideList)
       .filter(Boolean)
       .concat(done);
     runSequence.apply(runSequence, taskList);
@@ -313,10 +284,6 @@ gulp.task('init:jshint', function () {
 
 gulp.task('init:gitignore', function () {
   copyTemplateSync('.gitignore');
-});
-
-gulp.task('init:editorconfig', function () {
-  copyTemplateSync('.editorconfig');
 });
 
 function padded(length) {

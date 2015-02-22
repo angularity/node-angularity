@@ -115,8 +115,7 @@ gulp.task('javascript:lint', function () {
 gulp.task('javascript:unit', function () {
   var reporters = [].concat(cliArgs.karmareporter)
     .filter(function isString(value) {
-      // TODO @bguiz remove the second operand when you extract the reporter
-      return (typeof value === 'string') && (value !== karma.yargsOption.value.default);
+      return (typeof value === 'string');
     });
   return combined.create()
     .append(
@@ -133,7 +132,6 @@ gulp.task('javascript:unit', function () {
           .compile(80, transforms.concat(browserify.jasmineTransform('@')))
           .all('index.js'))
         .pipe(gulp.dest(streams.TEST))
-        .pipe(gulpFilter('*.js'))
     )
     .pipe(karma.createConfig(reporters))
     .pipe(gulp.dest(streams.TEST))
