@@ -212,31 +212,35 @@ gulp.task('webstorm:project', function () {
 gulp.task('webstorm:templates', function () {
   var srcDirectory  = path.join(TEMPLATE_PATH, 'fileTemplates');
   var destDirectory = path.join(userPreferencesDirectory(), 'fileTemplates');
-  var removed       = [ ];
-  var added         = [ ];
-  fs.readdirSync(destDirectory)
-    .forEach(function eachTemplate(filename) {
-      if (/^angularity/.test(path.basename(filename))) {
-        removed.push(filename);
-        fs.unlinkSync(path.join(destDirectory, filename));
-      }
-    });
-  fs.readdirSync(srcDirectory)
-    .forEach(function eachTemplate(filename) {
-      var srcPath  = path.join(srcDirectory, filename);
-      var destPath = path.join(destDirectory, filename);
-      added.push(filename);
-      fs.writeFileSync(destPath, fs.readFileSync(srcPath))
-    });
-  removed.forEach(function (filename) {
+  var isValid       = fs.existsSync(destDirectory) && fs.statsSync(destDirectory).isDirectory();
+  if (!isValid) {
+    gutil.log('Failed to locate Webstorm templates. Expected directory:')
+    gutil.log('  ' + destDirectory)
+  } else {
+    var removed = [ ];
+    var added   = [ ];
+    fs.readdirSync(destDirectory).forEach(function eachTemplate(filename) {
+        if (/^angularity/.test(path.basename(filename))) {
+          removed.push(filename);
+          fs.unlinkSync(path.join(destDirectory, filename));
+        }
+      });
+    fs.readdirSync(srcDirectory).forEach(function eachTemplate(filename) {
+        var srcPath = path.join(srcDirectory, filename);
+        var destPath = path.join(destDirectory, filename);
+        added.push(filename);
+        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+      });
+    removed.forEach(function (filename) {
       var isRemove = (added.indexOf(filename) < 0);
       if (isRemove) {
         gutil.log('removed template ' + filename);
       }
     });
-  added.forEach(function (filename) {
+    added.forEach(function (filename) {
       gutil.log('wrote template ' + filename);
     });
+  }
 // TODO review with @impaler
 //  ideTemplate.webStorm.copyFileTemplates(fileTemplatePath);
 });
@@ -276,12 +280,19 @@ gulp.task('webstorm:tools', function () {
         } ]
     };
   }
-  var destPath = path.join(userPreferencesDirectory(), 'tools', 'Angularity.xml');
-  var content  = ideTemplate.webStorm.createExternalTool({
-    name : 'Angularity',
-    tools: ['test', 'watch', 'watch --unminified', 'build', 'build --unminified', 'release'].map(createNode)
-  });
-  fs.writeFileSync(destPath, content);
+  var destDirectory = path.join(userPreferencesDirectory(), 'tools');
+  var isValid       = fs.existsSync(destDirectory) && fs.statsSync(destDirectory).isDirectory();
+  if (!isValid) {
+    gutil.log('Failed to locate Webstorm tools. Expected directory:')
+    gutil.log('  ' + destDirectory)
+  } else {
+    var destPath = path.join(destDirectory, 'Angularity.xml');
+    var content = ideTemplate.webStorm.createExternalTool({
+      name : 'Angularity',
+      tools: ['test', 'watch', 'watch --unminified', 'build', 'build --unminified', 'release'].map(createNode)
+    });
+    fs.writeFileSync(destPath, content);
+  }
 // TODO review with @impaler
 //  ideTemplate.webStorm.writeExternalTool(toolContent, 'Angularity.xml');
 });

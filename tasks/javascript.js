@@ -4,7 +4,6 @@ var path            = require('path'),
     fs              = require('fs');
 
 var gulp            = require('gulp'),
-    gulpFilter      = require('gulp-filter'),
     jshint          = require('gulp-jshint'),
     rimraf          = require('gulp-rimraf'),
     runSequence     = require('run-sequence'),

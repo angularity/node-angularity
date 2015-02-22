@@ -4,6 +4,12 @@
   "description": "<%= description %>",
   "private": true,
   "tags": <%= tags %>,
-  "dependencies": { },
-  "devDependencies": { }
+  "dependencies": {
+    "jQuery": "latest",
+    "angular": "latest",
+    "angular-ui-router": "latest"
+  },
+  "devDependencies": {
+    "angular-mocks": "latest"
+  }
 }
