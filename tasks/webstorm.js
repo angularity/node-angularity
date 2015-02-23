@@ -77,7 +77,7 @@ yargs.getInstance('webstorm')
     '* Launch IDE                                             --launch',
   ].join('\n')))
   .example('angularity webstorm', 'Run this task')
-  .example('angularity webstorm --defaults -l \<some-path\>', 'Set a default executable path')
+  .example('angularity webstorm --defaults -l <some-path>', 'Set a default executable path')
   .example('angularity webstorm --defaults reset', 'Reset defaults')
   .options('help', {
     describe: 'This help message',
@@ -190,7 +190,7 @@ gulp.task('webstorm:project', function () {
           mapping: {
             url: 'http://localhost:' + properties.port, localFile: '$PROJECT_DIR$'
           }
-        }
+        };
       }),
     plainText           : [
         'file://$PROJECT_DIR$/app-build/index.css',
@@ -214,8 +214,8 @@ gulp.task('webstorm:templates', function () {
   var destDirectory = path.join(userPreferencesDirectory(), 'fileTemplates');
   var isValid       = fs.existsSync(destDirectory) && fs.statsSync(destDirectory).isDirectory();
   if (!isValid) {
-    gutil.log('Failed to locate Webstorm templates. Expected directory:')
-    gutil.log('  ' + destDirectory)
+    gutil.log('Failed to locate Webstorm templates. Expected directory:');
+    gutil.log('  ' + destDirectory);
   } else {
     var removed = [ ];
     var added   = [ ];
@@ -229,7 +229,7 @@ gulp.task('webstorm:templates', function () {
         var srcPath = path.join(srcDirectory, filename);
         var destPath = path.join(destDirectory, filename);
         added.push(filename);
-        fs.writeFileSync(destPath, fs.readFileSync(srcPath))
+        fs.writeFileSync(destPath, fs.readFileSync(srcPath));
       });
     removed.forEach(function (filename) {
       var isRemove = (added.indexOf(filename) < 0);
@@ -283,8 +283,8 @@ gulp.task('webstorm:tools', function () {
   var destDirectory = path.join(userPreferencesDirectory(), 'tools');
   var isValid       = fs.existsSync(destDirectory) && fs.statsSync(destDirectory).isDirectory();
   if (!isValid) {
-    gutil.log('Failed to locate Webstorm tools. Expected directory:')
-    gutil.log('  ' + destDirectory)
+    gutil.log('Failed to locate Webstorm tools. Expected directory:');
+    gutil.log('  ' + destDirectory);
   } else {
     var destPath = path.join(destDirectory, 'Angularity.xml');
     var content = ideTemplate.webStorm.createExternalTool({
@@ -322,8 +322,8 @@ function validateLaunchPath(argv) {
         return 'Cannot find Webstorm executable, you will have to specify it explicitly.';
       } else {
         argv.launch = true;
-        break;
       }
+      break;
     default:
       if (!fs.existsSync(path.normalize(argv.launch))) {
         return 'Launch path is not valid or does not exist.';
@@ -368,20 +368,6 @@ function executablePath() {
  * @returns {string} A true concatentated path where found, else undefined
  */
 function maximisePath() {
-
-  // rank a vs b based on any numeric component in their string
-  function compare(a, b) {
-    var numA = parseFloat(/[.\d]+/.exec(a)[0]);
-    var numB = parseFloat(/[.\d]+/.exec(b)[0]);
-    if        (isNaN(numA) || (numB > numA)) {
-      return +1;
-    } else if (isNaN(numB) || (numA > numB)) {
-      return -1;
-    } else {
-      return 0;
-    }
-  }
-
   // ensure each element in the path exists
   // where it is a regex then match it and replace the element with a string
   var elements = Array.prototype.slice.call(arguments);
@@ -396,19 +382,7 @@ function maximisePath() {
     }
     // regex element is matched
     else if ((typeof elements[i] !== 'string') && ('test' in elements[i])) {
-
-      // find all matches, with the highest numeric index first
-      var matches = fs.readdirSync(directory).filter(function eachDirectoryItem(item) {
-          var resolved = path.resolve(path.join(directory, item));
-          return elements[i].test(item) && fs.statSync(resolved).isDirectory();
-        }).sort(compare);
-
-      // no match implies failure, else use the item with the highest numeric index
-      if (matches.length === 0) {
-        return null;
-      } else {
-        elements[i] = matches[0];
-      }
+      resolveMatches(directory, elements[i]);
     }
     // anything else is cast to string
     else {
@@ -418,6 +392,41 @@ function maximisePath() {
 
   // now join them all together
   return path.resolve(elements.join(path.sep));
+}
+
+/**
+ * Find all matches, with the highest numeric index first,
+ * no match implies a failure, else use the item with the highest numeric index
+ * @param directory
+ * @param element
+ * @returns {null}
+ */
+function resolveMatches(directory, element) {
+  var matches = fs.readdirSync(directory).filter(function eachDirectoryItem(item) {
+    var resolved = path.resolve(path.join(directory, item));
+    return element.test(item) && fs.statSync(resolved).isDirectory();
+  }).sort(compare);
+
+  if (matches.length === 0) {
+    return null;
+  } else {
+    element = matches[0];
+  }
+}
+
+/**
+ * rank a vs b based on any numeric component in their string
+ */
+function compare(a, b) {
+  var numA = parseFloat(/[.\d]+/.exec(a)[0]);
+  var numB = parseFloat(/[.\d]+/.exec(b)[0]);
+  if (isNaN(numA) || (numB > numA)) {
+    return +1;
+  } else if (isNaN(numB) || (numA > numB)) {
+    return -1;
+  } else {
+    return 0;
+  }
 }
 
 /**
