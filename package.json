@@ -82,7 +82,7 @@
     "minifyify": "latest",
     "minimatch": "latest",
     "mold-source-map": "latest",
-    "node-sass": "latest",
+    "node-sass": "^2.0.1",
     "pretty-hrtime": "latest",
     "q": "latest",
     "request-progress": "latest",
