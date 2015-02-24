@@ -6,7 +6,6 @@ var gulp         = require('gulp'),
     runSequence  = require('run-sequence'),
     fs           = require('fs'),
     path         = require('path'),
-    childProcess = require('child_process'),
     template     = require('lodash.template'),
     ideTemplate  = require('ide-template');
 
@@ -158,12 +157,12 @@ gulp.task('webstorm:subdir', function () {
 gulp.task('webstorm:project', function () {
   var properties = require(path.resolve('angularity.json'));
 
-  //todo watcherSuppressedTasks
   var context = {
     projectName         : properties.name,
     jshintPath          : '$PROJECT_DIR$/.jshintrc',
     jsDebugPort         : properties.port,
     javascriptVersion   : 'es6',
+    watcherSuppressedTasks: 'Traceur compiler;SCSS',
     contentPaths        : [
       {content: 'file://' + process.cwd()}
     ],
