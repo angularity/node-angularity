@@ -116,8 +116,8 @@ yargs.getInstance('webstorm')
 gulp.task('webstorm', function (done) {
   console.log(hr('-', 80, 'webstorm'));
 
-  // find the yargs instance that is most appropriate for the given command line parameters
-  //cliArgs = validateLaunchPath(yargs.resolveArgv());
+  // Find the yargs instance that is most appropriate for the given command line parameters
+  cliArgs = validateLaunchPath(yargs.resolveArgv());
 
   cliArgs = yargs.resolveArgv();
 
@@ -254,34 +254,30 @@ function createWebstormExternalToolContext(parameters) {
   };
 }
 
-
 /**
  * yargs check for a valid --launch parameter
  * Additionally parses true|false strings to boolean literals
  * @param argv
  */
 function validateLaunchPath(argv) {
-  //todo
-  // ideTemplate.validateLaunchPath
-
-  //switch (argv.launch) {
-  //  case false:
-  //  case 'false':
-  //    argv.launch = false;
-  //    break;
-  //  case true:
-  //  case 'true':
-  //    if (!fs.existsSync(executablePath())) {
-  //      return 'Cannot find Webstorm executable, you will have to specify it explicitly.';
-  //    } else {
-  //      argv.launch = true;
-  //    }
-  //    break;
-  //  default:
-  //    if (!fs.existsSync(path.normalize(argv.launch))) {
-  //      return 'Launch path is not valid or does not exist.';
-  //    }
-  //}
+  switch (argv.launch) {
+    case false:
+    case 'false':
+      argv.launch = false;
+      break;
+    case true:
+    case 'true':
+      if (ideTemplate.webStorm.validateExecutable()) {
+        argv.launch = true;
+      } else {
+        return 'Cannot find Webstorm executable, you will have to specify it explicitly.';
+      }
+      break;
+    default:
+      if (!fs.existsSync(path.normalize(argv.launch))) {
+        return 'Launch path is not valid or does not exist.';
+      }
+  }
   return true;
 }
 
