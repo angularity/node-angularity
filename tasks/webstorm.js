@@ -163,6 +163,7 @@ gulp.task('webstorm:project', function () {
     jsDebugPort         : properties.port,
     javascriptVersion   : 'es6',
     watcherSuppressedTasks: 'Traceur compiler;SCSS',
+    JsKarmaPackageDirSetting: 'C:\\Program Files\\nodejs\\node_modules\\karma', // todo resolve by platform
     contentPaths        : [
       {content: 'file://' + process.cwd()}
     ],
@@ -171,6 +172,19 @@ gulp.task('webstorm:project', function () {
       'angular'
     ],
     selectedDebugName   : 'JavaScript Debug.' + properties.name,
+    karmaDebugConfiguration : [
+      {
+        name: properties.name,
+        configFile: '$PROJECT_DIR$/' + streams.TEST + '/karma.conf.js',
+        browsers: 'Chrome',
+        env: [],
+        tasks: [
+          {
+            name: 'Tool_Angularity_test --debug'
+          }
+        ]
+      }
+    ],
     jsDebugConfiguration: subdirectoriesWithFile(streams.APP, 'index.html')
       .map(function (directory) {
         var directoryTerms = directory.split(path.sep).slice(1);
