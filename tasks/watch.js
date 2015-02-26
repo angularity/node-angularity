@@ -8,7 +8,7 @@ var gulp          = require('gulp'),
 var defaults       = require('../lib/config/defaults'),
     yargs          = require('../lib/util/yargs'),
     hr             = require('../lib/util/hr'),
-    karma           = require('../lib/test/karma'),
+    karma          = require('../lib/test/karma'),
     jshintReporter = require('../lib/util/jshint-reporter'),
     streams        = require('../lib/config/streams');
 
