@@ -107,12 +107,12 @@ gulp.task('javascript:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jshintReporter.get(cliArgs.reporter));
+    .pipe(jshintReporter.get(cliArgs[jshintReporter.yargsOption.key]));
 });
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
-  var reporters = [].concat(cliArgs.karmareporter)
+  var reporters = [].concat(cliArgs[karma.yargsOption.key])
     .filter(function isString(value) {
       return (typeof value === 'string');
     });
