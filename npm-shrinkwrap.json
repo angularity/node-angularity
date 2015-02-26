@@ -1577,14 +1577,7 @@
         "falafel": {
           "version": "0.3.1",
           "from": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz",
-          "resolved": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz",
-          "dependencies": {
-            "esprima": {
-              "version": "1.1.0-dev",
-              "from": "git://github.com/substack/esprima#is-keyword",
-              "resolved": "git://github.com/substack/esprima#0a7f8489a11b44b019ce168506f535f22d0be290"
-            }
-          }
+          "resolved": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz"
         }
       }
     },
