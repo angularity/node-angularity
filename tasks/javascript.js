@@ -153,8 +153,9 @@ function init() {
   cliArgs    = cliArgs || yargs.resolveArgv();
   transforms = [
     to5ify.configure({ ignoreRegex: /(?!)/ }),              // convert any es6 to es5 (ignoreRegex is degenerate)
-    stringify({ minify: true }),                            // allow import of html to a string
+    stringify({ minify: false }),                           // allow import of html to a string
     !cliArgs.unminified && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
   ];
+  // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
   // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
 }
