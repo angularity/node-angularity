@@ -152,9 +152,9 @@ gulp.task('javascript:build', function () {
 function init() {
   cliArgs    = cliArgs || yargs.resolveArgv();
   transforms = [
-    to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
-    stringify({ minify: true }),                // allow import of html to a string
-    !cliArgs.unminified && ngAnnotate           // @ngInject for angular injection points
+    to5ify.configure({ ignoreRegex: /(?!)/ }),              // convert any es6 to es5 (ignoreRegex is degenerate)
+    stringify({ minify: true }),                            // allow import of html to a string
+    !cliArgs.unminified && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
   ];
   // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
 }
