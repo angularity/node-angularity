@@ -13,7 +13,7 @@ var path        = require('path'),
     chalk       = require('chalk'),
     prettyTime  = require('pretty-hrtime');
 
-var yargs = require('./../lib/util/yargs');
+var taskYargs = require('../lib/util/task-yargs');
 
 // TODO @bholloway menus
 // var mainMenu = require('../lib/cli/mainMenu');
@@ -32,43 +32,53 @@ gulp.on('task_stop', function (e) {
   );
 });
 
-// describe the top level arguments
-yargs.getInstance()
-  .usage(wordwrap(2, 80)([
-    'Angularity is an opinionated build tool for AngularJS projects.',
-    '',
-    'Tasks include:',
-    yargs.listTasks().join(', ')
-  ].join('\n')))
-  .example('angularity', 'Interactive menu')
-  .example('angularity -v', 'Display the version of angularity')
-  .example('angularity -h \<task name\>', 'Get help on a particular task')
-  .example('angularity \<task name\>', 'Run the given task')
-  .describe('h', 'This help message, or help on a specific task').alias('h', '?').alias('h', 'help')
-  .describe('version', 'Display the version of angularity').alias('version', 'v').boolean('version')
-  .wrap(80);
+taskYargs.register('__default', {
+  description: (path.join(__dirname, '..', 'package.json').description || 'Angularity'),
+  prerequisiteTasks: [],
+  checks: [],
+  options: [
+    {
+      key: 'help',
+      value: {
+        describe: 'This help message, or help on a specific task',
+        alias: ['h', '?'],
+        boolean: true
+      }
+    },
+    {
+      key: 'version',
+      value: {
+        describe: 'Display the version of angularity',
+        alias: ['v'],
+        boolean: true
+      }
+    }
+  ]
+});
 
-// find the yargs instance that is most appropriate for the given command line parameters
-var cliArgs = yargs.resolveArgv();
-
-// show help
+var taskName = taskYargs.getCurrentName();
+var yargsInstance = taskYargs.getCurrent() || taskYargs.get('__default', process.argv.slice(2));
+//TODO deal with slice automatically, and allow no arguments for non-subtask tasks
+var cliArgs = (yargsInstance) ? yargsInstance.argv : {};
 if (cliArgs.help) {
-  yargs
-    .getInstance(cliArgs.taskName || cliArgs.help)
-    .showHelp();
+  yargsInstance
+    .usage(wordwrap(2, 80)([
+      'Angularity is an opinionated build tool for AngularJS projects.',
+      '',
+      'Tasks include:'
+      //TODO add task list here
+    ].join('\n')))
+    // .example('angularity', 'Interactive menu') //TODO reinstate when interactive menu ins reinstated
+    .example('angularity -v', 'Display the version of angularity')
+    .example('angularity -h \<task name\>', 'Get help on a particular task')
+    .example('angularity \<task name\>', 'Run the given task');
+  yargsInstance.showHelp();
 }
-// run a task
-else if (cliArgs.taskName) {
-  runSequence(cliArgs.taskName);
-}
-// show the version string
 else if (cliArgs.version) {
   var packagePath = path.join(__dirname, '..', 'package.json');
   var version     = require(packagePath).version;
   console.log('angularity:', version);
 }
-// interactive menu
-// TODO @bholloway reimplement after yargs refactor regression
-// else {
-//   mainMenu.prompt();
-// }
+else if (taskName) {
+  runSequence(taskName);
+}

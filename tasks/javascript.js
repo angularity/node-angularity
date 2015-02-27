@@ -16,6 +16,7 @@ var gulp            = require('gulp'),
 var karma           = require('../lib/test/karma'),
     browserify      = require('../lib/build/browserify'),
     yargs           = require('../lib/util/yargs'),
+    taskYargs       = require('../lib/util/task-yargs'),
     hr              = require('../lib/util/hr'),
     streams         = require('../lib/config/streams'),
     jshintReporter  = require('../lib/util/jshint-reporter');
@@ -23,50 +24,45 @@ var karma           = require('../lib/test/karma'),
 var cliArgs;
 var transforms;
 
-yargs.getInstance('javascript')
-  .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
-  .example('angularity javascript', 'Run this task')
-  .example('angularity javascript -u', 'Run this task but do not minify javascript')
-  .options('help', {
-    describe: 'This help message',
-    alias: ['h', '?'],
-    boolean: true
-  })
-  .options('unminified', {
-    describe: 'Inhibit minification of javascript',
-    alias: ['u'],
-    boolean: true,
-    default: false
-  })
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(jshintReporter.yargsCheck)
-  .wrap(80);
+taskYargs.register('javascript', {
+  description: (wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).')),
+  prerequisiteTasks: [],
+  options: [
+    {
+      key: 'help',
+      value: {
+        describe: 'This help message',
+        alias: ['h', '?'],
+        boolean: true
+      }
+    },
+    {
+      key: 'unminified',
+      value: {
+        describe: 'Inhibit minification of javascript',
+        alias: ['u'],
+        boolean: true,
+        default: false
+      }
+    },
+    jshintReporter.yargsOption
+  ],
+  checks: [
+    jshintReporter.yargsCheck
+  ]
+});
 
-//TODO @bguiz jsHintReporter module should only need to be imported by this module
-//however, at the moment, the other gulp tasks use different yargs instances
-//and therefore the options and checks need to repeated in each one,
-//making the code tightly couple when they should not be.
-//Proper solution would be to have yargs.getInstance modified to
-//mixin options and checks from dependent/ prequisite yargs instances
-
-yargs.getInstance('test')
-  .usage(wordwrap(2, 80)('The "test" task performs a one time build and '+
-    'karma test of all .spec.js files in the project.'))
-  .example('angularity test', 'Run this task')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .options(karma.yargsOption.key, karma.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(jshintReporter.yargsCheck)
-  .check(karma.yargsCheck)
-  .wrap(80);
+taskYargs.register('test', {
+  description: wordwrap(2, 80)('The "test" task performs a one time build and '+
+    'karma test of all .spec.js files in the project.'),
+  prerequisiteTasks: ['javascript'],
+  options: [
+    karma.yargsOption
+  ],
+  checks: [
+    karma.yargsCheck
+  ]
+});
 
 gulp.task('javascript', function (done) {
   console.log(hr('-', 80, 'javascript'));
@@ -90,13 +86,13 @@ gulp.task('test', function (done) {
 
 // clean javascript from the build directory
 gulp.task('javascript:cleanbuild', function () {
-  return gulp.src(streams.BUILD + '/**/*.js*', {read: false})
+  return gulp.src(streams.BUILD + '/**/*.js*', { read: false })
     .pipe(rimraf());
 });
 
 // clean javascript from the test directory
 gulp.task('javascript:cleanunit', function () {
-  return gulp.src(streams.TEST + '/**/*.js*', {read: false})
+  return gulp.src(streams.TEST + '/**/*.js*', { read: false })
     .pipe(rimraf());
 });
 
@@ -112,7 +108,8 @@ gulp.task('javascript:lint', function () {
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
-  var reporters = [].concat(cliArgs[karma.yargsOption.key])
+  var reporters = []
+    .concat(cliArgs[karma.yargsOption.key])
     .filter(function isString(value) {
       return (typeof value === 'string');
     });
@@ -147,14 +144,20 @@ gulp.task('javascript:build', function () {
 });
 
 /**
- * Initialisation must be deferred until a task actually starts
+ * Defer initialisation until after a task starts
  */
 function init() {
-  cliArgs    = cliArgs || yargs.resolveArgv();
+  var yargsInstance = taskYargs.getCurrent();
+  yargsInstance
+    .strict()
+    .wrap(80);
+  cliArgs = yargsInstance.argv;
+  console.log('cliArgs', cliArgs);
   transforms = [
     to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
-    stringify({ minify: true }),                // allow import of html to a string
-    !cliArgs.unminified && ngAnnotate           // @ngInject for angular injection points
+    stringify({ minify: !cliArgs.unminified })  // allow import of html to a string
   ];
-  // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
+  if (!cliArgs.unminified) {
+    transforms.push(ngAnnotate);                // @ngInject for angular injection points)
+  }
 }
