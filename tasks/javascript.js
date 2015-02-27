@@ -107,12 +107,12 @@ gulp.task('javascript:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jshintReporter.get(cliArgs.reporter));
+    .pipe(jshintReporter.get(cliArgs[jshintReporter.yargsOption.key]));
 });
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
-  var reporters = [].concat(cliArgs.karmareporter)
+  var reporters = [].concat(cliArgs[karma.yargsOption.key])
     .filter(function isString(value) {
       return (typeof value === 'string');
     });
@@ -152,9 +152,10 @@ gulp.task('javascript:build', function () {
 function init() {
   cliArgs    = cliArgs || yargs.resolveArgv();
   transforms = [
-    to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
-    stringify({ minify: true }),                // allow import of html to a string
-    !cliArgs.unminified && ngAnnotate           // @ngInject for angular injection points
+    to5ify.configure({ ignoreRegex: /(?!)/ }),              // convert any es6 to es5 (ignoreRegex is degenerate)
+    stringify({ minify: false }),                           // allow import of html to a string
+    !cliArgs.unminified && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
   ];
+  // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
   // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
 }
