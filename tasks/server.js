@@ -6,7 +6,7 @@ var gulp        = require('gulp'),
     browserSync = require('browser-sync');
 
 var defaults       = require('../lib/config/defaults'),
-    yargs          = require('../lib/util/yargs'),
+    taskYargs       = require('../lib/util/task-yargs'),
     hr             = require('../lib/util/hr'),
     jshintReporter = require('../lib/util/jshint-reporter'),
     streams        = require('../lib/config/streams');
@@ -19,54 +19,45 @@ var config = defaults.getInstance()
     port: 55555
   });
 
-var check = yargs.createCheck()
-  // don't check if we are just accessing help
-  .withGate(function (argv) {
-    return !argv.help;
-  })
-  .withTest({
-    port: function (value) {
-      if ((typeof value !== 'number') || isNaN(parseInt(value)) || (Math.round(value) !== value)) {
-        return 'port must be an integer';
+taskYargs.register('server', {
+  description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
+    'components to a release directory.')),
+  prerequisiteTasks: ['build'],
+  checks: [
+    function checkPort(argv) {
+      var value = argv.port;
+      if (argv.help) {
+        return true;
+      }
+      else if ((typeof value !== 'number') || isNaN(parseInt(value)) || (Math.round(value) !== value)) {
+        throw new Error('port must be an integer');
+      }
+      else {
+        return true;
       }
     }
-  })
-  .commit();
-
-yargs.getInstance('server')
-  .usage(wordwrap(2, 80)('The "server" task performs a one time build and then serves the application on localhost ' +
-    'at the given port.'))
-  .example('angularity server', 'Run this task and serve on the default port')
-  .example('angularity server -p 8080', 'Run this task and serve at http://localhost:8080')
-  .example('angularity server -n', 'Run this task but do not minify built javascript')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options('unminified', {
-    describe: 'Inhibit minification of javascript',
-    alias   : 'u',
-    boolean : true,
-    default : false
-  })
-  .options('port', {
-    describe: 'A port for the development web server',
-    alias   : 'p',
-    default : config.get('port')
-  })
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(check)
-  .check(jshintReporter.yargsCheck)
-  .wrap(80);
+  ],
+  options: [
+    {
+      key: 'port',
+      value: {
+        describe: 'A port for the development web server',
+        alias   : 'p',
+        default : config.get('port')
+      }
+    }
+  ]
+});
 
 gulp.task('server', ['build'], function () {
   console.log(hr('-', 80, 'server'));
 
   // find the yargs instance that is most appropriate for the given command line parameters
-  cliArgs = yargs.resolveArgv();
+  var yargsInstance = taskYargs.getCurrent();
+  yargsInstance
+    .strict()
+    .wrap(80);
+  cliArgs = yargsInstance.argv;
 
   // debug message
   gutil.log('serving on port:', cliArgs.port);

@@ -14,32 +14,18 @@ var injectAdjacent   = require('../lib/inject/adjacent-files'),
     injectTransform  = require('../lib/inject/relative-transform'),
     bowerFiles       = require('../lib/inject/bower-files'),
     versionDirectory = require('../lib/release/version-directory'),
-    yargs            = require('../lib/util/yargs'),
+    taskYargs        = require('../lib/util/task-yargs'),
     hr               = require('../lib/util/hr'),
     jshintReporter   = require('../lib/util/jshint-reporter'),
     streams          = require('../lib/config/streams');
 
-yargs.getInstance('release')
-  .usage(wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
-    'components to a release directory.'))
-  .example('angularity release', 'Run this task')
-  .example('angularity release -n', 'Run this task but do not minify built javascript')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options('unminified', {
-    describe: 'Inhibit minification of javascript',
-    alias   : 'u',
-    boolean : true,
-    default : false
-  })
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(jshintReporter.yargsCheck)
-  .wrap(80);
+taskYargs.register('release', {
+  description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
+    'components to a release directory.')),
+  prerequisiteTasks: ['build'],
+  checks: [],
+  options: []
+});
 
 gulp.task('release', ['build'], function (done) {
   console.log(hr('-', 80, 'release'));

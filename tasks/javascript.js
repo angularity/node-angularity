@@ -15,7 +15,6 @@ var gulp            = require('gulp'),
 
 var karma           = require('../lib/test/karma'),
     browserify      = require('../lib/build/browserify'),
-    yargs           = require('../lib/util/yargs'),
     taskYargs       = require('../lib/util/task-yargs'),
     hr              = require('../lib/util/hr'),
     streams         = require('../lib/config/streams'),
@@ -152,7 +151,6 @@ function init() {
     .strict()
     .wrap(80);
   cliArgs = yargsInstance.argv;
-  console.log('cliArgs', cliArgs);
   transforms = [
     to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (ignoreRegex is degenerate)
     stringify({ minify: !cliArgs.unminified })  // allow import of html to a string
