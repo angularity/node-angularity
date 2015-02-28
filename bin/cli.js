@@ -33,9 +33,10 @@ gulp.on('task_stop', function (e) {
   );
 });
 
+var packageJson = require(path.join(__dirname, '..', 'package.json'));
 var defaultYargsInstance = yargs
   .usage(wordwrap(2, 80)([
-    'Angularity is an opinionated build tool for AngularJS projects.',
+    packageJson.description,
     '',
     'Tasks include:'
     //TODO add task list here
@@ -60,13 +61,10 @@ if (cliArgs.help) {
   defaultYargsInstance.showHelp();
 }
 else if (cliArgs.version) {
-  var packagePath = path.join(__dirname, '..', 'package.json');
-  var version     = require(packagePath).version;
-  console.log('angularity:', version);
+  console.log('angularity:', packageJson.version);
 }
 else {
   var taskName = taskYargs.getCurrentName();
-  var yargsInstance = taskYargs.getCurrent();
   if (taskName) {
     runSequence(taskName);
   }
