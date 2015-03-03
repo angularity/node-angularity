@@ -56,16 +56,16 @@ var defaultYargsInstance = yargs
     boolean: true
   });
 
-var cliArgs = defaultYargsInstance.argv;
-if (cliArgs.help) {
-  defaultYargsInstance.showHelp();
-}
-else if (cliArgs.version) {
-  console.log('angularity:', packageJson.version);
+var taskName = taskYargs.getCurrentName();
+if (taskName) {
+  runSequence(taskName);
 }
 else {
-  var taskName = taskYargs.getCurrentName();
-  if (taskName) {
-    runSequence(taskName);
+  var cliArgs = defaultYargsInstance.argv;
+  if (cliArgs.help) {
+    defaultYargsInstance.showHelp();
+  }
+  else if (cliArgs.version) {
+    console.log('angularity:', packageJson.version);
   }
 }

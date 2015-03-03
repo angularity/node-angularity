@@ -1,31 +1,26 @@
 'use strict';
 
-var gulp        = require('gulp'),
-    concat      = require('gulp-concat'),
-    inject      = require('gulp-inject'),
-    plumber     = require('gulp-plumber'),
-    rimraf      = require('gulp-rimraf'),
-    wordwrap    = require('wordwrap'),
-    runSequence = require('run-sequence');
+var gulp            = require('gulp'),
+    concat          = require('gulp-concat'),
+    inject          = require('gulp-inject'),
+    plumber         = require('gulp-plumber'),
+    rimraf          = require('gulp-rimraf'),
+    wordwrap        = require('wordwrap'),
+    runSequence     = require('run-sequence');
 
-var injectAdjacent = require('../lib/inject/adjacent-files'),
-    bowerFiles     = require('../lib/inject/bower-files'),
-    yargs          = require('../lib/util/yargs'),
-    hr             = require('../lib/util/hr'),
-    streams        = require('../lib/config/streams');
+var injectAdjacent  = require('../lib/inject/adjacent-files'),
+    bowerFiles      = require('../lib/inject/bower-files'),
+    taskYargs       = require('../lib/util/task-yargs'),
+    hr              = require('../lib/util/hr'),
+    streams         = require('../lib/config/streams');
 
-yargs.getInstance('html')
-  .usage(wordwrap(2, 80)('The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
-    'HTML.'))
-  .example('angularity html', 'Run this task')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .strict()
-  .check(yargs.subCommandCheck)
-  .wrap(80);
+taskYargs.register('html', {
+  description: (wordwrap(2, 80)('The "html" task performs a one time injection of ' +
+    'pre-built JS and CSS into the application HTML.')),
+  prerequisiteTasks: [],
+  checks: [],
+  options: []
+});
 
 gulp.task('html', function (done) {
   console.log(hr('-', 80, 'html'));
