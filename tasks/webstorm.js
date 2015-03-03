@@ -1,20 +1,20 @@
 'use strict';
 
-var gulp         = require('gulp'),
-    gutil        = require('gulp-util'),
-    wordwrap     = require('wordwrap'),
-    runSequence  = require('run-sequence'),
-    fs           = require('fs'),
-    path         = require('path'),
-    childProcess = require('child_process'),
-    template     = require('lodash.template'),
-    ideTemplate  = require('ide-template');
+var gulp            = require('gulp'),
+    gutil           = require('gulp-util'),
+    wordwrap        = require('wordwrap'),
+    runSequence     = require('run-sequence'),
+    fs              = require('fs'),
+    path            = require('path'),
+    childProcess    = require('child_process'),
+    template        = require('lodash.template'),
+    ideTemplate     = require('ide-template');
 
-var defaults = require('../lib/config/defaults'),
-    platform = require('../lib/config/platform'),
-    streams  = require('../lib/config/streams'),
-    yargs    = require('../lib/util/yargs'),
-    hr       = require('../lib/util/hr');
+var defaults        = require('../lib/config/defaults'),
+    platform        = require('../lib/config/platform'),
+    streams         = require('../lib/config/streams'),
+    taskYargs       = require('../lib/util/task-yargs'),
+    hr              = require('../lib/util/hr');
 
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
 
@@ -23,6 +23,7 @@ var cliArgs;
 var config = defaults.getInstance('webstorm')
   .file(platform.userHomeDirectory(), '.angularity')
   .defaults({
+    'subdir'   : undefined,
     'project'  : true,
     'tools'    : true,
     'rules'    : true,
@@ -30,38 +31,182 @@ var config = defaults.getInstance('webstorm')
     'launch'   : true
   });
 
-var check = yargs.createCheck()
-  // don't check if we are just accessing help
-  .withGate(function (argv) {
-    return !(argv.help);
-  })
-  .withTest(validateLaunchPath)
-  .withTest({
-    subdir: function (value) {
-      if (value) {
+var webstormOptionDefinitions = [
+  {
+    key: 'help',
+    value: {
+      describe: 'This help message',
+      alias   : [ 'h', '?' ],
+      boolean : true
+    }
+  },
+  {
+    key: 'defaults',
+    value: {
+      describe: 'Set defaults',
+      alias   : 'z',
+      boolean : true,
+      isOptional: true
+    }
+  },
+  {
+    key: 'subdir',
+    value: {
+      describe: 'Navigate to the sub-directory specified',
+      alias   : 's',
+      string  : true,
+      isOptional: true,
+      default : config.get('subdir')
+    }
+  },
+  {
+    key: 'project',
+    value: {
+      describe: 'Setup project (.idea folder)',
+      alias   : 'p',
+      boolean : true,
+      default : config.get('project')
+    }
+  },
+  {
+    key: 'tools',
+    value: {
+      describe: 'Install external tools',
+      alias   : 't',
+      boolean : true,
+      default : config.get('tools')
+    }
+  },
+  {
+    key: 'rules',
+    value: {
+      describe: 'Set style rules',
+      alias   : 'r',
+      boolean : true,
+      default : config.get('rules')
+    }
+  },
+  {
+    key: 'templates',
+    value: {
+      describe: 'Add code templates',
+      alias   : 't',
+      boolean : true,
+      default : config.get('templates')
+    }
+  },
+  {
+    key: 'launch',
+    value: {
+      describe: 'Launch the IDE following setup',
+      alias   : 'l',
+      boolean : true,
+      default : config.get('launch')
+    }
+  },
+];
+
+function checkWebstormFlags(argv) {
+  if (argv.help) {
+    return true;
+  }
+  else {
+    webstormOptionDefinitions.forEach(function(opt) {
+      var key = opt.key;
+      var value = argv[key];
+      if ((!!opt.value.isOptional) &&
+        (typeof value === 'undefined')) {
+        // all other options must be specified, or have default defined
+        return;
+      }
+      if ((typeof value === 'undefined') ||
+        ((typeof value === 'string') && (value.length < 1) && (key !== 'description'))) {
+        throw new Error('Required option "' + key + '" is not specified');
+      }
+
+      var valueType = (typeof value);
+      // ensure options correspond to the types that they were defined as belonging to
+      var typeIsOk = false;
+      var validTypes = ['string', 'boolean', 'number']
+        .filter(function(selType) {
+          return !!(opt.value[selType]);
+        });
+      if (!opt.value.isMultiple) {
+        validTypes.forEach(function(validType) {
+          if (valueType === validType) {
+            typeIsOk = true;
+          }
+        });
+      }
+      else {
+        value = [].concat(value);
+        if (value.length === 0) {
+          typeIsOk = true;
+        }
+        else {
+          value.forEach(function (subValue) {
+            validTypes.forEach(function(validType) {
+              if (typeof subValue === validType) {
+                typeIsOk = true;
+              }
+            });
+          });
+        }
+      }
+      if (!typeIsOk) {
+        var expectedType = JSON.stringify(validTypes);
+        if (opt.value.isMultiple) {
+          expectedType = 'Array<' + expectedType + '>'
+        }
+        throw new Error('' + key + ' is expected to be of types ' +
+          expectedType + ' but a ' + (typeof value) + ' was provided instead.');
+      }
+
+      if (key === 'subdir') {
         var subdir  = path.resolve(value);
         var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
         if (!isValid) {
-          return 'The specified subdirectory does not exist.';
+          throw new Error('The specified subdirectory does not exist.');
+        }
+        if (!argv.defaults) {
+          // when defaults are not present, check whether angularity project is present
+          var projectPath = (value) ? path.join(value, 'angularity.json') : 'angularity.json';
+          if (!fs.existsSync(path.resolve(projectPath))) {
+            throw new Error('Current working directory (or specified subdir) is not a valid project. ' +
+              'Try running the "init" command first.');
+          }
         }
       }
-    }
-  })
-  // don't check for a project if we are just setting defaults
-  .withGate(function (argv) {
-    return !(argv.defaults);
-  })
-  .withTest(function angularityProjectPresent(argv) {
-    var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
-    if (!fs.existsSync(path.resolve(projectPath))) {
-      return 'Current working directory (or specified subdir) is not a valid project. Try running the "init" ' +
-        'command first.';
-    }
-  })
-  .commit();
+    },
+    function(opt) {
+      var key = opt.key;
+      var value = argv[key];
+      if ((typeof value === 'undefined') ||
+        ((typeof value === 'string') && (value.length < 1))) {
+        throw new Error('Required option "' + key + '" is not specified');
+      }
+      if (key === 'subdir' && !!value) {
+        var subdir  = path.resolve(value);
+        var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
+        if (!isValid) {
+          throw new Error('The specified subdirectory does not exist.');
+        }
+        if (!argv.defaults) {
+          // when defaults are not present, check whether angularity project is present
+          var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
+          if (!fs.existsSync(path.resolve(projectPath))) {
+            throw new Error('Current working directory (or specified subdir) is not a valid project. ' +
+              'Try running the "init" command first.');
+          }
+        }
+      }
+    });
+  }
+  return true;
+}
 
-yargs.getInstance('webstorm')
-  .usage(wordwrap(2, 80)([
+taskYargs.register('webstorm', {
+  description: (wordwrap(2, 80)([
     'The "webstorm" task initialises webstorm for a project in the current working directory and launches the IDE.',
     '',
     'Where the IDE is installed in a non-standard location the full path to the IDE should be used in place of the ' +
@@ -75,69 +220,20 @@ yargs.getInstance('webstorm')
     '* Set coding style rules                                 --rules',
     '* Add code templates                                     --templates',
     '* Launch IDE                                             --launch',
-  ].join('\n')))
-  .example('angularity webstorm', 'Run this task')
-  .example('angularity webstorm --defaults -l \<some-path\>', 'Set a default executable path')
-  .example('angularity webstorm --defaults reset', 'Reset defaults')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options('defaults', {
-    describe: 'Set defaults',
-    alias   : 'z',
-    string  : true
-  })
-  .options('subdir', {
-    describe: 'Navigate to the sub-directory specified',
-    alias   : 's',
-    string  : true,
-    default : config.get('subdir')
-  })
-  .options('project', {
-    describe: 'Setup project',
-    alias   : 'p',
-    boolean : true,
-    default : config.get('project')
-  })
-  .options('tools', {
-    describe: 'Install external tools',
-    alias   : 't',
-    boolean : true,
-    default : config.get('tools')
-  })
-  .options('rules', {
-    describe: 'Set style rules',
-    alias   : 'r',
-    boolean : true,
-    default : config.get('rules')
-  })
-  .options('templates', {
-    describe: 'Add code templates',
-    alias   : 't',
-    boolean : true,
-    default : config.get('templates')
-  })
-  .options('launch', {
-    describe: 'Launch the IDE following setup',
-    alias   : 'l',
-    string  : true,
-    default : config.get('launch')
-  })
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(check)
-  .wrap(80);
+  ].join('\n'))),
+  prerequisiteTasks: [],
+  checks: [validateLaunchPath, checkWebstormFlags],
+  options: webstormOptionDefinitions
+});
 
 gulp.task('webstorm', function (done) {
   console.log(hr('-', 80, 'webstorm'));
 
-  // find the yargs instance that is most appropriate for the given command line parameters
-  cliArgs = validateLaunchPath(yargs.resolveArgv());
-  if (cliArgs.taskName === 'init') {
-    cliArgs = config.get(); // default arguments when called by the "init" task
-  }
+  var yargsInstance = taskYargs.getCurrent();
+  yargsInstance
+    .strict()
+    .wrap(80);
+  cliArgs = yargsInstance.argv;
 
   // set defaults
   if (cliArgs.defaults) {
@@ -158,7 +254,13 @@ gulp.task('webstorm', function (done) {
       cliArgs.tools && 'webstorm:tools',
       cliArgs.launch && 'webstorm:launch'
     ].filter(Boolean).concat(done);
-    runSequence.apply(runSequence, taskList);
+    if (taskList.length > 1) {
+      // length will be one because done callback is always appended to the task list
+      runSequence.apply(runSequence, taskList);
+    }
+    else {
+      console.log('Webstorm task run with all options turned off, so doing nothing');
+    }
   }
 });
 
@@ -212,7 +314,7 @@ gulp.task('webstorm:project', function () {
 gulp.task('webstorm:templates', function () {
   var srcDirectory  = path.join(TEMPLATE_PATH, 'fileTemplates');
   var destDirectory = path.join(userPreferencesDirectory(), 'fileTemplates');
-  var isValid       = fs.existsSync(destDirectory) && fs.statsSync(destDirectory).isDirectory();
+  var isValid       = fs.existsSync(destDirectory) && fs.statSync(destDirectory).isDirectory();
   if (!isValid) {
     gutil.log('Failed to locate Webstorm templates. Expected directory:')
     gutil.log('  ' + destDirectory)
@@ -281,7 +383,7 @@ gulp.task('webstorm:tools', function () {
     };
   }
   var destDirectory = path.join(userPreferencesDirectory(), 'tools');
-  var isValid       = fs.existsSync(destDirectory) && fs.statsSync(destDirectory).isDirectory();
+  var isValid       = fs.existsSync(destDirectory) && fs.statSync(destDirectory).isDirectory();
   if (!isValid) {
     gutil.log('Failed to locate Webstorm tools. Expected directory:')
     gutil.log('  ' + destDirectory)
@@ -319,14 +421,14 @@ function validateLaunchPath(argv) {
     case true:
     case 'true':
       if (!fs.existsSync(executablePath())) {
-        return 'Cannot find Webstorm executable, you will have to specify it explicitly.';
+        throw new Error('Cannot find Webstorm executable, you will have to specify it explicitly.');
       } else {
         argv.launch = true;
         break;
       }
     default:
       if (!fs.existsSync(path.normalize(argv.launch))) {
-        return 'Launch path is not valid or does not exist.';
+        throw new Error('Launch path is not valid or does not exist.');
       }
   }
   return argv;
@@ -355,7 +457,15 @@ function executablePath() {
   } else if (platform.isMacOS()) {
     return '/Applications/WebStorm.app/Contents/MacOS/webide';
   } else if (platform.isUnix()) {
-    return path.join('opt/webstorm/bin/webstorm.sh');
+    if (fs.existsSync('/opt/webstorm/bin/webstorm.sh')) {
+      return '/opt/webstorm/bin/webstorm.sh';
+    }
+    else if (fs.existsSync('/usr/local/bin/wstorm')) {
+      return '/usr/local/bin/wstorm';
+    }
+    else {
+      return null;
+    }
   } else {
     return null;
   }

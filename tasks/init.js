@@ -161,7 +161,7 @@ function checkInitFlags(argv) {
       var value = argv[key];
       if ((!!opt.value.isOptional) &&
         (typeof value === 'undefined')) {
-        // all other option must be specified, or have default defined
+        // all other options must be specified, or have default defined
         return;
       }
       if ((typeof value === 'undefined') ||
