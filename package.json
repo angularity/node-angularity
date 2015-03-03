@@ -17,7 +17,7 @@
   "scripts": {
     "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
   },
-  "author": "Ben Holloway, Chris Decoster, Brendan Graetz",
+  "contributors": ["bholloway", "impaler", "bguiz"],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,9 +31,10 @@
   "bin": {
     "angularity": "./bin/cli.js"
   },
-  "engineStrict": true,
+  "engineStrict": "true",
   "engines": {
-    "node": ">= 0.9"
+    "node": ">=0.10.28 <0.11",
+    "npm": ">=2.0"
   },
   "dependencies": {
     "6to5ify": "latest",
