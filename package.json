@@ -17,7 +17,7 @@
   "scripts": {
     "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
   },
-  "contributors": ["bholloway, impaler, bguiz"],
+  "contributors": ["bholloway", "impaler", "bguiz"],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,8 +31,9 @@
   "bin": {
     "angularity": "./bin/cli.js"
   },
+  "engineStrict": "true",
   "engines": {
-    "node": ">=0.10 <0.11",
+    "node": ">=0.10.28 <0.11",
     "npm": ">=2.0"
   },
   "dependencies": {
