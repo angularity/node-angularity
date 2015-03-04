@@ -17,7 +17,11 @@
   "scripts": {
     "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
   },
-  "contributors": ["bholloway", "impaler", "bguiz"],
+  "contributors": [
+    "bholloway",
+    "impaler",
+    "bguiz"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
