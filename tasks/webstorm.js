@@ -174,15 +174,11 @@ gulp.task('webstorm:project', function () {
     selectedDebugName       : 'JavaScript Debug.' + properties.name,
     karmaDebugConfiguration : [
       {
-        name: properties.name,
+        name      : properties.name,
         configFile: '$PROJECT_DIR$/' + streams.TEST + '/karma.conf.js',
-        browsers: 'Chrome',
-        env: [],
-        tasks: [
-          {
-            name: 'Tool_Angularity_test --debug'
-          }
-        ]
+        browsers  : 'Chrome',
+        env       : [],
+        tasks     : []
       }
     ],
     jsDebugConfiguration    : subdirectoriesWithFile(streams.APP, 'index.html')
