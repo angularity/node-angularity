@@ -73,7 +73,7 @@ gulp.task('watch', ['server'], function () {
   });
 
   // watch statements
-  watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*', '!**/*.spec.*'), {
+  watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
     name      : 'JS|HTML',
     emitOnGlob: false
   }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
@@ -87,9 +87,4 @@ gulp.task('watch', ['server'], function () {
     name      : 'INJECT',
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
-
-  watch(streams.getLocalLibGlob()(['**/*.spec.js', '!*.spec.js']), {
-    name      : 'TEST',
-    emitOnGlob: false
-  }, queue.getHandler('test'));
 });
