@@ -18,6 +18,7 @@ var defaults = require('../lib/config/defaults'),
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'angularity');
 
 var cliArgs;
+var templateParams;
 
 var config = defaults.getInstance('init')
   .file(platform.userHomeDirectory(), '.angularity')
@@ -221,6 +222,13 @@ gulp.task('init', function (done) {
   // find the yargs instance that is most appropriate for the given command line parameters
   cliArgs = yargs.resolveArgv();
 
+  // augment or adjust yargs parameters
+  var port = (cliArgs.port === 'random') ? Math.floor(Math.random() * (65536 - 49152) + 49152) : cliArgs.port;
+  var tags = []
+    .concat(cliArgs.tag)   // yargs will convert multiple --tag flags to an array
+    .filter(Boolean);
+  templateParams = merge(cliArgs, { port: port, tags: JSON.stringify(tags) }); // must stringify lists
+
   // set defaults
   if (cliArgs.defaults) {
     ((cliArgs.defaults === 'reset') ? config.revert() : config.set(cliArgs))
@@ -327,20 +335,10 @@ function writeTemplate(filename, subdir, portOffset) {
   var destRelative = path.join(subdir || '.', filename);
   var destAbsolute = path.resolve(destRelative);
   if (fs.existsSync(srcAbsolute) && !fs.existsSync(destAbsolute)) {
-
-    // augment or adjust yargs parameters
-    var port = (cliArgs.port === 'random') ? Math.floor(Math.random() * (65536 - 49152) + 49152) : port;
-    var tags = []
-      .concat(cliArgs.tag)   // yargs will convert multiple --tag flags to an array
-      .filter(Boolean);
     var partial = fs.readFileSync(srcAbsolute).toString();
-    var params  = merge(cliArgs, {
-      port : port + (portOffset || 0),
-      tags : JSON.stringify(tags)  // must stringify lists
-    });
-
-    // complete the template and write to file
-    var merged  = template(partial, params);
+    var merged  = template(partial, merge(cliArgs, {
+      port: portOffset ? (templateParams.port + portOffset) : templateParams.port
+    }));
     fs.writeFileSync(destAbsolute, merged);
     gutil.log('created file ' + destRelative);
   }
