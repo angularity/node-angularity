@@ -65,7 +65,7 @@ yargs.getInstance('watch')
   .wrap(80);
 
 gulp.task('watch', ['server'], function () {
-  var getGlobAppNodeBower = streams.getGlob(streams.APP, streams.NODE, streams.BOWER);
+  var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
 
   // enqueue actions to avoid multiple trigger
   var queue = watchSequence(500, function () {
@@ -88,7 +88,7 @@ gulp.task('watch', ['server'], function () {
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
 
-  watch(streams.getGlob()(['**/*.spec.js', '!*.spec.js']), {
+  watch(streams.getLocalLibGlob()(['**/*.spec.js', '!*.spec.js']), {
     name      : 'TEST',
     emitOnGlob: false
   }, queue.getHandler('test'));

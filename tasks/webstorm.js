@@ -158,20 +158,20 @@ gulp.task('webstorm:project', function () {
   var properties = require(path.resolve('angularity.json'));
 
   var context = {
-    projectName         : properties.name,
-    jshintPath          : '$PROJECT_DIR$/.jshintrc',
-    jsDebugPort         : properties.port,
-    javascriptVersion   : 'es6',
-    watcherSuppressedTasks: 'Traceur compiler;SCSS',
-    JsKarmaPackageDirSetting: 'C:\\Program Files\\nodejs\\node_modules\\karma', // todo resolve by platform
-    contentPaths        : [
+    projectName             : properties.name,
+    jshintPath              : '$PROJECT_DIR$/.jshintrc',
+    jsDebugPort             : properties.port,
+    javascriptVersion       : 'es6',
+    watcherSuppressedTasks  : 'Traceur compiler;SCSS',
+    JsKarmaPackageDirSetting: path.resolve(__dirname, '..', 'node_modules', 'karma'),
+    contentPaths            : [
       {content: 'file://' + process.cwd()}
     ],
-    libraries           : [
+    libraries               : [
       'jasmine-DefinitelyTyped',
       'angular'
     ],
-    selectedDebugName   : 'JavaScript Debug.' + properties.name,
+    selectedDebugName       : 'JavaScript Debug.' + properties.name,
     karmaDebugConfiguration : [
       {
         name: properties.name,
@@ -185,7 +185,7 @@ gulp.task('webstorm:project', function () {
         ]
       }
     ],
-    jsDebugConfiguration: subdirectoriesWithFile(streams.APP, 'index.html')
+    jsDebugConfiguration    : subdirectoriesWithFile(streams.APP, 'index.html')
       .map(function (directory) {
         var directoryTerms = directory.split(path.sep).slice(1);
         return {
@@ -196,17 +196,17 @@ gulp.task('webstorm:project', function () {
           }
         };
       }),
-    plainText           : [
+    plainText               : [
       'file://$PROJECT_DIR$/app-build/index.css',
       'file://$PROJECT_DIR$/app-build/index.js',
       'file://$PROJECT_DIR$/app-test/index.js'
     ],
-    resourceRoots       : [
+    resourceRoots           : [
       'file://$PROJECT_DIR$',
       'file://$PROJECT_DIR$/node_modules',
       'file://$PROJECT_DIR$/bower_components'
     ],
-    projectPane         : template(fs.readFileSync(path.join(TEMPLATE_PATH, 'projectPane.xml')), {
+    projectPane             : template(fs.readFileSync(path.join(TEMPLATE_PATH, 'projectPane.xml')), {
       rootPath: properties
     })
   };

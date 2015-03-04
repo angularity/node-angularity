@@ -8,6 +8,7 @@ var gulp            = require('gulp'),
     rimraf          = require('gulp-rimraf'),
     runSequence     = require('run-sequence'),
     combined        = require('combined-stream'),
+    semiflat        = require('gulp-semiflat'),
     to5ify          = require('6to5ify'),
     stringify       = require('stringify'),
     wordwrap        = require('wordwrap'),
@@ -80,7 +81,7 @@ gulp.task('javascript', function (done) {
 
 gulp.task('test', function (done) {
   console.log(hr('-', 80, 'test'));
-  init();
+  init(true);
   runSequence(
     ['javascript:cleanunit', 'javascript:lint'],
     'javascript:unit',
@@ -120,7 +121,7 @@ gulp.task('javascript:unit', function () {
     .append(
       streams
         .testDependencies({
-          dev: true,
+          dev : true,
           read: false
         })
     )
@@ -129,9 +130,10 @@ gulp.task('javascript:unit', function () {
         .jsSpec()
         .pipe(browserify
           .compile(80, transforms.concat(browserify.jasmineTransform('@')))
-          .all('index.js'))
+          .all('index.js', false, '/base'))
         .pipe(gulp.dest(streams.TEST))
     )
+    .pipe(semiflat(process.cwd()))
     .pipe(karma.createConfig(reporters))
     .pipe(gulp.dest(streams.TEST))
     .pipe(karma.run(reporters, 80));
@@ -149,12 +151,12 @@ gulp.task('javascript:build', function () {
 /**
  * Initialisation must be deferred until a task actually starts
  */
-function init() {
+function init(unminified) {
   cliArgs    = cliArgs || yargs.resolveArgv();
   transforms = [
-    to5ify.configure({ ignoreRegex: /(?!)/ }),              // convert any es6 to es5 (ignoreRegex is degenerate)
-    stringify({ minify: false }),                           // allow import of html to a string
-    !cliArgs.unminified && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
+    to5ify.configure({ ignoreRegex: /(?!)/ }),                             // convert any es6 to es5 (degenerate regex)
+    stringify({ minify: false }),                                          // allow import of html to a string
+    !cliArgs.unminified && !unminified && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
   ];
   // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
   // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying

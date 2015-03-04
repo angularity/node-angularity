@@ -281,7 +281,7 @@ gulp.task('init:bower', function () {
 });
 
 gulp.task('init:karma', function () {
-  writeTemplate('karma.conf.js');
+  writeTemplate('karma.conf.js', null, 1);
 });
 
 gulp.task('init:jshint', function () {
@@ -322,7 +322,7 @@ function anyFileOfType(ext, subdir) {
     });
 }
 
-function writeTemplate(filename, subdir) {
+function writeTemplate(filename, subdir, portOffset) {
   var srcAbsolute  = path.join(TEMPLATE_PATH, filename);
   var destRelative = path.join(subdir || '.', filename);
   var destAbsolute = path.resolve(destRelative);
@@ -335,7 +335,7 @@ function writeTemplate(filename, subdir) {
       .filter(Boolean);
     var partial = fs.readFileSync(srcAbsolute).toString();
     var params  = merge(cliArgs, {
-      port : port,
+      port : port + (portOffset || 0),
       tags : JSON.stringify(tags)  // must stringify lists
     });
 
