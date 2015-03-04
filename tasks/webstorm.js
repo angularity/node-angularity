@@ -23,7 +23,7 @@ var config = defaults.getInstance('webstorm')
   .file(platform.userHomeDirectory(), '.angularity')
   .defaults({
     'project'  : true,
-    'tools'    : true,
+    'external' : true,
     'codestyle': true,
     'templates': true,
     'launch'   : true
@@ -54,7 +54,7 @@ yargs.getInstance('webstorm')
     'defined or reset using the --defaults option.',
     '',
     '* Setup project (resources, debug config, suppressors)   --project',
-    '* Create external tools that launch angularity           --tools',
+    '* Create external tools that launch angularity           --external',
     '* Set coding style                                       --codestyle',
     '* Add code templates                                     --templates',
     '* Launch IDE                                             --launch',
@@ -84,20 +84,20 @@ yargs.getInstance('webstorm')
     boolean : true,
     default : config.get('project')
   })
-  .options('tools', {
-    describe: 'Install external tools',
-    alias   : 't',
+  .options('external', {
+    describe: 'Install external tools to run Angularity',
+    alias   : 'e',
     boolean : true,
-    default : config.get('tools')
+    default : config.get('external')
   })
   .options('codestyle', {
     describe: 'Install the Javascript code style',
-    alias   : 'r',
+    alias   : 'c',
     boolean : true,
     default : config.get('codestyle')
   })
   .options('templates', {
-    describe: 'Add code templates',
+    describe: 'Add templates for angular',
     alias   : 't',
     boolean : true,
     default : config.get('templates')
