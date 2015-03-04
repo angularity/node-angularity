@@ -119,9 +119,8 @@ gulp.task('webstorm', function (done) {
 
   // Find the yargs instance that is most appropriate for the given command line parameters
   cliArgs = validateLaunchPath(yargs.resolveArgv());
-  if (cliArgs.taskName === 'init') {
-    cliArgs = config.get(); // default arguments when called by the "init" task
-  }
+
+  cliArgs = config.get();
 
   // set defaults
   if (cliArgs.defaults) {
@@ -132,9 +131,8 @@ gulp.task('webstorm', function (done) {
       });
     gutil.log('wrote file ' + config.commit());
   }
-
-  // else run the selected items
   else {
+    // else run the selected items
     var taskList = [
       cliArgs.subdir && 'webstorm:subdir',
       cliArgs.project && 'webstorm:project',
