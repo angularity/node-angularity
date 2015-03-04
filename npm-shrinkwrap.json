@@ -1577,14 +1577,7 @@
         "falafel": {
           "version": "0.3.1",
           "from": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz",
-          "resolved": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz",
-          "dependencies": {
-            "esprima": {
-              "version": "1.1.0-dev",
-              "from": "git://github.com/substack/esprima#is-keyword",
-              "resolved": "git://github.com/substack/esprima#0a7f8489a11b44b019ce168506f535f22d0be290"
-            }
-          }
+          "resolved": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz"
         }
       }
     },
@@ -3811,23 +3804,6 @@
           "version": "2.5.0",
           "from": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz",
           "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-2.5.0.tgz"
-        }
-      }
-    },
-    "mold-source-map": {
-      "version": "0.3.0",
-      "from": "https://registry.npmjs.org/mold-source-map/-/mold-source-map-0.3.0.tgz",
-      "resolved": "https://registry.npmjs.org/mold-source-map/-/mold-source-map-0.3.0.tgz",
-      "dependencies": {
-        "through": {
-          "version": "2.2.7",
-          "from": "https://registry.npmjs.org/through/-/through-2.2.7.tgz",
-          "resolved": "https://registry.npmjs.org/through/-/through-2.2.7.tgz"
-        },
-        "convert-source-map": {
-          "version": "0.3.5",
-          "from": "https://registry.npmjs.org/convert-source-map/-/convert-source-map-0.3.5.tgz",
-          "resolved": "https://registry.npmjs.org/convert-source-map/-/convert-source-map-0.3.5.tgz"
         }
       }
     },
