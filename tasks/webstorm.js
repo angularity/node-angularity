@@ -18,6 +18,7 @@ var defaults = require('../lib/config/defaults'),
 var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
 
 var cliArgs;
+
 // Load the global config for defaults
 var config = defaults.getInstance('webstorm')
   .file(platform.userHomeDirectory(), '.angularity')
@@ -118,9 +119,6 @@ gulp.task('webstorm', function (done) {
 
   // Find the yargs instance that is most appropriate for the given command line parameters
   cliArgs = validateLaunchPath(yargs.resolveArgv());
-
-  cliArgs = yargs.resolveArgv();
-
   if (cliArgs.taskName === 'init') {
     cliArgs = config.get(); // default arguments when called by the "init" task
   }
