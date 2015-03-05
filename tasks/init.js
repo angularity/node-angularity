@@ -227,7 +227,7 @@ gulp.task('init', function (done) {
   var tags = []
     .concat(cliArgs.tag)   // yargs will convert multiple --tag flags to an array
     .filter(Boolean);
-  templateParams = merge(cliArgs, { port: port, tags: JSON.stringify(tags) }); // must stringify lists
+  templateParams = merge({}, cliArgs, { port: port, tags: JSON.stringify(tags) }); // must stringify lists
 
   // set defaults
   if (cliArgs.defaults) {
