@@ -335,9 +335,10 @@ function writeTemplate(filename, subdir, portOffset) {
   var destAbsolute = path.resolve(destRelative);
   if (fs.existsSync(srcAbsolute) && !fs.existsSync(destAbsolute)) {
     var partial = fs.readFileSync(srcAbsolute).toString();
-    var merged  = template(partial, merge(cliArgs, {
-      port: portOffset ? (templateParams.port + portOffset) : templateParams.port
-    }));
+    var params  = merge({ }, templateParams, {
+        port: portOffset ? (templateParams.port + portOffset) : templateParams.port
+      });
+    var merged  = template(partial, params);
     fs.writeFileSync(destAbsolute, merged);
     gutil.log('created file ' + destRelative);
   }
