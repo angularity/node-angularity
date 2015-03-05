@@ -238,7 +238,6 @@ gulp.task('init', function (done) {
       });
     gutil.log('wrote file ' + config.commit());
   }
-
   // else run the selected items
   else {
     var taskList = [

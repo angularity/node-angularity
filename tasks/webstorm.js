@@ -120,8 +120,6 @@ gulp.task('webstorm', function (done) {
   // Find the yargs instance that is most appropriate for the given command line parameters
   cliArgs = validateLaunchPath(yargs.resolveArgv());
 
-  cliArgs = config.get();
-
   // set defaults
   if (cliArgs.defaults) {
     ((cliArgs.defaults === 'reset') ? config.revert() : config.set(cliArgs))
@@ -131,8 +129,8 @@ gulp.task('webstorm', function (done) {
       });
     gutil.log('wrote file ' + config.commit());
   }
+  // else run the selected items
   else {
-    // else run the selected items
     var taskList = [
       cliArgs.subdir && 'webstorm:subdir',
       cliArgs.project && 'webstorm:project',
@@ -141,7 +139,6 @@ gulp.task('webstorm', function (done) {
       cliArgs.codestyle && 'webstorm:codestyle',
       cliArgs.launch && 'webstorm:launch'
     ].filter(Boolean).concat(done);
-
     runSequence.apply(runSequence, taskList);
   }
 });
@@ -284,9 +281,14 @@ function validateLaunchPath(argv) {
         return 'Launch path is not valid or does not exist.';
       }
   }
-  return true;
+  return argv;
 }
 
+/**
+ * Validator function for the sub-directory property.
+ * @param {*} value The value of the property to test
+ * @returns {string|undefined} Error message on failure
+ */
 function validateSubDirectory(value) {
   if (value) {
     var subdir = path.resolve(value);
@@ -317,11 +319,15 @@ function subdirectoriesWithFile(base, filename) {
   return result;
 }
 
-// Todo move method to util location.
-function angularityProjectPresent(argv) {
+/**
+ * Validator function for an angularity project being present in the current working directory
+ * @param {object} argv The yargs command line parameter set
+ * @returns {string|undefined} Error message on failure
+ */
+function angularityProjectPresent(argv) { // Todo @impaler move method to util location
   var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
   if (!fs.existsSync(path.resolve(projectPath))) {
-    return 'Current working directory (or specified subdir) is not a valid angularity project. ' +
-      'Try running the "init" command first.';
+    return 'Current working directory (or specified subdir) is not a valid angularity project. Try running the ' +
+      '"init" command first.';
   }
 }
