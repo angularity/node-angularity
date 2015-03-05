@@ -134,9 +134,9 @@ gulp.task('webstorm', function (done) {
     var taskList = [
       cliArgs.subdir && 'webstorm:subdir',
       cliArgs.project && 'webstorm:project',
-      cliArgs.templates && 'webstorm:templates',
-      cliArgs.tools && 'webstorm:tools',
+      cliArgs.external && 'webstorm:externaltools',
       cliArgs.codestyle && 'webstorm:codestyle',
+      cliArgs.templates && 'webstorm:templates',
       cliArgs.launch && 'webstorm:launch'
     ].filter(Boolean).concat(done);
     runSequence.apply(runSequence, taskList);
@@ -206,7 +206,7 @@ gulp.task('webstorm:templates', function () {
   ideTemplate.webStorm.copyFileTemplates(path.join(TEMPLATE_PATH, 'fileTemplates'));
 });
 
-gulp.task('webstorm:tools', function () {
+gulp.task('webstorm:externaltools', function () {
   ideTemplate.webStorm.createExternalTool({
     name : 'Angularity',
     tools: ['test', 'watch', 'watch --unminified', 'build', 'build --unminified', 'release']
