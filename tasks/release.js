@@ -22,7 +22,7 @@ var injectAdjacent   = require('../lib/inject/adjacent-files'),
 taskYargs.register('release', {
   description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
     'components to a release directory.')),
-  prerequisiteTasks: ['build'],
+  prerequisiteTasks: ['help', 'build'],
   checks: [],
   options: []
 });

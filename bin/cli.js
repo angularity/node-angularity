@@ -34,6 +34,14 @@ gulp.on('task_stop', function (e) {
 });
 
 var packageJson = require(path.join(__dirname, '..', 'package.json'));
+var helpOption = {
+  key: 'help',
+  value: {
+    describe: 'This help message, or help on a specific task',
+    alias: ['h', '?'],
+    boolean: true
+  }
+};
 var defaultYargsInstance = yargs
   .usage(wordwrap(2, 80)([
     packageJson.description,
@@ -41,27 +49,46 @@ var defaultYargsInstance = yargs
     'Tasks include:'
     //TODO add task list here
   ].join('\n')))
-  // .example('angularity', 'Interactive menu') //TODO reinstate when interactive menu ins reinstated
+  // .example('angularity', 'Interactive menu') //TODO reinstate when interactive menu is reinstated
   .example('angularity -v', 'Display the version of angularity')
-  .example('angularity -h \<task name\>', 'Get help on a particular task')
+  .example('angularity \<task name\> -h', 'Get help on a particular task')
   .example('angularity \<task name\>', 'Run the given task')
-  .option('help', {
-    describe: 'This help message, or help on a specific task',
-    alias: ['h', '?'],
-    boolean: true
-  })
   .option('version', {
-    describe: 'Display the version of angularity',
+    describe: 'Display the curent version',
     alias: ['v'],
     boolean: true
-  });
+  })
+  .option(helpOption.key, helpOption.value);
+taskYargs.register('help', {
+  description: (wordwrap(2, 80)('Displays context-specific help messages')),
+  prerequisiteTasks: [],
+  options: [
+    {
+      key: 'help',
+      value: {
+        describe: 'This help message, or help on a specific task',
+        alias: ['h', '?'],
+        boolean: true
+      }
+    }
+  ],
+  checks: []
+});
 
+var cliArgs;
 var taskName = taskYargs.getCurrentName();
 if (taskName) {
-  runSequence(taskName);
+  var yargsInstance = taskYargs.getCurrent();
+  cliArgs = yargsInstance.argv;
+  if (cliArgs.help) {
+    yargsInstance.showHelp();
+  }
+  else {
+    runSequence(taskName);
+  }
 }
 else {
-  var cliArgs = defaultYargsInstance.argv;
+  cliArgs = defaultYargsInstance.argv;
   if (cliArgs.help) {
     defaultYargsInstance.showHelp();
   }

@@ -13,7 +13,7 @@ var nodeSass        = require('../lib/build/node-sass'),
 
 taskYargs.register('css', {
   description: (wordwrap(2, 80)('The "css" task performs a one time build of the SASS composition root(s).')),
-  prerequisiteTasks: [],
+  prerequisiteTasks: ['help'],
   checks: [],
   options: []
 });

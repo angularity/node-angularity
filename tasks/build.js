@@ -9,7 +9,7 @@ var taskYargs       = require('../lib/util/task-yargs'),
 
 taskYargs.register('build', {
   description: (wordwrap(2, 80)('The "build" task performs a single build of the javascript and SASS composition root(s).')),
-  prerequisiteTasks: ['javascript', 'css', 'html'],
+  prerequisiteTasks: ['help', 'javascript', 'css', 'html'],
   checks: [],
   options: []
 });

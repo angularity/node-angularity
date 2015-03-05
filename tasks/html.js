@@ -17,7 +17,7 @@ var injectAdjacent  = require('../lib/inject/adjacent-files'),
 taskYargs.register('html', {
   description: (wordwrap(2, 80)('The "html" task performs a one time injection of ' +
     'pre-built JS and CSS into the application HTML.')),
-  prerequisiteTasks: [],
+  prerequisiteTasks: ['help'],
   checks: [],
   options: []
 });

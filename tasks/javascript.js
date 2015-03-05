@@ -23,18 +23,41 @@ var karma           = require('../lib/test/karma'),
 var cliArgs;
 var transforms;
 
+var optionDefinitionJsHintReporter = {
+  key: 'jshint-reporter',
+  value: {
+    describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module, or the absolute path ' +
+      'to one.',
+    alias: ['j'],
+    default: jshintReporter.defaultReporterName,
+    string: true
+  }
+};
+function checkJsHintReporter(argv) {
+  if (argv.help) {
+    return true;
+  }
+  else {
+    var value = argv[optionDefinitionJsHintReporter.key];
+    if (typeof value === 'string' && value.length > 0) {
+      try {
+        jshintReporter.get(value);
+      }
+      catch (ex) {
+        throw new Error('Illegal value for "'+optionDefinitionJsHintReporter.key+'"\n' + ex);
+      }
+      return true;
+    }
+    else {
+      throw new Error('Required option "'+optionDefinitionJsHintReporter.key+'" in not specified');
+    }
+  }
+}
+
 taskYargs.register('javascript', {
   description: (wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).')),
-  prerequisiteTasks: [],
+  prerequisiteTasks: ['help'],
   options: [
-    {
-      key: 'help',
-      value: {
-        describe: 'This help message',
-        alias: ['h', '?'],
-        boolean: true
-      }
-    },
     {
       key: 'unminified',
       value: {
@@ -44,23 +67,51 @@ taskYargs.register('javascript', {
         default: false
       }
     },
-    jshintReporter.yargsOption
+    optionDefinitionJsHintReporter
   ],
   checks: [
-    jshintReporter.yargsCheck
+    checkJsHintReporter
   ]
 });
 
+var optionDefinitonKarmaReporter = {
+  key: 'karma-reporter',
+  value: {
+    describe: 'Specify a custom Karma reporter to use. ' +
+      'Either a locally npm installed module, or an absolute path to one.',
+    alias: ['k'],
+    default: karma.defaultReporterName,
+    string:true,
+  }
+};
+
+function checkKarmaReporter(argv) {
+  if (argv.help) {
+    return true;
+  }
+  else {
+    var value = argv[optionDefinitonKarmaReporter.key];
+    if (typeof value === 'string' && value.length > 0) {
+      try {
+        karma.getPluginPath(value);
+      }
+      catch (ex) {
+        throw new Error('Illegal value for "' + optionDefinitonKarmaReporter.key + '"\n' + ex);
+      }
+      return true;
+    }
+    else {
+      throw new Error('Required option "' + optionDefinitonKarmaReporter.key + '" in not specified');
+    }
+  }
+}
+
 taskYargs.register('test', {
-  description: wordwrap(2, 80)('The "test" task performs a one time build and '+
+  description: wordwrap(2, 80)('The "test" task performs a one time build and ' +
     'karma test of all .spec.js files in the project.'),
   prerequisiteTasks: ['javascript'],
-  options: [
-    karma.yargsOption
-  ],
-  checks: [
-    karma.yargsCheck
-  ]
+  options: [optionDefinitonKarmaReporter],
+  checks: [checkKarmaReporter]
 });
 
 gulp.task('javascript', function (done) {
@@ -102,13 +153,13 @@ gulp.task('javascript:lint', function () {
     .append(streams.jsLib())
     .append(streams.jsSpec())
     .pipe(jshint())
-    .pipe(jshintReporter.get(cliArgs[jshintReporter.yargsOption.key]));
+    .pipe(jshintReporter.get(cliArgs[optionDefinitionJsHintReporter.key]));
 });
 
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
   var reporters = []
-    .concat(cliArgs[karma.yargsOption.key])
+    .concat(cliArgs[optionDefinitonKarmaReporter.key])
     .filter(function isString(value) {
       return (typeof value === 'string');
     });

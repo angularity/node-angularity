@@ -22,7 +22,7 @@ taskYargs.register('watch', {
   description: (wordwrap(2, 80)('The "watch" task performs an initial build and then serves the application on localhost at ' +
     'the given port. It then watches the project and performs rebuild of Javascript and/or SASS compositions upon ' +
     'change. This is followed by HTML injection and browser reload.')),
-  prerequisiteTasks: ['server'],
+  prerequisiteTasks: ['help', 'server'],
   checks: [],
   options: []
 });

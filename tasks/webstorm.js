@@ -33,14 +33,6 @@ var config = defaults.getInstance('webstorm')
 
 var webstormOptionDefinitions = [
   {
-    key: 'help',
-    value: {
-      describe: 'This help message',
-      alias   : [ 'h', '?' ],
-      boolean : true
-    }
-  },
-  {
     key: 'defaults',
     value: {
       describe: 'Set defaults',
@@ -114,53 +106,12 @@ function checkWebstormFlags(argv) {
     webstormOptionDefinitions.forEach(function(opt) {
       var key = opt.key;
       var value = argv[key];
-      if ((!!opt.value.isOptional) &&
-        (typeof value === 'undefined')) {
-        // all other options must be specified, or have default defined
+      if (taskYargs.checkFlagMissing(opt, key, value)) {
         return;
       }
-      if ((typeof value === 'undefined') ||
-        ((typeof value === 'string') && (value.length < 1) && (key !== 'description'))) {
-        throw new Error('Required option "' + key + '" is not specified');
-      }
 
-      var valueType = (typeof value);
       // ensure options correspond to the types that they were defined as belonging to
-      var typeIsOk = false;
-      var validTypes = ['string', 'boolean', 'number']
-        .filter(function(selType) {
-          return !!(opt.value[selType]);
-        });
-      if (!opt.value.isMultiple) {
-        validTypes.forEach(function(validType) {
-          if (valueType === validType) {
-            typeIsOk = true;
-          }
-        });
-      }
-      else {
-        value = [].concat(value);
-        if (value.length === 0) {
-          typeIsOk = true;
-        }
-        else {
-          value.forEach(function (subValue) {
-            validTypes.forEach(function(validType) {
-              if (typeof subValue === validType) {
-                typeIsOk = true;
-              }
-            });
-          });
-        }
-      }
-      if (!typeIsOk) {
-        var expectedType = JSON.stringify(validTypes);
-        if (opt.value.isMultiple) {
-          expectedType = 'Array<' + expectedType + '>'
-        }
-        throw new Error('' + key + ' is expected to be of types ' +
-          expectedType + ' but a ' + (typeof value) + ' was provided instead.');
-      }
+      taskYargs.checkFlagType(opt, key, value);
 
       if (key === 'subdir') {
         var subdir  = path.resolve(value);
@@ -171,29 +122,6 @@ function checkWebstormFlags(argv) {
         if (!argv.defaults) {
           // when defaults are not present, check whether angularity project is present
           var projectPath = (value) ? path.join(value, 'angularity.json') : 'angularity.json';
-          if (!fs.existsSync(path.resolve(projectPath))) {
-            throw new Error('Current working directory (or specified subdir) is not a valid project. ' +
-              'Try running the "init" command first.');
-          }
-        }
-      }
-    },
-    function(opt) {
-      var key = opt.key;
-      var value = argv[key];
-      if ((typeof value === 'undefined') ||
-        ((typeof value === 'string') && (value.length < 1))) {
-        throw new Error('Required option "' + key + '" is not specified');
-      }
-      if (key === 'subdir' && !!value) {
-        var subdir  = path.resolve(value);
-        var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
-        if (!isValid) {
-          throw new Error('The specified subdirectory does not exist.');
-        }
-        if (!argv.defaults) {
-          // when defaults are not present, check whether angularity project is present
-          var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
           if (!fs.existsSync(path.resolve(projectPath))) {
             throw new Error('Current working directory (or specified subdir) is not a valid project. ' +
               'Try running the "init" command first.');
@@ -221,7 +149,7 @@ taskYargs.register('webstorm', {
     '* Add code templates                                     --templates',
     '* Launch IDE                                             --launch',
   ].join('\n'))),
-  prerequisiteTasks: [],
+  prerequisiteTasks: ['help'],
   checks: [validateLaunchPath, checkWebstormFlags],
   options: webstormOptionDefinitions
 });

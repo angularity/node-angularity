@@ -37,14 +37,6 @@ var config = defaults.getInstance('init')
 
 var initOptionDefinitions = [
   {
-    key: 'help',
-    value: {
-      describe: 'This help message',
-      alias   : [ 'h', '?' ],
-      boolean : true
-    }
-  },
-  {
     key: 'defaults',
     value: {
       describe: 'Set defaults',
@@ -159,56 +151,16 @@ function checkInitFlags(argv) {
     initOptionDefinitions.forEach(function(opt) {
       var key = opt.key;
       var value = argv[key];
-      if ((!!opt.value.isOptional) &&
-        (typeof value === 'undefined')) {
-        // all other options must be specified, or have default defined
+      if (taskYargs.checkFlagMissing(opt, key, value)) {
         return;
       }
-      if ((typeof value === 'undefined') ||
-        ((typeof value === 'string') && (value.length < 1) && (key !== 'description'))) {
-        throw new Error('Required option "' + key + '" is not specified');
-      }
-      var valueType = (typeof value);
       if (key !== 'port') {
         // skip the valid types test for port, as will be done later
         // ensure options correspond to the types that they were defined as belonging to
-        var typeIsOk = false;
-        var validTypes = ['string', 'boolean', 'number']
-          .filter(function(selType) {
-            return !!(opt.value[selType]);
-          });
-        if (!opt.value.isMultiple) {
-          validTypes.forEach(function(validType) {
-            if (valueType === validType) {
-              typeIsOk = true;
-            }
-          });
-        }
-        else {
-          value = [].concat(value);
-          if (value.length === 0) {
-            typeIsOk = true;
-          }
-          else {
-            value.forEach(function (subValue) {
-              validTypes.forEach(function(validType) {
-                if (typeof subValue === validType) {
-                  typeIsOk = true;
-                }
-              });
-            });
-          }
-        }
-        if (!typeIsOk) {
-          var expectedType = JSON.stringify(validTypes);
-          if (opt.value.isMultiple) {
-            expectedType = 'Array<' + expectedType + '>'
-          }
-          throw new Error('' + key + ' is expected to be of types ' +
-            expectedType + ' but a ' + (typeof value) + ' was provided instead.');
-        }
+        taskYargs.checkFlagType(opt, key, value);
       }
 
+      // specific checks
       if (key === 'version') {
         // version needs an additional test than the default one for a string
         if (!( /\d+\.\d+\.\d+[-\w\d]*/ ).test(value)) {
@@ -216,6 +168,7 @@ function checkInitFlags(argv) {
         }
       }
       else if (key === 'port') {
+        var valueType = (typeof value);
         // port gets special treatment because it is valid with more than one type
         if ((valueType === 'number' && isNaN(parseInt(value))) ||
           (valueType === 'string' && value !== 'random') ||
@@ -257,7 +210,7 @@ taskYargs.register('init', {
     '',
     'Both the npm and bower packages are initially set private which you will need to clear in order to publish.'
   ].join('\n'))),
-  prerequisiteTasks: [],
+  prerequisiteTasks: ['help'],
   checks: [checkInitFlags],
   options: initOptionDefinitions
 });
