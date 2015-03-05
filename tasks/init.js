@@ -139,7 +139,7 @@ yargs.getInstance('init')
     '',
     'Both the npm and bower packages are initially set private which you will need to clear in order to publish.'
   ].join('\n')))
-  .example('angularity init -n todo -i webstorm', 'Create "todo" and initialise webstorm')
+  .example('angularity init -n todo', 'Create project named "todo"')
   .example('angularity init --defaults -n pending', 'Change the name default to "pending')
   .example('angularity init --defaults reset', 'Reset defaults')
   .options('help', {

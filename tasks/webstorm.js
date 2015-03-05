@@ -58,7 +58,7 @@ yargs.getInstance('webstorm')
     '* Create external tools that launch angularity           --external',
     '* Set coding style                                       --codestyle',
     '* Add code templates                                     --templates',
-    '* Launch IDE                                             --launch',
+    '* Launch IDE                                             --launch'
   ].join('\n')))
   .example('angularity webstorm', 'Run this task')
   .example('angularity webstorm --defaults -l <some-path>', 'Set a default executable path')
