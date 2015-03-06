@@ -64,7 +64,7 @@ function setUpTaskHtml(tyRun) {
       });
     },
     onRun: function onRunHtmlTask(yargsInstance) {
-      console.log('onInitHtmlTask');
+      console.log('onRunHtmlTask');
       cliArgs = yargsInstance
         .strict()
         .wrap(80)

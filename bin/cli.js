@@ -78,6 +78,7 @@ taskYargsRun.taskYargs.register('help', {
 });
 
 require('../tasks/html')(taskYargsRun);
+require('../tasks/javascript')(taskYargsRun);
 
 var cliArgs;
 var taskName = taskYargsRun.taskYargs.getCurrentName();
