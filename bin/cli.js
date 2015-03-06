@@ -14,7 +14,8 @@ var path        = require('path'),
     prettyTime  = require('pretty-hrtime'),
     yargs       = require('yargs');
 
-var taskYargs = require('../lib/util/task-yargs');
+var taskYargs     = require('../lib/util/task-yargs'),
+    taskYargsRun  = require('../lib/util/task-yargs-run');
 
 // TODO @bholloway menus
 // var mainMenu = require('../lib/cli/mainMenu');
@@ -59,7 +60,8 @@ var defaultYargsInstance = yargs
     boolean: true
   })
   .option(helpOption.key, helpOption.value);
-taskYargs.register('help', {
+
+taskYargsRun.taskYargs.register('help', {
   description: (wordwrap(2, 80)('Displays context-specific help messages')),
   prerequisiteTasks: [],
   options: [
@@ -75,24 +77,22 @@ taskYargs.register('help', {
   checks: []
 });
 
+require('../tasks/html')(taskYargsRun);
+
 var cliArgs;
-var taskName = taskYargs.getCurrentName();
+var taskName = taskYargsRun.taskYargs.getCurrentName();
 if (taskName) {
-  var yargsInstance = taskYargs.getCurrent();
-  cliArgs = yargsInstance.argv;
-  if (cliArgs.help) {
-    yargsInstance.showHelp();
-  }
-  else {
-    runSequence(taskName);
-  }
+  taskYargsRun.current();
 }
 else {
   cliArgs = defaultYargsInstance.argv;
-  if (cliArgs.help) {
-    defaultYargsInstance.showHelp();
-  }
-  else if (cliArgs.version) {
+  if (cliArgs.version) {
     console.log('angularity:', packageJson.version);
+  }
+  else {
+    if (!cliArgs.help) {
+      console.log('Task specified is not recognised');
+    }
+    defaultYargsInstance.showHelp();
   }
 }
