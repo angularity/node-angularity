@@ -7,7 +7,7 @@
 module.exports = function(config) {
   config.set({
     // base path, that will be used to resolve files and exclude
-    basePath: process.cwd(),
+    basePath: '/*ANGULARITY_BASE_PATH*/',
 
     //make sure we use karma-jasmine as the test framework
     frameworks: ['jasmine'],
@@ -58,7 +58,7 @@ module.exports = function(config) {
     singleRun: true,
 
     // report which specs are slower than 500ms
-    reportSlowerThan: 500,
+    reportSlowerThan: 500
   });
 };
 

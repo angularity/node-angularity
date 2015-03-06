@@ -65,7 +65,7 @@ yargs.getInstance('watch')
   .wrap(80);
 
 gulp.task('watch', ['server'], function () {
-  var getGlobAppNodeBower = streams.getGlob(streams.APP, streams.NODE, streams.BOWER);
+  var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
 
   // enqueue actions to avoid multiple trigger
   var queue = watchSequence(500, function () {
@@ -73,7 +73,7 @@ gulp.task('watch', ['server'], function () {
   });
 
   // watch statements
-  watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*', '!**/*.spec.*'), {
+  watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
     name      : 'JS|HTML',
     emitOnGlob: false
   }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
@@ -87,9 +87,4 @@ gulp.task('watch', ['server'], function () {
     name      : 'INJECT',
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
-
-  watch(streams.getGlob()(['**/*.spec.js', '!*.spec.js']), {
-    name      : 'TEST',
-    emitOnGlob: false
-  }, queue.getHandler('test'));
 });

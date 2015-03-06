@@ -2,18 +2,18 @@
 
 var $declaration_to_test = require('./$file_that_exports_declaration');
 
-describe('@', function() {
+describe('$file_that_exports_declaration', function() {
 
   // variables
   var scope;
   /* TODO additional variables for each mock */
 
   // definition
-  angular.module('@', [ ])
+  angular.module('$file_that_exports_declaration', [ ])
     .controller('$declaration_to_test', $declaration_to_test);
 
   // our temporary module
-  beforeEach(angular.mock.module('@'));
+  beforeEach(angular.mock.module('$file_that_exports_declaration'));
 
   // mocks
   beforeEach(function() {

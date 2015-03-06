@@ -1,17 +1,18 @@
 'use strict';
 
-var path            = require('path'),
-    fs              = require('fs');
+var path = require('path'),
+    fs   = require('fs');
 
-var gulp            = require('gulp'),
-    jshint          = require('gulp-jshint'),
-    rimraf          = require('gulp-rimraf'),
-    runSequence     = require('run-sequence'),
-    combined        = require('combined-stream'),
-    to5ify          = require('6to5ify'),
-    stringify       = require('stringify'),
-    wordwrap        = require('wordwrap'),
-    ngAnnotate      = require('browserify-ngannotate');
+var gulp        = require('gulp'),
+    jshint      = require('gulp-jshint'),
+    rimraf      = require('gulp-rimraf'),
+    runSequence = require('run-sequence'),
+    combined    = require('combined-stream'),
+    semiflat    = require('gulp-semiflat'),
+    to5ify      = require('6to5ify'),
+    stringify   = require('stringify'),
+    wordwrap    = require('wordwrap'),
+    ngAnnotate  = require('browserify-ngannotate');
 
 var karma           = require('../lib/test/karma'),
     browserify      = require('../lib/build/browserify'),
@@ -21,10 +22,10 @@ var karma           = require('../lib/test/karma'),
     jshintReporter  = require('../lib/util/jshint-reporter');
 
 var cliArgs;
-var transforms;
 
 yargs.getInstance('javascript')
-  .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s).'))
+  .usage(wordwrap(2, 80)('The "javascript" task performs a one time build of the javascript composition root(s) ' +
+    'and also bundles of all .spec.js files in the project.'))
   .example('angularity javascript', 'Run this task')
   .example('angularity javascript -u', 'Run this task but do not minify javascript')
   .options('help', {
@@ -51,39 +52,12 @@ yargs.getInstance('javascript')
 //Proper solution would be to have yargs.getInstance modified to
 //mixin options and checks from dependent/ prequisite yargs instances
 
-yargs.getInstance('test')
-  .usage(wordwrap(2, 80)('The "test" task performs a one time build and '+
-    'karma test of all .spec.js files in the project.'))
-  .example('angularity test', 'Run this task')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .options(karma.yargsOption.key, karma.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(jshintReporter.yargsCheck)
-  .check(karma.yargsCheck)
-  .wrap(80);
-
 gulp.task('javascript', function (done) {
   console.log(hr('-', 80, 'javascript'));
-  init();
+  cliArgs = cliArgs || yargs.resolveArgv();
   runSequence(
-    ['javascript:cleanbuild', 'javascript:lint'],
-    ['javascript:build'],
-    done
-  );
-});
-
-gulp.task('test', function (done) {
-  console.log(hr('-', 80, 'test'));
-  init();
-  runSequence(
-    ['javascript:cleanunit', 'javascript:lint'],
-    'javascript:unit',
+    ['javascript:cleanbuild', 'javascript:cleanunit', 'javascript:lint'],
+    ['javascript:build', 'javascript:unit'],
     done
   );
 });
@@ -95,8 +69,9 @@ gulp.task('javascript:cleanbuild', function () {
 });
 
 // clean javascript from the test directory
+//  don't remove the karma conf or Webstorm ide will have problems
 gulp.task('javascript:cleanunit', function () {
-  return gulp.src(streams.TEST + '/**/*.js*', {read: false})
+  return gulp.src([streams.TEST + '/**/*.js*', '!**/karma.conf.js'], {read: false}) // keep configuration
     .pipe(rimraf());
 });
 
@@ -113,14 +88,12 @@ gulp.task('javascript:lint', function () {
 // karma unit tests in local library only
 gulp.task('javascript:unit', function () {
   var reporters = [].concat(cliArgs[karma.yargsOption.key])
-    .filter(function isString(value) {
-      return (typeof value === 'string');
-    });
+    .filter(Boolean);
   return combined.create()
     .append(
       streams
         .testDependencies({
-          dev: true,
+          dev : true,
           read: false
         })
     )
@@ -128,34 +101,34 @@ gulp.task('javascript:unit', function () {
       streams
         .jsSpec()
         .pipe(browserify
-          .compile(80, transforms.concat(browserify.jasmineTransform('@')))
-          .all('index.js'))
+          .compile(80, getTransforms().concat(browserify.jasmineTransform('@')))
+          .all('index.js', false, '/base'))
         .pipe(gulp.dest(streams.TEST))
     )
+    .pipe(semiflat(process.cwd()))
     .pipe(karma.createConfig(reporters))
     .pipe(gulp.dest(streams.TEST))
-    .pipe(karma.run(reporters, 80));
 });
 
 // give a single optimised javascript file in the build directory with source map for each
 gulp.task('javascript:build', function () {
   return streams.jsApp({read: false})
     .pipe(browserify
-      .compile(80, transforms)
+      .compile(80, getTransforms(!cliArgs.unminified))
       .each(!cliArgs.unminified))
     .pipe(gulp.dest(streams.BUILD));
 });
 
 /**
- * Initialisation must be deferred until a task actually starts
+ * Retrieve the transform list
+ * @param {boolean} isMinify Indicates whether minification will be used
  */
-function init() {
-  cliArgs    = cliArgs || yargs.resolveArgv();
-  transforms = [
-    to5ify.configure({ ignoreRegex: /(?!)/ }),              // convert any es6 to es5 (ignoreRegex is degenerate)
-    stringify({ minify: false }),                           // allow import of html to a string
-    !cliArgs.unminified && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
-  ];
+function getTransforms(isMinify) {
+  return [
+    to5ify.configure({ ignoreRegex: /(?!)/ }),   // convert any es6 to es5 (degenerate regex)
+    stringify({ minify: false }),                // allow import of html to a string
+    isMinify && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
+  ].filter(Boolean);
   // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
   // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
 }

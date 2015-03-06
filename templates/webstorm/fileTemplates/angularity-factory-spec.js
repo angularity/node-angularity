@@ -2,7 +2,7 @@
 
 var $declaration_to_test = require('./$file_that_exports_declaration');
 
-describe('@', function() {
+describe('$file_that_exports_declaration', function() {
 
   // variables
   var sut;
