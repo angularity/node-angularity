@@ -1,20 +1,39 @@
 'use strict';
 
-var gulp        = require('gulp'),
-    wordwrap    = require('wordwrap'),
-    runSequence = require('run-sequence');
+function setUpTaskBuild(tyRun) {
+  var taskDefinition = {
+    name: 'build',
+    description: ('The "build" task performs a single build of the javascript and SASS composition root(s).'),
+    prerequisiteTasks: ['help', 'javascript', 'css', 'html'],
+    checks: [],
+    options: [],
+    onInit: function onBuildTask(yargsInstance) {
+      console.log('onInitBuildTask');
+      var cliArgs = yargsInstance
+        .strict()
+        .wrap(80)
+        .argv;
 
-var taskYargs       = require('../lib/util/task-yargs'),
-    hr              = require('../lib/util/hr');
+      var gulp        = require('gulp'),
+          wordwrap    = require('wordwrap'),
+          runSequence = require('run-sequence');
 
-taskYargs.register('build', {
-  description: (wordwrap(2, 80)('The "build" task performs a single build of the javascript and SASS composition root(s).')),
-  prerequisiteTasks: ['help', 'javascript', 'css', 'html'],
-  checks: [],
-  options: []
-});
+      var taskYargs       = require('../lib/util/task-yargs'),
+          hr              = require('../lib/util/hr');
 
-gulp.task('build', function (done) {
-  console.log(hr('-', 80, 'build'));
-  runSequence('javascript', 'css', 'html', done);
-});
+      gulp.task('build', function (done) {
+        console.log(hr('-', 80, 'build'));
+        runSequence('javascript', 'css', 'html', done);
+      });
+    },
+    onRun: function onBuildTask(yargsInstance) {
+      console.log('onRunBuildTask');
+      var runSequence = require('run-sequence');
+      runSequence(taskDefinition.name);
+    }
+  }
+
+  tyRun.taskYargs.register(taskDefinition);
+}
+
+module.exports = setUpTaskBuild;

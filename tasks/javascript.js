@@ -61,8 +61,9 @@ function setUpTaskJavascript(tyRun) {
     checks: [
       checkJsHintReporter
     ],
-    onInit: function onInitJavascriptTask() {
+    onInit: function onInitJavascriptTask(yargsInstance) {
       console.log('onInitJavascriptTask');
+
       var path            = require('path'),
           fs              = require('fs');
 
@@ -85,7 +86,7 @@ function setUpTaskJavascript(tyRun) {
 
       gulp.task('javascript', function (done) {
         console.log(hr('-', 80, 'javascript'));
-        init();
+        init(yargsInstance);
         runSequence(
           ['javascript:cleanbuild', 'javascript:lint'],
           ['javascript:build'],
@@ -120,10 +121,6 @@ function setUpTaskJavascript(tyRun) {
     },
     onRun: function onRunJavascriptTask(yargsInstance) {
       console.log('onRunJavascriptTask');
-      cliArgs = yargsInstance
-        .strict()
-        .wrap(80)
-        .argv;
       var runSequence = require('run-sequence');
       runSequence(taskDefinitionJavascript.name);
     }
@@ -176,7 +173,7 @@ function setUpTaskJavascript(tyRun) {
     prerequisiteTasks: ['javascript'],
     options: [optionDefinitonKarmaReporter],
     checks: [checkKarmaReporter],
-    onInit: function onInitTestTask() {
+    onInit: function onInitTestTask(yargsInstance) {
       var path            = require('path'),
           fs              = require('fs');
 
@@ -199,7 +196,7 @@ function setUpTaskJavascript(tyRun) {
 
       gulp.task('test', function (done) {
         console.log(hr('-', 80, 'test'));
-        init();
+        init(yargsInstance);
         runSequence(
           ['javascript:cleanunit', 'javascript:lint'],
           'javascript:unit',
@@ -243,10 +240,6 @@ function setUpTaskJavascript(tyRun) {
     },
     onRun: function onRunTestTask(yargsInstance) {
       console.log('onRunJavascriptTask');
-      cliArgs = yargsInstance
-        .strict()
-        .wrap(80)
-        .argv;
       var runSequence = require('run-sequence');
       runSequence(taskDefinitionTest.name);
     }
@@ -257,7 +250,11 @@ function setUpTaskJavascript(tyRun) {
   /**
    * Defer initialisation until after a task starts
    */
-  function init() {
+  function init(yargsInstance) {
+    cliArgs = yargsInstance
+        .strict()
+        .wrap(80)
+        .argv;
     var to5ify          = require('6to5ify'),
         stringify       = require('stringify'),
         ngAnnotate      = require('browserify-ngannotate');

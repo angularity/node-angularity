@@ -1,7 +1,6 @@
 'use strict';
 
 function setUpTaskHtml(tyRun) {
-  var cliArgs;
   var taskDefinition = {
     name: 'html',
     description: ('The "html" task performs a one time injection of ' +
@@ -9,8 +8,13 @@ function setUpTaskHtml(tyRun) {
     prerequisiteTasks: ['help'],
     checks: [],
     options: [],
-    onInit: function onInitHtmlTask() {
+    onInit: function onInitHtmlTask(yargsInstance) {
       console.log('onInitHtmlTask');
+
+      var cliArgs = yargsInstance
+        .strict()
+        .wrap(80)
+        .argv;
 
       var gulp            = require('gulp'),
           concat          = require('gulp-concat'),
@@ -65,10 +69,6 @@ function setUpTaskHtml(tyRun) {
     },
     onRun: function onRunHtmlTask(yargsInstance) {
       console.log('onRunHtmlTask');
-      cliArgs = yargsInstance
-        .strict()
-        .wrap(80)
-        .argv;
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
