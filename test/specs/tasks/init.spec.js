@@ -3,13 +3,9 @@
 var fs   = require('fs'),
     path = require('path');
 
-var helper = require('../helpers/helper');
+var helper = require('../../helpers/helper');
 
 describe('The Angularity init task should correctly initialise all the files needed for a new project.', function () {
-
-  afterEach(function(){
-    helper.cleanTestTemp();
-  });
 
   it('should correctly initialise a project with a custom name.', function (done) {
     var temporaryPath = helper.resolveTestTempPath('init-temp');
@@ -17,9 +13,8 @@ describe('The Angularity init task should correctly initialise all the files nee
 
     var customName = 'todo';
 
-    helper.runAngularity(['init', '-n', customName])
-      .then(function (result) {
-
+    helper.runAngularity(['init', '-n', customName], {cwd:temporaryPath})
+      .then(function () {
         //By default a subdirectory with the custom name is used
         var initProjectFolder = path.join(temporaryPath, customName);
 

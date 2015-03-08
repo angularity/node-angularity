@@ -7,14 +7,32 @@
 module.exports = function(config) {
   config.set({
     // base path, that will be used to resolve files and exclude
-    basePath: '/*ANGULARITY_BASE_PATH*/',
+    basePath: 'C:\\Users\\Chris.Decoster\\Documents\\source-code\\node-angularity\\test\\expected\\minimal-es5',
 
     //make sure we use karma-jasmine as the test framework
     frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
     // angularity will package unit tests and append to the `files` array
-    files: [].concat(/*ANGULARITY_FILE_LIST*/),
+    files: [].concat([
+  'bower_components\\jquery\\dist\\jquery.js',
+  'bower_components\\angular\\angular.js',
+  'bower_components\\angular-ui-router\\release\\angular-ui-router.js',
+  'bower_components\\angular-mocks\\angular-mocks.js',
+  'app-test\\index.js',
+  {
+    'pattern': '**/*.js',
+    'included': false
+  },
+  {
+    'pattern': '**/*.map',
+    'included': false
+  },
+  {
+    'pattern': '**/*.spec.js',
+    'included': false
+  }
+]),
 
     // list of files to exclude
     exclude: [],
@@ -22,11 +40,15 @@ module.exports = function(config) {
     // register any plugins which are not siblings of karma in angularity global
     // installation and thus need to be registered manually
     // append to existing value to preserve plugins loaded automatically
-    plugins: [].concat(config.plugins).concat(/*ANGULARITY_PLUGIN_LIST*/),
+    plugins: [].concat(config.plugins).concat([
+require("C:\\Users\\Chris.Decoster\\Documents\\source-code\\node-angularity\\node_modules\\karma-angularity-reporter")
+]),
 
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress', 'junit', 'teamcity'
-    reporters: [].concat(/*ANGULARITY_REPORTER_LIST*/),
+    reporters: [].concat([
+  'angularity'
+]),
 
     // web server port
     port: 61680,

@@ -1,8 +1,8 @@
 /* globals angular */
 
 var appRoutes = require('../minimal/app-routes');
-var appController = require('../minimal/app-controller');
+var helloWorldController = require('../hello-world/hello-world');
 
 angular.module('browser-image-diff-client', ['ui.router'])
-    .controller('AppController', appController)
+    .controller('helloWorld', helloWorldController)
     .config(appRoutes);

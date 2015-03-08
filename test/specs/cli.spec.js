@@ -1,7 +1,5 @@
-'use strict';
-
 var path = require('path');
-var helper = require('./helpers/helper');
+var helper = require('./../helpers/helper');
 
 describe('The Angularity global install provides a cli interface.', function () {
 
@@ -14,7 +12,7 @@ describe('The Angularity global install provides a cli interface.', function () 
   });
 
   it('should show the correct version number on the -v argument.', function (done) {
-    var packagePath = path.resolve(__dirname, '..', 'package.json');
+    var packagePath = path.resolve(__dirname, '..', '..', 'package.json');
     var version = require(packagePath).version;
 
     helper.runAngularityAlias(['-v', '--version'])

@@ -1,9 +1,10 @@
 'use strict';
-var Q      = require('q'),
-    path   = require('path'),
-    fs     = require('fs'),
-    rimraf = require('rimraf'),
-    spawn  = require('child_process').spawn;
+var Q            = require('q'),
+    path         = require('path'),
+    fs           = require('fs'),
+    rimraf       = require('rimraf'),
+    cp     = require('shelljs').cp,
+    childProcess = require('child_process');
 
 /**
  * Shortcut to a temporary absolute path to perform integration tests.
@@ -17,12 +18,13 @@ var testPath = path.resolve(__dirname, '..', 'test-temp');
  * @returns {*}
  */
 function expectedFolder(folderName) {
-  var expectedFolder = path.resolve(__dirname, '..', 'expected', folderName);
+  var folderPath = path.resolve(__dirname, '..', 'expected', folderName);
 
-  if (!fs.existsSync(expectedFolder))
-    console.error('helper.expectedFolder() the folderName', folderName, 'is not located in', expectedFolder);
+  if (!fs.existsSync(folderPath)) {
+    console.error('helper.folderPath() the folderName', folderName, 'is not located in', folderPath);
+  }
 
-  return expectedFolder;
+  return folderPath;
 }
 
 /**
@@ -33,11 +35,13 @@ function expectedFolder(folderName) {
 function resolveTestTempPath(folderName) {
   var testTempPath = path.join(testPath, String(folderName));
 
-  if (!fs.existsSync(testPath))
+  if (!fs.existsSync(testPath)) {
     fs.mkdirSync(testPath);
+  }
 
-  if (!fs.existsSync(testTempPath))
+  if (!fs.existsSync(testTempPath)) {
     fs.mkdirSync(testTempPath);
+  }
 
   return testTempPath;
 }
@@ -45,8 +49,10 @@ function resolveTestTempPath(folderName) {
 /**
  * Shortcut to delete all the content of the testPath folder.
  */
-function cleanTestTemp() {
-  rimraf.sync(testPath);
+function cleanTestTemp(done) {
+  rimraf(testPath, function () {
+    done();
+  });
 }
 
 /**
@@ -86,27 +92,25 @@ function runAngularityAlias(aliases, config) {
 function runAngularity(args, config) {
   var deferred = Q.defer();
 
-  var stdout = '',
-      stderr = '';
+  runAngularityProcess(args, config, processCallback);
 
-  var angularityProcess = runAngularityProcess(args, config);
+  function processCallback(error, stdout, stderr) {
+    var code;
+    if (error === null) {
+      code = 0;
+    } else {
+      code = error.code;
+    }
 
-  angularityProcess.stdout.on('data', function (data) {
-    stdout += data;
-  });
-
-  angularityProcess.stderr.on('data', function (data) {
-    stderr += data;
-  });
-
-  angularityProcess.on('exit', function (code) {
-    deferred.resolve({
+    var result = {
       args  : args,
       code  : code,
       stdout: stdout,
       stderr: stderr
-    });
-  });
+    };
+
+    deferred.resolve(result);
+  }
 
   return deferred.promise;
 }
@@ -119,25 +123,42 @@ function runAngularity(args, config) {
  * @param config
  * @returns {*}
  */
-function runAngularityProcess(args, config) {
+function runAngularityProcess(args, config, callback) {
+  config = config || {};
   args = args || [];
   if (typeof args === 'string') {
     args = [args];
   }
-  if (config) {
-    config.cwd = config.cwd || __dirname;
-  }
 
-  var angularity = spawn('angularity', args, config);
-  angularity.stdout.setEncoding('utf8');
+  var command = 'angularity ' + args.join(' ');
 
-  return angularity;
+  childProcess.exec(command, config, callback);
+}
+
+/**
+ * Shortcut to copy the expected project recursively and remove a specific folder recursivley
+ * Workarounds with rimraf async were necessary for windows.
+ * //TODO Ideally we want to reduce these dependencies while still being cross platform.
+ *
+ * @param done callback for when the rimraf is completed
+ * @param sourceFolder the expected target folder to copy
+ * @param targetFolder the target folder to remove
+ * @param destinationPath the destination path for the project to be copied to
+ */
+function prepareExpectedDir(done, souceFolder, targetFolder, destinationPath) {
+  rimraf(path.join(souceFolder, targetFolder), function () {
+    cp('-Rf', destinationPath + '/*', souceFolder);
+    rimraf(path.join(souceFolder, targetFolder), function () {
+      done();
+    });
+  });
 }
 
 module.exports = {
   testPath           : testPath,
   cleanTestTemp      : cleanTestTemp,
-  expectedFolder      : expectedFolder,
+  prepareExpectedDir : prepareExpectedDir,
+  expectedFolder     : expectedFolder,
   resolveTestTempPath: resolveTestTempPath,
   runAngularity      : runAngularity,
   runAngularityAlias : runAngularityAlias

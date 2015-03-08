@@ -1,40 +1,22 @@
 'use strict';
+var path   = require('path');
 
-var fs     = require('fs'),
-    rimraf = require('rimraf'),
-    path   = require('path');
-
-var helper = require('../helpers/helper');
-var cp = require('shelljs').cp;
+var helper = require('../../helpers/helper');
+var expectedBuildFolder = helper.expectedFolder('minimal-es5');
+var buildFolder = helper.resolveTestTempPath('minimal-es5-release');
+var buildName = 'app-release';
 
 describe('The Angularity release task should correctly build a release version.', function () {
-
-  var expectedBuildFolder;
-  var buildFolder;
-
-  beforeEach(function () {
+  beforeEach(function (done) {
     this.addMatchers(require('jasmine-diff-matchers').diffPatch);
-  });
-
-  afterEach(function () {
-    helper.cleanTestTemp();
-  });
-
-  beforeEach(function () {
-    expectedBuildFolder = helper.expectedFolder('minimal-es5');
-    buildFolder = helper.resolveTestTempPath('minimal-es5-release-temp');
-
-    cp('-Rf', expectedBuildFolder + '/*', buildFolder);
-    rimraf.sync(path.join(buildFolder, 'app-build'));
-    rimraf.sync(path.join(buildFolder, 'app-release'));
-    process.chdir(buildFolder);
+    helper.prepareExpectedDir(done, buildFolder, buildName, expectedBuildFolder);
   });
 
   it('should successfully release the minimal-es5 project\'s js.', function (done) {
-    helper.runAngularity('release')
-      .then(function (result) {
-        var expectedJSBundle = path.join(expectedBuildFolder, 'app-release', 'index.js');
-        var builtJSBundle = path.join(buildFolder, 'app-release', 'index.js');
+    helper.runAngularity('release', {cwd : buildFolder})
+      .then(function () {
+        var expectedJSBundle = path.join(expectedBuildFolder, buildName, 'index.js');
+        var builtJSBundle = path.join(buildFolder, buildName, 'index.js');
         expect(builtJSBundle).diffFilePatch(expectedJSBundle);
 
         done();
@@ -42,10 +24,10 @@ describe('The Angularity release task should correctly build a release version.'
   });
 
   it('should successfully release the minimal-es5 project\'s css.', function (done) {
-    helper.runAngularity('release')
-      .then(function (result) {
-        var expectedCSS = path.join(expectedBuildFolder, 'app-release', 'index.css');
-        var buildCSS = path.join(buildFolder, 'app-release', 'index.css');
+    helper.runAngularity('release', {cwd : buildFolder})
+      .then(function () {
+        var expectedCSS = path.join(expectedBuildFolder, buildName, 'index.css');
+        var buildCSS = path.join(buildFolder, buildName, 'index.css');
         expect(buildCSS).diffFilePatch(expectedCSS);
 
         done();
@@ -53,12 +35,11 @@ describe('The Angularity release task should correctly build a release version.'
   });
 
   it('should successfully release the minimal-es5 project\'s vendor files.', function (done) {
-    var expectedVendorFolder = path.join(expectedBuildFolder, 'app-release', 'vendor');
-    var buildVendorFolder = path.join(buildFolder, 'app-release', 'vendor');
+    var expectedVendorFolder = path.join(expectedBuildFolder, buildName, 'vendor');
+    var buildVendorFolder = path.join(buildFolder, buildName, 'vendor');
 
-    helper.runAngularity('release')
-      .then(function (result) {
-
+    helper.runAngularity('release', {cwd : buildFolder})
+      .then(function () {
         var expectedManifest = path.join(expectedVendorFolder, 'manifest.json');
         var buildManifest = path.join(buildVendorFolder, 'manifest.json');
         expect(buildManifest).diffFilePatch(expectedManifest);
