@@ -17,4 +17,4 @@ before_install:
   - jasmine-node --version
 script:
   - pwd && ls
-  - jasmine-node --verbose --test-dir /home/travis/build/angularity/node-angularity/test
+  - jasmine-node --verbose --test-dir /home/travis/build/angularity/node-angularity/test/specs
