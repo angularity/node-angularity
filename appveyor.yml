@@ -16,6 +16,6 @@ install:
   - jasmine-node --version
 
 test_script:
-  - jasmine-node --verbose --test-dir C:\projects\node-angularity\test\specs
+  - npm test
 
 build: off
