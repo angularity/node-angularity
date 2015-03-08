@@ -15,7 +15,7 @@ test_script:
   - npm -v
   - npm i -g
   - npm link
-  - angularity i
+  - angularity -v
   - npm test
 
 build: off
