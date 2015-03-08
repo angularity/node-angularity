@@ -1,14 +1,9 @@
 environment:
   matrix:
-    - nodejs_version: "0.11"
     - nodejs_version: "0.10"
-    - nodejs_version: "0.8"
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - nodejs_version: "0.11"
-    - nodejs_version: "0.8"
 
 install:
   - ps: Install-Product node $env:nodejs_version
