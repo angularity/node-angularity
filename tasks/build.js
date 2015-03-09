@@ -8,7 +8,6 @@ function setUpTaskBuild(tyRun) {
     checks: [],
     options: [],
     onInit: function onBuildTask(yargsInstance) {
-      console.log('onInitBuildTask');
       var cliArgs = yargsInstance
         .strict()
         .wrap(80)
@@ -27,7 +26,6 @@ function setUpTaskBuild(tyRun) {
       });
     },
     onRun: function onBuildTask(yargsInstance) {
-      console.log('onRunBuildTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

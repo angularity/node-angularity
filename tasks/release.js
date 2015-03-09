@@ -9,8 +9,6 @@ function setUpTaskRelease(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitReleaseTask(yargsInstance) {
-      console.log('onInitReleaseTask');
-
       var gulp        = require('gulp'),
           concat      = require('gulp-concat'),
           wrap        = require('gulp-wrap'),
@@ -90,7 +88,6 @@ function setUpTaskRelease(tyRun) {
       */
     },
     onRun: function onRunReleaseTask(yargsInstance) {
-      console.log('onRunReleaseTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

@@ -299,8 +299,6 @@ function setUpWebstormTask(tyRun) {
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
-      console.log('onInitWebstormTask');
-
       var gulp            = require('gulp'),
           gutil           = require('gulp-util'),
           wordwrap        = require('wordwrap'),
@@ -497,7 +495,6 @@ function setUpWebstormTask(tyRun) {
       });
     },
     onRun: function onRunWebstormTask(yargsInstance) {
-      console.log('onRunWebstormTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

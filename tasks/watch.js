@@ -18,8 +18,6 @@ function setUpTaskWatch(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitWatchTask(yargsInstance) {
-      console.log('onInitWatchTask');
-
       var gulp          = require('gulp'),
           watch         = require('gulp-watch'),
           wordwrap      = require('wordwrap'),
@@ -60,7 +58,6 @@ function setUpTaskWatch(tyRun) {
       });
     },
     onRun: function onRunWatchTask(yargsInstance) {
-      console.log('onRunWatchTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

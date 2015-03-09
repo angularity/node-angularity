@@ -239,7 +239,6 @@ function setUpTaskJavascript(tyRun) {
       });
     },
     onRun: function onRunTestTask(yargsInstance) {
-      console.log('onRunJavascriptTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinitionTest.name);
     }

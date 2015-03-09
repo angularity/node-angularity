@@ -38,8 +38,6 @@ function setUpTaskServer(tyRun) {
       }
     ],
     onInit: function onInitServerTask(yargsInstance) {
-      console.log('onInitServerTask');
-
       var gulp        = require('gulp'),
           gutil       = require('gulp-util'),
           wordwrap    = require('wordwrap'),
@@ -82,7 +80,6 @@ function setUpTaskServer(tyRun) {
       });
     },
     onRun: function onRunServerTask(yargsInstance) {
-      console.log('onRunServerTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

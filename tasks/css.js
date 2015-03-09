@@ -8,8 +8,6 @@ function setUpTaskCss(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitCssTask(yargsInstance) {
-      console.log('onInitCssTask');
-
       var cliArgs = yargsInstance
         .strict()
         .wrap(80)
@@ -49,8 +47,6 @@ function setUpTaskCss(tyRun) {
       });
     },
     onRun: function onRunCssTask(yargsInstance) {
-      console.log('onRunCssTask');
-
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

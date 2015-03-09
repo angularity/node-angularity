@@ -9,8 +9,6 @@ function setUpTaskHtml(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitHtmlTask(yargsInstance) {
-      console.log('onInitHtmlTask');
-
       var cliArgs = yargsInstance
         .strict()
         .wrap(80)
@@ -68,7 +66,6 @@ function setUpTaskHtml(tyRun) {
       });
     },
     onRun: function onRunHtmlTask(yargsInstance) {
-      console.log('onRunHtmlTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

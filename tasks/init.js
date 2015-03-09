@@ -200,8 +200,6 @@ function setUpInitTask(tyRun) {
     checks: [checkInitFlags],
     options: initOptionDefinitions,
     onInit: function onInitInitTask(yargsInstance) {
-      console.log('onInitInitTask');
-
       var gulp        = require('gulp'),
           gutil       = require('gulp-util'),
           wordwrap    = require('wordwrap'),
@@ -363,7 +361,6 @@ function setUpInitTask(tyRun) {
       }
     },
     onRun: function onRunInitTask(yargsInstance) {
-      console.log('onRunInitTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
