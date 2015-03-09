@@ -84,6 +84,8 @@ require('../tasks/build')(taskYargsRun);
 require('../tasks/release')(taskYargsRun);
 require('../tasks/server')(taskYargsRun);
 require('../tasks/watch')(taskYargsRun);
+require('../tasks/init')(taskYargsRun);
+require('../tasks/webstorm')(taskYargsRun);
 
 var cliArgs;
 var taskName = taskYargsRun.taskYargs.getCurrentName();

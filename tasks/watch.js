@@ -26,7 +26,6 @@ function setUpTaskWatch(tyRun) {
           watchSequence = require('gulp-watch-sequence');
 
       var defaults         = require('../lib/config/defaults'),
-          taskYargs        = require('../lib/util/task-yargs'),
           hr               = require('../lib/util/hr'),
           karma            = require('../lib/test/karma'),
           jshintReporter   = require('../lib/util/jshint-reporter'),
