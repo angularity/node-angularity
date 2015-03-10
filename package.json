@@ -15,7 +15,8 @@
     "es6ify"
   ],
   "scripts": {
-    "test": "node node_modules/jasmine-node/lib/jasmine-node/cli.js --verbose test/specs"
+    "test": "node node_modules/jasmine-node/lib/jasmine-node/cli.js --verbose test/specs",
+    "posttest": "node node_modules/rimraf/bin.js test/temp"
   },
   "contributors": [
     "bholloway",
@@ -86,6 +87,7 @@
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
+    "ncp": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
     "q": "latest",
@@ -104,7 +106,7 @@
     "yargs": "latest"
   },
   "devDependencies": {
-    "jasmine-node": "latest",
-    "jasmine-diff-matchers": "^1.0.2"
+    "jasmine-diff-matchers": "^1.0.2",
+    "jasmine-node": "latest"
   }
 }
