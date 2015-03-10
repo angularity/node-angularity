@@ -3,20 +3,24 @@
 var fs   = require('fs'),
     path = require('path');
 
-var helper = require('../../helpers/helper');
+var angularityTest = require('../../helpers/cli-test')
+  .create()
+  .forProgram('angularity')
+  .withDirectories('test/expected', 'test/temp')
+  .seal();
 
-describe('The Angularity init task should correctly initialise all the files needed for a new project.', function () {
+describe('The Angularity init task initialises the minimum files needed for a project.', function () {
 
   it('should correctly initialise a project with a custom name.', function (done) {
-    var temporaryPath = helper.resolveTestTempPath('init-temp');
-    process.chdir(temporaryPath);
 
     var customName = 'todo';
+    angularityTest.create()
+      .addInvocation('init', '-n', customName)
+      .run()
+      .then(function (workingDirectory) {
 
-    helper.runAngularity(['init', '-n', customName], {cwd:temporaryPath})
-      .then(function () {
         //By default a subdirectory with the custom name is used
-        var initProjectFolder = path.join(temporaryPath, customName);
+        var initProjectFolder = path.join(workingDirectory, customName);
 
         //'init:bower'
         var bowerFile = path.join(initProjectFolder, 'bower.json');
@@ -44,9 +48,8 @@ describe('The Angularity init task should correctly initialise all the files nee
         expect(fs.existsSync(path.join(appPath, 'index.html'))).toBe(true);
         expect(fs.existsSync(path.join(appPath, 'index.js'))).toBe(true);
         expect(fs.existsSync(path.join(appPath, 'index.scss'))).toBe(true);
-
-        done();
-      });
+      })
+      .finally(done);
   });
 
 });
