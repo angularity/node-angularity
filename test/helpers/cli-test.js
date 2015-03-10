@@ -6,6 +6,7 @@ var path         = require('path'),
     ncp          = require('ncp'),
     defaults     = require('lodash.defaults'),
     flatten      = require('lodash.flatten'),
+    template     = require('lodash.template'),
     childProcess = require('child_process');
 
 /**
@@ -13,9 +14,9 @@ var path         = require('path'),
  * Since this method is not exposed to the user we can rely on <code>base</code> to be correctly formed with array
  * properties.
  * @param {object} [base] Optional default set of parameters to merge
- * @returns {{create: create, reset: reset, withDirectories: withDirectories forProgram: forProgram,
- *          addSource: addSource, withSourceFilter: withSourceFilter, addExpectation: addExpectation,
- *          addInvocation: addInvocation, run: run}} A new instance
+ * @returns {{create: {function}, reset: {function}, withDirectories: {function} forProgram: {function},
+ *          addSource: {function}, withSourceFilter: {function}, addExpectation: {function}, addInvocation: {function},
+ *          run: {function}}} A new instance
  */
 function factory(base) {
 
@@ -34,6 +35,7 @@ function factory(base) {
     withSourceFilter : withSourceFilter,
     addExpectation   : addExpectation,
     addInvocation    : addInvocation,
+    addParameters    : addParameters,
     run              : run
   };
   return self;
@@ -52,18 +54,19 @@ function factory(base) {
    */
   function reset() {
     params = defaults({}, base || {
-      directories : {},
-      sources     : [],
-      filter      : /.*/,
-      program     : null,
-      expectations: [],
-      invocations : []
+      directories  : {},
+      sources      : [],
+      filter       : /.*/,
+      program      : null,
+      expectations : [],
+      invocations  : [],
+      parameterSets: []
     });
     return self;
   }
 
   /**
-   * Get a copy of the instance that cannot be mutated
+   * Get a copy of the instance that
    * @returns {{create: create}}
    */
   function seal() {
@@ -125,7 +128,7 @@ function factory(base) {
   }
 
   /**
-   * Add the given parameter set as a test case
+   * Add the given command line argument set as a test case
    * @param {...string} parameters Any number of arguments for the command line
    * @returns {object} The same instance with mutated properties
    */
@@ -136,35 +139,68 @@ function factory(base) {
   }
 
   /**
+   * Add the given parameter set as a test case
+   * @param {object} parameters Values that will substitute into the invocation template
+   */
+  function addParameters(parameters) {
+    params.parameterSets.push(parameters);
+    return self;
+  }
+
+  /**
    * Execute the parameters encoded in the current instance as a test
-   * @returns {promise} A promise that resolves when all tests complete
+   * @returns {{then: {function}, catch: {function}, finally: {function}} A promise that resolves when tests complete
    */
   function run() {
     var promises    = [];
     var resolveSrc  = ensureDirectory(params.directories.source);
     var resolveDest = ensureDirectory(params.directories.temp);
-    var sources     = (params.sources.length == 0) ? [null] : params.sources;
-    sources.forEach(function eachSource(source) {
-      params.invocations.forEach(function eachInvocation(cliArgs) {
-        var signature     = escapeFilenameString(source, cliArgs);
-        var destDirectory = resolveDest(signature);
-        var deferred      = Q.defer();
-        copySources(resolveSrc(source), destDirectory, function(error) {
-          if (error) {
-            deferred.reject(error)
-          } else {
-            var command = [params.program].concat(cliArgs).join(' ');
-            childProcess.exec(command, {cwd: destDirectory}, function(error, stdout, stderr) {
-              var message = error ? error.message : stderr;
-              if (message) {
-                deferred.reject(message);
-              } else {
-                deferred.resolve(destDirectory);
-              }
-            });
-          }
-        });
-        promises.push(deferred.promise);
+
+    // enumerate all combinations
+    var sources       = (params.sources.length      ) ? params.sources       : [null];
+    var parameterSets = (params.parameterSets.length) ? params.parameterSets : [{}];
+    parameterSets.forEach(function eachParamSet(paramSet) {
+
+      // substitute parameter set into the item template
+      function resolveTemplate(item) {
+        return template(item, paramSet, {interpolate: /\{\s*(\w+)\s*\}/})
+      }
+
+      sources.forEach(function eachSource(source) {
+        params.invocations.forEach(function eachInvocation(invocation) {
+
+          // each combination is async
+          var deferred = Q.defer();
+
+          // determine the overall command we will run
+          var command = [params.program]
+            .concat(invocation.map(resolveTemplate))
+            .join(' ');
+
+          // organise a working directory
+          var signature = escapeFilenameString(source, command);
+          var cwd       = resolveDest(signature);
+          copySources(resolveSrc(source), cwd, function(error) {
+
+            // error in copying implies rejected async
+            if (error) {
+              deferred.reject(error)
+            }
+            // run the command
+            else {
+              childProcess.exec(command, {cwd: cwd}, function(error, stdout, stderr) {
+                var message = error ? error.message : stderr;
+                if (message) {
+                  deferred.reject(message);
+                } else {
+                  var testCase = defaults({cwd: cwd}, paramSet);
+                  deferred.resolve(testCase);
+                }
+              });
+            }
+          });
+          promises.push(deferred.promise);
+        })
       })
     });
     return (promises.length == 1) ? promises[0] : Q.all(promises);

@@ -13,21 +13,22 @@ describe('The Angularity init task initialises the minimum files needed for a pr
 
   it('should correctly initialise a project with a custom name.', function (done) {
 
-    var customName = 'todo';
     angularityTest.create()
-      .addInvocation('init', '-n', customName)
+      .addInvocation('init -n {name}')
+      .addParameters({ name: 'todo' })
+      .addParameters({ name: 'bar' })
       .run()
-      .then(function (workingDirectory) {
+      .then(function (testCase) {
 
         //By default a subdirectory with the custom name is used
-        var initProjectFolder = path.join(workingDirectory, customName);
+        var initProjectFolder = path.join(testCase.cwd, testCase.name);
 
         //'init:bower'
         var bowerFile = path.join(initProjectFolder, 'bower.json');
         expect(fs.existsSync(bowerFile)).toBe(true);
 
         var bowerFileContent = require(bowerFile);
-        expect(bowerFileContent.name).toBe(customName);
+        expect(bowerFileContent.name).toBe(testCase.name);
         expect(bowerFileContent.version).toBe('0.0.0');
         expect(bowerFileContent.private).toEqual(true);
 
