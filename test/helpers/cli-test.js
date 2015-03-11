@@ -14,9 +14,9 @@ var path         = require('path'),
  * Since this method is not exposed to the user we can rely on <code>base</code> to be correctly formed with array
  * properties.
  * @param {object} [base] Optional default set of parameters to merge
- * @returns {{create: {function}, reset: {function}, withDirectories: {function} forProgram: {function},
- *          addSource: {function}, withSourceFilter: {function}, addExpectation: {function}, addInvocation: {function},
- *          run: {function}}} A new instance
+ * @returns {{create: {function}, reset: {function}, seal: {function}, withDirectories: {function},
+  *         forProgram: {function}, addSource: {function}, withSourceFilter: {function}, addExpectation: {function},
+  *         addInvocation: {function}, run: {function}}} A new instance
  */
 function factory(base) {
 
@@ -26,17 +26,19 @@ function factory(base) {
 
   // compose instance
   var self = {
-    create           : create,
-    reset            : reset,
-    seal             : seal,
-    withDirectories  : withDirectories,
-    forProgram       : forProgram,
-    addSource        : addSource,
-    withSourceFilter : withSourceFilter,
-    addExpectation   : addExpectation,
-    addInvocation    : addInvocation,
-    addParameters    : addParameters,
-    run              : run
+    create          : create,
+    toString        : toString,
+    reset           : reset,
+    seal            : seal,
+    withDirectories : withDirectories,
+    forProgram      : forProgram,
+    addSource       : addSource,
+    withSourceFilter: withSourceFilter,
+    addExpectation  : addExpectation,
+    addInvocation   : addInvocation,
+    addParameters   : addParameters,
+    toArray         : toArray,
+    run             : run
   };
   return self;
 
@@ -46,6 +48,21 @@ function factory(base) {
    */
   function create() {
     return factory(params);
+  }
+
+  /**
+   * Infer the command from the first invocation/parameter-set combination
+   * @returns {string} The inferred command
+   */
+  function toString() {
+    var invocation = params.invocations[0];
+    var paramSet   = params.parameterSets[0];
+    function resolveTemplate(item) {
+      return template(item, paramSet, {interpolate: /\{\s*(\w+)\s*\}/});
+    }
+    return [params.program]
+      .concat(invocation.map(resolveTemplate))
+      .join(' ');
   }
 
   /**
@@ -72,7 +89,7 @@ function factory(base) {
   function seal() {
     return {
       create: create
-    }
+    };
   }
 
   /**
@@ -148,62 +165,89 @@ function factory(base) {
   }
 
   /**
+   * Enumerate all test cases
+   * @param {function} callback The method to call with the instance and the test case
+   */
+  function toArray() {
+    var sources       = (params.sources.length      ) ? params.sources       : [null];
+    var parameterSets = (params.parameterSets.length) ? params.parameterSets : [{}];
+    var results       = [];
+    parameterSets.forEach(function eachParamSet(paramSet) {
+      sources.forEach(function eachSource(source) {
+        params.invocations.forEach(function eachInvocation(invocation) {
+
+          // create an isolated instance
+          var instance = factory(defaults({
+            sources      : [source],
+            invocations  : [invocation],
+            parameterSets: [paramSet]
+          }, params));
+
+          // accumulate instances
+          results.push(instance);
+        });
+      });
+    });
+    return results;
+  }
+
+  /**
    * Execute the parameters encoded in the current instance as a test
    * @returns {{then: {function}, catch: {function}, finally: {function}} A promise that resolves when tests complete
    */
   function run() {
-    var promises    = [];
-    var resolveSrc  = ensureDirectory(params.directories.source);
-    var resolveDest = ensureDirectory(params.directories.temp);
 
-    // enumerate all combinations
-    var sources       = (params.sources.length      ) ? params.sources       : [null];
-    var parameterSets = (params.parameterSets.length) ? params.parameterSets : [{}];
-    parameterSets.forEach(function eachParamSet(paramSet) {
+    // if we can get a list of single instances we recurse them
+    var list = toArray();
+    if (list.length > 1) {
+      var promises = list
+        .map(function(instance) {
+          return instance.run();
+        });
+      return Q.all(promises);
+    }
+    // otherwise single instance
+    else {
+      var resolveSrc  = ensureDirectory(params.directories.source);
+      var resolveDest = ensureDirectory(params.directories.temp);
+      var source      = params.sources[0];
+      var paramSet    = params.parameterSets[0];
 
-      // substitute parameter set into the item template
-      function resolveTemplate(item) {
-        return template(item, paramSet, {interpolate: /\{\s*(\w+)\s*\}/})
-      }
+      // each combination is async
+      var deferred = Q.defer();
 
-      sources.forEach(function eachSource(source) {
-        params.invocations.forEach(function eachInvocation(invocation) {
+      // determine the overall command we will run
+      var command = toString();
 
-          // each combination is async
-          var deferred = Q.defer();
+      // organise a working directory
+      var signature = escapeFilenameString(source, command);
+      var cwd       = resolveDest(signature);
+      copySources(resolveSrc(source), cwd, function(error) {
 
-          // determine the overall command we will run
-          var command = [params.program]
-            .concat(invocation.map(resolveTemplate))
-            .join(' ');
-
-          // organise a working directory
-          var signature = escapeFilenameString(source, command);
-          var cwd       = resolveDest(signature);
-          copySources(resolveSrc(source), cwd, function(error) {
-
-            // error in copying implies rejected async
-            if (error) {
-              deferred.reject(error)
-            }
-            // run the command
-            else {
-              childProcess.exec(command, {cwd: cwd}, function(error, stdout, stderr) {
-                var message = error ? error.message : stderr;
-                if (message) {
-                  deferred.reject(message);
-                } else {
-                  var testCase = defaults({cwd: cwd}, paramSet);
-                  deferred.resolve(testCase);
-                }
-              });
+        // error in copying implies rejected async
+        if (error) {
+          deferred.reject(error);
+        }
+        // run the command
+        else {
+          childProcess.exec(command, {cwd: cwd}, function onProcessComplete(error, stderr, stdout) {
+            var message = error && stderr.toString();
+            if (message) {
+              deferred.reject(message);
+            } else {
+              var testCase = defaults({
+                cwd    : cwd,
+                command: command,
+                stdout : stdout,
+                stderr : stderr
+              }, paramSet);
+              deferred.resolve(testCase);
             }
           });
-          promises.push(deferred.promise);
-        })
-      })
-    });
-    return (promises.length == 1) ? promises[0] : Q.all(promises);
+        }
+      });
+      return deferred.promise;
+    }
   }
 }
 
@@ -222,7 +266,7 @@ function escapeFilenameString() {
 
 function copySources(src, dest, callback) {
   if (src) {
-    ncp(src, dest, {filter: params.filter}, callback)
+    ncp(src, dest, {filter: params.filter}, callback);
   } else {
     ensureDirectory(dest);
     callback();
@@ -245,7 +289,7 @@ function ensureDirectory() {
       } else {
         return null;
       }
-    }
+    };
   }
 
   // find the project directory based on the package json
