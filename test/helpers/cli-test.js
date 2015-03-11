@@ -7,6 +7,7 @@ var path         = require('path'),
     defaults     = require('lodash.defaults'),
     flatten      = require('lodash.flatten'),
     template     = require('lodash.template'),
+    isArray      = require('lodash.isarray'),
     childProcess = require('child_process');
 
 /**
@@ -70,7 +71,9 @@ function factory(base) {
    * @returns {object} The same instance with mutated properties
    */
   function reset() {
-    params = defaults({}, base || {
+
+    // default value
+    params = {
       directories  : {},
       sources      : [],
       filter       : /.*/,
@@ -78,7 +81,15 @@ function factory(base) {
       expectations : [],
       invocations  : [],
       parameterSets: []
-    });
+    };
+
+    // clone params, must duplicate arrays
+    for (var key in base || {}) {
+      var value = base[key];
+      params[key] = isArray(value) ? value.concat() : value;
+    }
+
+    // complete
     return self;
   }
 

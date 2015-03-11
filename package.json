@@ -15,7 +15,7 @@
     "es6ify"
   ],
   "scripts": {
-    "test": "node node_modules/jasmine-node/lib/jasmine-node/cli.js --verbose test/specs",
+    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose test/specs",
     "posttest": "node node_modules/rimraf/bin.js test/temp"
   },
   "contributors": [
@@ -107,6 +107,6 @@
   },
   "devDependencies": {
     "jasmine-diff-matchers": "^1.0.2",
-    "jasmine-node": "latest"
+    "jasmine-node": "mhevery/jasmine-node#Jasmine2.0"
   }
 }
