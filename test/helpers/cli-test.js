@@ -16,8 +16,8 @@ var path         = require('path'),
  * properties.
  * @param {object} [base] Optional default set of parameters to merge
  * @returns {{create: {function}, reset: {function}, seal: {function}, withDirectories: {function},
-  *         forProgram: {function}, addSource: {function}, withSourceFilter: {function}, addExpectation: {function},
-  *         addInvocation: {function}, run: {function}}} A new instance
+ *          forProgram: {function}, addSource: {function}, withSourceFilter: {function}, addExpectation: {function},
+ *          addInvocation: {function}, run: {function}}} A new instance
  */
 function factory(base) {
 
@@ -39,6 +39,7 @@ function factory(base) {
     addInvocation   : addInvocation,
     addParameters   : addParameters,
     toArray         : toArray,
+    forEach         : forEach,
     run             : run
   };
   return self;
@@ -200,6 +201,15 @@ function factory(base) {
       });
     });
     return results;
+  }
+
+  /**
+   * Iterate all the test cases per <code>toArray()</code>
+   * @param {function} method The method that each case will be applied to and which should return a promise
+   * @return {promise} A promise that resolves when all method promises resolve
+   */
+  function forEach(method) {
+    return Q.all(toArray().map(method));
   }
 
   /**
