@@ -1,15 +1,15 @@
 /* globals it */
 'use strict';
 
-var Q       = require('q'),
-    path    = require('path'),
-    isArray = require('lodash.isarray'),
-    flatten = require('lodash.flatten'),
-    gulp    = require('gulp'),
-    rimraf  = require('gulp-rimraf');
+var Q          = require('q'),
+    path       = require('path'),
+    isArray    = require('lodash.isarray'),
+    gulp       = require('gulp'),
+    gulpRimraf = require('gulp-rimraf'),
+    rimraf     = require('rimraf');
 
 var TEST_SRC  = 'test/expected';
-var TEST_TEMP = 'test/temp'
+var TEST_TEMP = 'test/temp';
 
 /**
  * Test runner base for angularity cli tests
@@ -27,7 +27,7 @@ var runner = require('./cli-test')
  * @param {function} callback Callback for when deletion is complete
  */
 function cleanUp(callback) {
-  rimraf(TEST_TEMP, callback);
+  rimraf(path.resolve(TEST_TEMP), callback);
 }
 
 /**
@@ -68,7 +68,7 @@ function getFileDelete() {
         return (split.length === 1) ? split[0] : split.slice(1).join('');
       });
     gulp.src(glob, {read: false})
-      .pipe(rimraf())
+      .pipe(gulpRimraf())
       .on('data', function() {})  // if there is no data handler end will not be called ?wtf?
       .on('end', function() {
         deferred.resolve(testCase);

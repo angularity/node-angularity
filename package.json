@@ -1,6 +1,6 @@
 {
   "name": "angularity",
-  "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
+  "description": "Angularity is an opinionated build tool for AngularJS projects",
   "version": "0.1.1",
   "tags": [
     "build",
@@ -12,10 +12,10 @@
     "es6",
     "esnext",
     "browserify",
-    "es6ify"
+    "babel"
   ],
   "scripts": {
-    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose test/specs"
+    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs"
   },
   "contributors": [
     "bholloway",

@@ -1,39 +1,50 @@
+'use strict';
+
 var path = require('path');
-var helper = require('./../helpers/helper');
 
-describe('The Angularity global install provides a cli interface.', function () {
+var helper = require('../helpers/angularity-test');
 
-  it('should return no error when the global command is run.', function (done) {
-    helper.runAngularity()
-      .then(function (result) {
-        expect(result.code).toEqual(0);
-        done();
-      });
+describe('The Angularity cli interface', function () {
+
+  afterEach(helper.cleanUp);
+
+  describe('with no other arguments', function (done) {
+    helper.runner.create()
+      .addInvocation()
+      .forEach(helper.getJasmineForRunner(expectations))
+      .finally(done);
+
+    function expectations(testCase) {
+      expect(testCase.exitcode).toBeFalsy();
+      expect(testCase.stdout).toMatch(/\s*/);
+      expect(testCase.stderr).toMatch(/\s*/);
+    }
   });
 
-  it('should show the correct version number on the -v argument.', function (done) {
-    var packagePath = path.resolve(__dirname, '..', '..', 'package.json');
-    var version = require(packagePath).version;
+  describe('with version switch', function (done) {
+    helper.runner.create()
+      .addInvocation('--version')
+      .addInvocation('-v')
+      .forEach(helper.getJasmineForRunner(expectations))
+      .finally(done);
 
-    helper.runAngularityAlias(['-v', '--version'])
-      .then(function (results) {
-        results.forEach(function (result) {
-          expect(result.stdout).toBe('angularity: ' + version + '\n');
-          expect(result.code).toEqual(0);
-        });
-        done();
-      });
+    function expectations(testCase) {
+      var version = require(path.resolve('package.json')).version;
+      expect(testCase.stdout).toMatch(new RegExp('^angularity\\:\\s*' + version));
+    }
   });
 
-  it('should correctly display a help menu with the --help argument.', function (done) {
-    helper.runAngularityAlias(['-h', '--help'])
-      .then(function (results) {
-        results.forEach(function (result) {
-          expect(result.stderr).toMatch(/Angularity is an opinionated build tool for AngularJS projects/);
-          expect(result.stderr).toMatch(/Examples:/);
-          expect(result.stderr).toMatch(/Options:/);
-        });
-        done();
-      });
+  describe('with help switch', function (done) {
+    helper.runner.create()
+      .addInvocation('--help')
+      .addInvocation('-h')
+      .addInvocation('-?')
+      .forEach(helper.getJasmineForRunner(expectations))
+      .finally(done);
+
+    function expectations(testCase) {
+      var description = require(path.resolve('package.json')).description;
+      expect(testCase.stderr).toMatch(new RegExp('^\\s*' + description));
+    }
   });
 });

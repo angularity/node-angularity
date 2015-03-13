@@ -3,7 +3,7 @@ var Q            = require('q'),
     path         = require('path'),
     fs           = require('fs'),
     rimraf       = require('rimraf'),
-    cp     = require('shelljs').cp,
+    cp           = require('shelljs').cp,
     childProcess = require('child_process');
 
 /**
