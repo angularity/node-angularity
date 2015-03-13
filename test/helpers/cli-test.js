@@ -264,9 +264,7 @@ function factory(base) {
               stderr  : stderr
             }, paramSet);
             params.hasRun = true;
-            setTimeout(function() {
-              deferred.resolve(testCase);
-            }, 100);
+            deferred.resolve(testCase);
           });
         }
       });
