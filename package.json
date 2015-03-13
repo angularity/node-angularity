@@ -106,6 +106,6 @@
   },
   "devDependencies": {
     "jasmine-diff-matchers": "^1.0.2",
-    "jasmine-node": "mhevery/jasmine-node#Jasmine2.0"
+    "jasmine-node": "2.0.0-beta4"
   }
 }
