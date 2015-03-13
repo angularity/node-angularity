@@ -8,6 +8,8 @@ var Q          = require('q'),
     gulpRimraf = require('gulp-rimraf'),
     rimraf     = require('rimraf');
 
+var cliTest    = require('./cli-test');
+
 var TEST_SRC  = 'test/expected';
 var TEST_TEMP = 'test/temp';
 
@@ -15,7 +17,7 @@ var TEST_TEMP = 'test/temp';
  * Test runner base for angularity cli tests
  * @type {{create: {function}}}
  */
-var runner = require('./cli-test')
+var runner = cliTest
   .create()
   .forProgram('angularity')
   .withDirectories(TEST_SRC, TEST_TEMP)
