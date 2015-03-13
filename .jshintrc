@@ -21,5 +21,6 @@
   "maxparams": 20,
   "maxdepth": 5,
   "maxlen": 120,
-  "node": true
+  "node": true,
+  "jasmine": true
 }

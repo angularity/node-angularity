@@ -57,8 +57,8 @@ function factory(base) {
    * @returns {string} The inferred command
    */
   function toString() {
-    var invocation = params.invocations[0];
-    var paramSet   = params.parameterSets[0];
+    var invocation = params.invocations[0]   || [];
+    var paramSet   = params.parameterSets[0] || {};
     function resolveTemplate(item) {
       return template(item, paramSet, {interpolate: /\{\s*(\w+)\s*\}/});
     }
@@ -81,7 +81,8 @@ function factory(base) {
       program      : null,
       expectations : [],
       invocations  : [],
-      parameterSets: []
+      parameterSets: [],
+      hasRun       : false
     };
 
     // clone params, must duplicate arrays
@@ -181,8 +182,8 @@ function factory(base) {
    * @param {function} callback The method to call with the instance and the test case
    */
   function toArray() {
-    var sources       = (params.sources.length      ) ? params.sources       : [null];
-    var parameterSets = (params.parameterSets.length) ? params.parameterSets : [{}];
+    var sources       = params.sources.length       ? params.sources       : [null];
+    var parameterSets = params.parameterSets.length ? params.parameterSets : [ {} ];
     var results       = [];
     parameterSets.forEach(function eachParamSet(paramSet) {
       sources.forEach(function eachSource(source) {
@@ -213,7 +214,8 @@ function factory(base) {
   }
 
   /**
-   * Execute the parameters encoded in the current instance as a test
+   * Execute the parameters encoded in the current instance as a test.
+   * If run has occurred before (without reset) then the source will not be re-copied to the working folder.
    * @returns {{then: {function}, catch: {function}, finally: {function}} A promise that resolves when tests complete
    */
   function run() {
@@ -242,8 +244,9 @@ function factory(base) {
 
       // organise a working directory
       var signature = escapeFilenameString(source, command);
+      var src       = !params.hasRun && resolveSrc(source);
       var cwd       = resolveDest(signature);
-      copySources(resolveSrc(source), cwd, function(error) {
+      copySources(src, cwd, function onCopyComplete(error) {
 
         // error in copying implies rejected async
         if (error) {
@@ -251,23 +254,36 @@ function factory(base) {
         }
         // run the command
         else {
-          childProcess.exec(command, {cwd: cwd}, function onProcessComplete(error, stderr, stdout) {
-            var message = error && stderr.toString();
-            if (message) {
-              deferred.reject(message);
-            } else {
-              var testCase = defaults({
-                cwd    : cwd,
-                command: command,
-                stdout : stdout,
-                stderr : stderr
-              }, paramSet);
-              deferred.resolve(testCase);
-            }
+          childProcess.exec(command, {cwd: cwd}, function onProcessComplete(exitcode, stdout, stderr) {
+            var testCase = defaults({
+              runner  : self,
+              cwd     : cwd,
+              command : command,
+              exitcode: exitcode,
+              stdout  : stdout,
+              stderr  : stderr
+            }, paramSet);
+            params.hasRun = true;
+            deferred.resolve(testCase);
           });
         }
       });
       return deferred.promise;
+    }
+  }
+
+  /**
+   * Use ncp to copy files
+   * @param {string|null} src The source directory
+   * @param {string} dest The destination directory
+   * @param {function} callback Completion callback
+   */
+  function copySources(src, dest, callback) {
+    if (src) {
+      ncp(src, dest, {filter: params.filter}, callback);
+    } else {
+      ensureDirectory(dest);
+      callback();
     }
   }
 }
@@ -283,15 +299,6 @@ function escapeFilenameString() {
     .join('.')
     .replace(/["']/g, '')                                                                     // omit quotes
     .replace(/[^ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._-]+/g, '.');  // change illegal chars
-}
-
-function copySources(src, dest, callback) {
-  if (src) {
-    ncp(src, dest, {filter: params.filter}, callback);
-  } else {
-    ensureDirectory(dest);
-    callback();
-  }
 }
 
 /**

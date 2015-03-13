@@ -1,10 +1,31 @@
-/* globals beforeEach, jasmine */
+/* globals jasmine */
 'use strict';
 
 var path    = require('path'),
     fs      = require('fs'),
-    merge   = require('lodash.merge'),
     isArray = require('lodash.isarray');
+
+var hr = require('../../lib/util/hr');
+
+function toBeTask() {
+  return {
+    compare: function compare(buffer, tasknames) {
+      var text    = buffer.toString();
+      var message = [].concat(tasknames)
+        .map(function(taskname) {
+          var banner = hr('-', 20, taskname);
+          var pass   = (text.indexOf(banner) >= 0);
+          return !pass && ['Task', quote(taskname), 'did not run'].join(' ');
+        })
+        .filter(Boolean)
+        .join(', ');
+      return {
+        pass   : !message,
+        message: message || 'All tasks were run'
+      };
+    }
+  };
+}
 
 function toHaveFile() {
   return {
@@ -13,7 +34,7 @@ function toHaveFile() {
       var pass     = fs.existsSync(fullPath) && !fs.statSync(fullPath).isDirectory();
       return {
         pass   : pass,
-        message: 'file "' + filename + '" ' + (pass ? 'is' : 'is not') + ' present in directory ' + directory
+        message: ['file', quote(filename), (pass ? 'is' : 'is not'), 'present in directory', quote(directory)].join(' ')
       };
     }
   };
@@ -46,15 +67,15 @@ function toBeEmptyDirectory() {
   };
 }
 
-function getHelpMatcher(description) {
+function getHelpMatcher(regexp) {
   return function () {
     return {
       compare: function compare(buffer, expectError) {
         var text     = buffer.toString();
         var lastLine = text.split(/\n/g).filter(Boolean).pop();
-        var hasError = /^\s*\[Error\:/.test(lastLine);
-        var message =
-          !(description.test(text)) ? 'Help description does not match expectation' :
+        var hasError = /^\s*\[Error\:[^\]]*]/.test(lastLine);
+        var message  =
+          !(regexp.test(text)) ? 'Help message does not match expectation' :
           (hasError !== expectError) ? ['Help', (expectError ? 'expected' : 'did not expect'), 'an error',
             (expectError) ? ('saw ' + quote(lastLine)) : ''].join(' ') :
           '';
@@ -77,9 +98,10 @@ function getFileMatcher() {
           .map(function(filename) {
             var isExpected = ([].concat(exceptions).indexOf(filename) < 0);
             var fullPath   = path.resolve.apply(path, [directory].concat(filename));
-            var pass       = ((fs.existsSync(fullPath) && !fs.statSync(fullPath).isDirectory()) === isExpected);
-            return !pass && ['file', quote(filename), (isExpected ? 'is not' : 'is'), 'present in directory',
-                quote(directory)].join(' ');
+            var exists     = fs.existsSync(fullPath);
+            var pass       = isExpected ? (exists && !fs.statSync(fullPath).isDirectory()) : !exists;
+            return !pass && ['file', quote(filename), (isExpected ? 'is not' : 'is unexpectedly'), 'present in',
+              'directory', quote(directory)].join(' ');
           })
           .filter(Boolean)
           .join(', ');
@@ -103,13 +125,12 @@ function getFileFieldMatcher(file, field) {
           .map(function (basename) {
             var fullPath = path.resolve.apply(path, [].concat(directory).concat(basename));
             var json     = loadJSON(fullPath);
-            return json && fields
+            return json ? fields
               .map(function (field, i) {
                 function test(value, j) {
-                  var required = (arguments.length > 1) ? requires[i][j] : requires[i];
-                  return (typeof required === 'string') ? (value === required) :
-                    ('test' in required) ? required.test(value) :
-                    false;
+                  var required = (typeof j === 'number') ? requires[i][j] : requires[i];
+                  return ((typeof required === 'object') && ('test' in required)) ? required.test(value) :
+                    (value === required);
                 }
                 var value  = json[field];
                 var isPass = (field in json) && (isArray(value) ? value.every(test) : test(value));
@@ -117,7 +138,8 @@ function getFileFieldMatcher(file, field) {
                   JSON.stringify(requires[i]), 'saw', JSON.stringify(json[field])].join(' ');
               })
               .filter(Boolean)
-              .join(', ');
+              .join(', ') :
+              ['JSON file', quote(basename), 'not found'].join(' ');
           })
           .filter(Boolean)
           .join(', ');
@@ -149,8 +171,9 @@ function quote(text) {
   return '"' + text + '"';
 }
 
-function addFileMatchers() {
+function addMatchers() {
   jasmine.addMatchers({
+    toBeTask          : toBeTask,
     toHaveFile        : toHaveFile,
     toHaveDirectory   : toHaveDirectory,
     toBeEmptyDirectory: toBeEmptyDirectory
@@ -161,5 +184,5 @@ module.exports = {
   getHelpMatcher     : getHelpMatcher,
   getFileMatcher     : getFileMatcher,
   getFileFieldMatcher: getFileFieldMatcher,
-  addFileMatchers    : addFileMatchers
+  addMatchers        : addMatchers
 };

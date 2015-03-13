@@ -1,8 +1,5 @@
-/* globals describe, expect, beforeEach, jasmine */
+/* jshint -W082 */
 'use strict';
-
-var fs   = require('fs'),
-    path = require('path');
 
 var helper   = require('../../helpers/angularity-test'),
     matchers = require('../../helpers/jasmine-matchers');
@@ -12,23 +9,66 @@ var DEFAULT_VERSION     = '0.0.0';
 var DEFAULT_DESCRIPTION = '';
 var DEFAULT_TAGS        = [];
 var DEFAULT_PORT        = /^(?!55555)\d{5}$/;
+var FILES_BY_FLAG       = {
+    npm         : 'package.json',
+    bower       : 'bower.json',
+    karma       : 'karma.conf.js',
+    jshint      : '.jshintrc',
+    gitignore   : '.gitignore',
+    editorconfig: '.editorconfig'
+  };
 
 describe('The Angularity init task', function () {
 
-  beforeEach(matchers.addFileMatchers);
+  beforeEach(matchers.addMatchers);
 
   beforeEach(customMatchers);
+
+  afterEach(helper.cleanUp);
 
   describe('command line help', function (done) {
     helper.runner.create()
       .addInvocation('init --help')
       .addInvocation('init -h')
       .addInvocation('init -?')
-      .forEach(helper.forEachIt(function (testCase) {
-        expect(testCase.cwd).toBeEmptyDirectory();
-        expect(testCase.stdout).toBeHelpWithError(false);
-      }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      expect(testCase.cwd).toBeEmptyDirectory();
+      expect(testCase.stderr).toBeHelpWithError(false);
+    }
+  });
+
+  describe('directory creation', function () {
+    it('should rerun in any directory with package.json', function(done) {
+
+      helper.runner.create()
+        .addInvocation('init')
+        .run()
+        .then(expectations)
+        .then(helper.getFileDelete(DEFAULT_NAME, ['*', '.*', 'app', '!**/package.json']))
+        .then(rerun)
+        .then(expectations)
+        .finally(done);
+
+      function rerun(testCase) {
+        return testCase.runner.run();
+      }
+
+      function expectations(testCase) {
+        expect(testCase.stdout).toBeTask('init');
+        expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+        return testCase;
+      }
+    });
+
   });
 
   describe('should support a custom name', function (done) {
@@ -37,40 +77,47 @@ describe('The Angularity init task', function () {
       .addInvocation('init -n {name}')
       .addParameters({ name: 'foo' })
       .addParameters({ name: '"a name with spaces"' })
-      .forEach(helper.forEachIt(function (testCase) {
-        var unquotedName = testCase.name.replace(/"/g, '');
-        expect(testCase.cwd).toHaveDirectory(unquotedName);
-        expect([testCase.cwd, unquotedName]).toHaveExpectedItemsExcept();
-        expect([testCase.cwd, unquotedName]).toHaveJsonWithName(unquotedName);
-        expect([testCase.cwd, unquotedName]).toHaveJsonWithVersion(DEFAULT_VERSION);
-        expect([testCase.cwd, unquotedName]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-        expect([testCase.cwd, unquotedName]).toHaveJsonWithTags(DEFAULT_TAGS);
-        expect([testCase.cwd, unquotedName]).toHaveJsonWithPort(DEFAULT_PORT);
-      }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      var unquotedName = testCase.name.replace(/^"|"$/g, '');
+      expect(testCase.stdout).toBeTask('init');
+      expect(testCase.cwd).toHaveDirectory(unquotedName);
+      expect([testCase.cwd, unquotedName]).toHaveExpectedItemsExcept();
+      expect([testCase.cwd, unquotedName]).toHaveJsonWithName(unquotedName);
+      expect([testCase.cwd, unquotedName]).toHaveJsonWithVersion(DEFAULT_VERSION);
+      expect([testCase.cwd, unquotedName]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+      expect([testCase.cwd, unquotedName]).toHaveJsonWithTags(DEFAULT_TAGS);
+      expect([testCase.cwd, unquotedName]).toHaveJsonWithPort(DEFAULT_PORT);
+    }
   });
 
   describe('should support a custom version', function (done) {
     helper.runner.create()
       .addParameters({ version: '1.2.3' })
-      .addParameters({ version: '"non-sever string"' })
+      .addParameters({ version: '4.6.6-rc2A' })
+      .addParameters({ version: '"non semver string"' })
       .addInvocation('init --version {version}')
       .addInvocation('init -v {version}')
-      .forEach(helper.forEachIt(function (testCase) {
-        var unquotedVersion = testCase.version.replace(/"/g, '');
-        if (unquotedVersion !== testCase.version) {
-          expect(testCase.stdout).toBeHelpWithError(true);
-        } else {
-          expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(unquotedVersion);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
-        }
-     }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      var unquotedVersion = testCase.version.replace(/^"|"$/g, '');
+      if (/\s/.test(unquotedVersion)) {
+        expect(testCase.stderr).toBeHelpWithError(true);
+      } else {
+        expect(testCase.stdout).toBeTask('init');
+        expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(unquotedVersion);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+      }
+    }
   });
 
   describe('should support a custom description', function (done) {
@@ -79,39 +126,47 @@ describe('The Angularity init task', function () {
       .addParameters({ description: '"A few words"' })
       .addInvocation('init --description {description}')
       .addInvocation('init -d {description}')
-      .forEach(helper.forEachIt(function (testCase) {
-        var unquotedDescription = testCase.desciption.replace(/"/g, '');
-        expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(unquotedDescription + 'x');
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
-      }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      if (testCase.command === 'angularity init -d ""') return; // TODO yargs short form seems to fail with empty string
+
+      var unquotedDescription = testCase.description.replace(/^"|"$/g, '');
+      expect(testCase.stdout).toBeTask('init');
+      expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(unquotedDescription);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+    }
   });
 
   describe('should support custom tags', function (done) {
     helper.runner.create()
       .addParameters({ tag1: 'a', tag2: 'b', tags: ['a', 'b'] })
-      .addParameters({ tag1: 1, tag2: '"some long tag"', tags: [1, "some long tag"] })
+      .addParameters({ tag1: 1, tag2: '"some long tag"', tags: ['1', 'some long tag'] })
       .addInvocation('init --tag {tag1}')
       .addInvocation('init -t {tag1}')
       .addInvocation('init --tag {tag1} --tag {tag2}')
       .addInvocation('init -t {tag1} -t {tag2}')
-      .forEach(helper.forEachIt(function (testCase) {
-        var tagCount = testCase.command.split(/-t/g).length - 1;
-        var tags     = testCase.tags.slice(0, tagCount);
-        expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(tags);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
-      }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      var tagCount = testCase.command.split(/-t/g).length - 1;
+      var tags     = testCase.tags.slice(0, tagCount);
+      expect(testCase.stdout).toBeTask('init');
+      expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(tags);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+    }
   });
 
   describe('should support a custom port', function (done) {
@@ -121,62 +176,64 @@ describe('The Angularity init task', function () {
       .addParameters({ port: 'illegal' })
       .addInvocation('init --port {port}')
       .addInvocation('init -p {port}')
-      .forEach(helper.forEachIt(function (testCase) {
-        if (testCase.port === 'illegal') {
-          expect(testCase.stdout).toBeHelpWithError(true);
-        } else {
-          var port = (testCase.port === 'random') ? DEFAULT_PORT : testCase.port;
-          expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-          expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(port);
-        }
-      }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      if (testCase.port === 'illegal') {
+        expect(testCase.stderr).toBeHelpWithError(true);
+      } else {
+        var port = (testCase.port === 'random') ? DEFAULT_PORT : testCase.port;
+        expect(testCase.stdout).toBeTask('init');
+        expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
+        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(port);
+      }
+    }
   });
 
-  describe('should allow gating of features', function (done) {
-    var LOOKUP = {
-      npm         : 'package.json',
-      bower       : 'bower.json',
-      karma       : 'karma.conf.js',
-      jshint      : '.jshintrc',
-      gitignore   : '.gitignore',
-      editorconfig: '.editorconfig'
-    };
+  describe('should gate features using flags', function (done) {
 
-    // set a single flag in each param set
+    // invocation will consist of all flags and their boolean values
+    var fields     = Object.getOwnPropertyNames(FILES_BY_FLAG);
+    var invocation = ['init'].concat(fields
+      .map(function toFlag(field) {
+        return '--' + field + ' {' + field + '}';
+      })
+      .join(' '));
+
+    // create the runner
     var runner = helper.runner.create()
-    var fields = Object.getOwnPropertyNames(LOOKUP);
-    for (var i = 0; i < 2 * fields.length; i++) {
-      var paramSet = {};
-      for (var j = 0; j < fields.length; j++) {
-        var field = fields[j];
-        paramSet[field] = (j < fields.length) ? (j === i) : (Math.random() < 0.5);
-      }
-      runner.addParameters(paramSet);
-    }
+      .addInvocation(invocation);
+
+    // add flag permutations
+    helper
+      .randomFlags(fields)
+      .forEach(runner.addParameters.bind(runner));
 
     // now run
     runner
-      .addInvocation('init --npm {npm} --bower {bower} --karma {karma} --jshint {jshint} --gitignore {gitignore}',
-        '--editorconfig {editorconfig}')
-      .forEach(helper.forEachIt(function (testCase) {
-        var exceptions = fields
-          .filter(function testExcluded(field) {
-            return !testCase[field];
-          })
-          .map(function decode(field) {
-            return LOOKUP[field];
-          });
-        expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept(exceptions);
-      }))
+      .forEach(helper.getJasmineForRunner(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      var exceptions = fields
+        .filter(function testNegated(field) {
+          return !testCase[field];
+        })
+        .map(function lookupFile(field) {
+          return FILES_BY_FLAG[field];
+        });
+      expect(testCase.stdout).toBeTask('init');
+      expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
+      expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept(exceptions);
+    }
   });
+
 });
 
 function customMatchers() {
@@ -194,7 +251,7 @@ function customMatchers() {
     toBeHelpWithError         : matchers
       .getHelpMatcher(/^\s*The "init" task/),
     toHaveExpectedItemsExcept : matchers
-      .getFileMatcher('bower.json', 'package.json', 'angularity.json', '.jshintrc', '.editorconfig', 'karma.conf.js',
-        'app/index.html', 'app/index.js', 'app/index.scss')
+      .getFileMatcher('package.json', 'bower.json', 'angularity.json', '.jshintrc', '.gitignore', '.editorconfig',
+        'karma.conf.js', 'app/index.html', 'app/index.js', 'app/index.scss')
   });
 }

@@ -15,8 +15,7 @@
     "es6ify"
   ],
   "scripts": {
-    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose test/specs",
-    "posttest": "node node_modules/rimraf/bin.js test/temp"
+    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose test/specs"
   },
   "contributors": [
     "bholloway",
