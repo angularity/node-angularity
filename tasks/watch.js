@@ -18,44 +18,44 @@ function setUpTaskWatch(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitWatchTask(yargsInstance) {
-      var gulp          = require('gulp'),
-          watch         = require('gulp-watch'),
-          wordwrap      = require('wordwrap'),
-          watchSequence = require('gulp-watch-sequence');
+var gulp          = require('gulp'),
+    watch         = require('gulp-watch'),
+    wordwrap      = require('wordwrap'),
+    watchSequence = require('gulp-watch-sequence');
 
-      var defaults         = require('../lib/config/defaults'),
-          hr               = require('../lib/util/hr'),
-          karma            = require('../lib/test/karma'),
-          jshintReporter   = require('../lib/util/jshint-reporter'),
-          streams          = require('../lib/config/streams');
+var defaults         = require('../lib/config/defaults'),
+    hr               = require('../lib/util/hr'),
+    karma            = require('../lib/test/karma'),
+    jshintReporter   = require('../lib/util/jshint-reporter'),
+    streams          = require('../lib/config/streams');
 
-      gulp.task('watch', ['server'], function () {
-        // enqueue actions to avoid multiple trigger
-        var queue = watchSequence(500, function () {
-          console.log(hr('\u2591', 80));
-        });
+gulp.task('watch', ['server'], function () {
+  // enqueue actions to avoid multiple trigger
+  var queue = watchSequence(500, function () {
+    console.log(hr('\u2591', 80));
+  });
 
-        // watch statements
-        watch(streams.getGlob(['**/*.js', '**/*.html', '!*.*', '!**/*.spec.*'], [streams.APP, streams.NODE, streams.BOWER]), {
-          name      : 'JS|HTML',
-          emitOnGlob: false
-        }, queue.getHandler('javascript', 'html', 'reload')); // app html will be needed in case previous injection failed
+  // watch statements
+  watch(streams.getGlob(['**/*.js', '**/*.html', '!*.*', '!**/*.spec.*'], [streams.APP, streams.NODE, streams.BOWER]), {
+    name      : 'JS|HTML',
+    emitOnGlob: false
+  }, queue.getHandler('javascript', 'html', 'reload')); // app html will be needed in case previous injection failed
 
-        watch(streams.getGlob(['**/*.scss', '!*.scss'], [streams.APP, streams.NODE, streams.BOWER]), {
-          name      : 'CSS',
-          emitOnGlob: false
-        }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
+  watch(streams.getGlob(['**/*.scss', '!*.scss'], [streams.APP, streams.NODE, streams.BOWER]), {
+    name      : 'CSS',
+    emitOnGlob: false
+  }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
-        watch([streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict with JS or CSS
-          name      : 'BOWER',
-          emitOnGlob: false
-        }, queue.getHandler('html', 'reload'));
+  watch([streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict with JS or CSS
+    name      : 'BOWER',
+    emitOnGlob: false
+  }, queue.getHandler('html', 'reload'));
 
-        watch(streams.getGlob(['**/*.spec.js', '!*.spec.js']), {
-          name      : 'TEST',
-          emitOnGlob: false
-        }, queue.getHandler('test'));
-      });
+  watch(streams.getGlob(['**/*.spec.js', '!*.spec.js']), {
+    name      : 'TEST',
+    emitOnGlob: false
+  }, queue.getHandler('test'));
+});
     },
     onRun: function onRunWatchTask(yargsInstance) {
       var runSequence = require('run-sequence');

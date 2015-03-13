@@ -8,39 +8,39 @@ function setUpTaskJavascript(tyRun) {
   // TASK javascript
   ////
 
-  var jshintReporter  = require('../lib/util/jshint-reporter');
+var jshintReporter  = require('../lib/util/jshint-reporter');
 
-  var optionDefinitionJsHintReporter = {
-    key: 'jshint-reporter',
-    value: {
-      describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module, or the absolute path ' +
-        'to one.',
-      alias: ['j'],
-      //TODO @bguiz get this from config
-      default: 'angularity-jshint-reporter',
-      string: true
-    }
-  };
-  function checkJsHintReporter(argv) {
-    if (argv.help) {
+var optionDefinitionJsHintReporter = {
+  key: 'jshint-reporter',
+  value: {
+    describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module, or the absolute path ' +
+      'to one.',
+    alias: ['j'],
+    //TODO @bguiz get this from config
+    default: 'angularity-jshint-reporter',
+    string: true
+  }
+};
+function checkJsHintReporter(argv) {
+  if (argv.help) {
+    return true;
+  }
+  else {
+    var value = argv[optionDefinitionJsHintReporter.key];
+    if (typeof value === 'string' && value.length > 0) {
+      try {
+        jshintReporter.get(value);
+      }
+      catch (ex) {
+        throw new Error('Illegal value for "'+optionDefinitionJsHintReporter.key+'"\n' + ex);
+      }
       return true;
     }
     else {
-      var value = argv[optionDefinitionJsHintReporter.key];
-      if (typeof value === 'string' && value.length > 0) {
-        try {
-          jshintReporter.get(value);
-        }
-        catch (ex) {
-          throw new Error('Illegal value for "'+optionDefinitionJsHintReporter.key+'"\n' + ex);
-        }
-        return true;
-      }
-      else {
-        throw new Error('Required option "'+optionDefinitionJsHintReporter.key+'" in not specified');
-      }
+      throw new Error('Required option "'+optionDefinitionJsHintReporter.key+'" in not specified');
     }
   }
+}
 
   var taskDefinitionJavascript = {
     name: 'javascript',
@@ -62,62 +62,60 @@ function setUpTaskJavascript(tyRun) {
       checkJsHintReporter
     ],
     onInit: function onInitJavascriptTask(yargsInstance) {
-      console.log('onInitJavascriptTask');
+var path            = require('path'),
+    fs              = require('fs');
 
-      var path            = require('path'),
-          fs              = require('fs');
+var gulp            = require('gulp'),
+    jshint          = require('gulp-jshint'),
+    rimraf          = require('gulp-rimraf'),
+    runSequence     = require('run-sequence'),
+    combined        = require('combined-stream'),
+    to5ify          = require('6to5ify'),
+    stringify       = require('stringify'),
+    wordwrap        = require('wordwrap'),
+    ngAnnotate      = require('browserify-ngannotate');
 
-      var gulp            = require('gulp'),
-          jshint          = require('gulp-jshint'),
-          rimraf          = require('gulp-rimraf'),
-          runSequence     = require('run-sequence'),
-          combined        = require('combined-stream'),
-          to5ify          = require('6to5ify'),
-          stringify       = require('stringify'),
-          wordwrap        = require('wordwrap'),
-          ngAnnotate      = require('browserify-ngannotate');
+var karma           = require('../lib/test/karma'),
+    browserify      = require('../lib/build/browserify'),
+    taskYargs       = require('../lib/util/task-yargs'),
+    hr              = require('../lib/util/hr'),
+    streams         = require('../lib/config/streams'),
+    jshintReporter  = require('../lib/util/jshint-reporter');
 
-      var karma           = require('../lib/test/karma'),
-          browserify      = require('../lib/build/browserify'),
-          taskYargs       = require('../lib/util/task-yargs'),
-          hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams'),
-          jshintReporter  = require('../lib/util/jshint-reporter');
+gulp.task('javascript', function (done) {
+  console.log(hr('-', 80, 'javascript'));
+  init(yargsInstance);
+  runSequence(
+    ['javascript:cleanbuild', 'javascript:lint'],
+    ['javascript:build'],
+    done
+  );
+});
 
-      gulp.task('javascript', function (done) {
-        console.log(hr('-', 80, 'javascript'));
-        init(yargsInstance);
-        runSequence(
-          ['javascript:cleanbuild', 'javascript:lint'],
-          ['javascript:build'],
-          done
-        );
-      });
+// run linter
+gulp.task('javascript:lint', function () {
+  return combined.create()
+    .append(streams.jsApp())
+    .append(streams.jsLib())
+    .append(streams.jsSpec())
+    .pipe(jshint())
+    .pipe(jshintReporter.get(cliArgs[optionDefinitionJsHintReporter.key]));
+});
 
-      // run linter
-      gulp.task('javascript:lint', function () {
-        return combined.create()
-          .append(streams.jsApp())
-          .append(streams.jsLib())
-          .append(streams.jsSpec())
-          .pipe(jshint())
-          .pipe(jshintReporter.get(cliArgs[optionDefinitionJsHintReporter.key]));
-      });
+// clean javascript from the build directory
+gulp.task('javascript:cleanbuild', function () {
+  return gulp.src(streams.BUILD + '/**/*.js*', { read: false })
+    .pipe(rimraf());
+});
 
-      // clean javascript from the build directory
-      gulp.task('javascript:cleanbuild', function () {
-        return gulp.src(streams.BUILD + '/**/*.js*', { read: false })
-          .pipe(rimraf());
-      });
-
-      // give a single optimised javascript file in the build directory with source map for each
-      gulp.task('javascript:build', function () {
-        return streams.jsApp({read: false})
-          .pipe(browserify
-            .compile(80, transforms)
-            .each(!cliArgs.unminified))
-          .pipe(gulp.dest(streams.BUILD));
-      });
+// give a single optimised javascript file in the build directory with source map for each
+gulp.task('javascript:build', function () {
+  return streams.jsApp({read: false})
+    .pipe(browserify
+      .compile(80, transforms)
+      .each(!cliArgs.unminified))
+    .pipe(gulp.dest(streams.BUILD));
+});
     },
     onRun: function onRunJavascriptTask(yargsInstance) {
       console.log('onRunJavascriptTask');

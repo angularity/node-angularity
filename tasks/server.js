@@ -38,46 +38,46 @@ function setUpTaskServer(tyRun) {
       }
     ],
     onInit: function onInitServerTask(yargsInstance) {
-      var gulp        = require('gulp'),
-          gutil       = require('gulp-util'),
-          wordwrap    = require('wordwrap'),
-          browserSync = require('browser-sync');
+var gulp        = require('gulp'),
+    gutil       = require('gulp-util'),
+    wordwrap    = require('wordwrap'),
+    browserSync = require('browser-sync');
 
-      var taskYargs       = require('../lib/util/task-yargs'),
-          hr             = require('../lib/util/hr'),
-          jshintReporter = require('../lib/util/jshint-reporter'),
-          streams        = require('../lib/config/streams');
+var taskYargs       = require('../lib/util/task-yargs'),
+    hr             = require('../lib/util/hr'),
+    jshintReporter = require('../lib/util/jshint-reporter'),
+    streams        = require('../lib/config/streams');
 
-      var cliArgs;
+var cliArgs;
 
-      gulp.task('server', ['build'], function () {
-        console.log(hr('-', 80, 'server'));
+gulp.task('server', ['build'], function () {
+  console.log(hr('-', 80, 'server'));
 
-        cliArgs = yargsInstance
-          .strict()
-          .wrap(80)
-          .argv;
+  cliArgs = yargsInstance
+    .strict()
+    .wrap(80)
+    .argv;
 
-        // debug message
-        gutil.log('serving on port:', cliArgs.port);
+  // debug message
+  gutil.log('serving on port:', cliArgs.port);
 
-        // start serving with browser sync
-        browserSync({
-          server  : {
-            baseDir: streams.BUILD,
-            routes : streams.ROUTES
-          },
-          port    : cliArgs.port,
-          logLevel: 'silent',
-          open    : false
-        });
-      });
+  // start serving with browser sync
+  browserSync({
+    server  : {
+      baseDir: streams.BUILD,
+      routes : streams.ROUTES
+    },
+    port    : cliArgs.port,
+    logLevel: 'silent',
+    open    : false
+  });
+});
 
-      gulp.task('reload', function () {
-        console.log(hr('-', 80, 'reload'));
-        gutil.log('serving on port:', cliArgs.port);
-        browserSync.reload();
-      });
+gulp.task('reload', function () {
+  console.log(hr('-', 80, 'reload'));
+  gutil.log('serving on port:', cliArgs.port);
+  browserSync.reload();
+});
     },
     onRun: function onRunServerTask(yargsInstance) {
       var runSequence = require('run-sequence');
