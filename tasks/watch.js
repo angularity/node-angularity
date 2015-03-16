@@ -30,31 +30,28 @@ var defaults         = require('../lib/config/defaults'),
     streams          = require('../lib/config/streams');
 
 gulp.task('watch', ['server'], function () {
+  var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
+
   // enqueue actions to avoid multiple trigger
   var queue = watchSequence(500, function () {
     console.log(hr('\u2591', 80));
   });
 
   // watch statements
-  watch(streams.getGlob(['**/*.js', '**/*.html', '!*.*', '!**/*.spec.*'], [streams.APP, streams.NODE, streams.BOWER]), {
+  watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
     name      : 'JS|HTML',
     emitOnGlob: false
-  }, queue.getHandler('javascript', 'html', 'reload')); // app html will be needed in case previous injection failed
+  }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
 
-  watch(streams.getGlob(['**/*.scss', '!*.scss'], [streams.APP, streams.NODE, streams.BOWER]), {
+  watch(getGlobAppNodeBower(['**/*.scss', '!*.scss']), {
     name      : 'CSS',
     emitOnGlob: false
   }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
-  watch([streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict with JS or CSS
-    name      : 'BOWER',
+  watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict JS or CSS
+    name      : 'INJECT',
     emitOnGlob: false
   }, queue.getHandler('html', 'reload'));
-
-  watch(streams.getGlob(['**/*.spec.js', '!*.spec.js']), {
-    name      : 'TEST',
-    emitOnGlob: false
-  }, queue.getHandler('test'));
 });
     },
     onRun: function onRunWatchTask(yargsInstance) {

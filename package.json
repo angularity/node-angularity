@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An opinionated NodeJs build system for ECMAScript 6 AngularJs projects",
-  "version": "0.1.0-rc",
+  "version": "0.1.1",
   "tags": [
     "build",
     "system",
@@ -17,7 +17,11 @@
   "scripts": {
     "test": "node ./node_modules/jasmine-node/bin/jasmine-node test"
   },
-  "author": "Ben Holloway, Chris Decoster, Brendan Graetz",
+  "contributors": [
+    "bholloway",
+    "impaler",
+    "bguiz"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,9 +35,10 @@
   "bin": {
     "angularity": "./bin/cli.js"
   },
-  "engineStrict": true,
+  "engineStrict": "true",
   "engines": {
-    "node": ">= 0.9"
+    "node": ">=0.10.28 <0.11",
+    "npm": ">=2.0"
   },
   "dependencies": {
     "6to5ify": "latest",
@@ -81,7 +86,6 @@
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
-    "mold-source-map": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
     "q": "latest",

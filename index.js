@@ -1,1 +1,1 @@
-require('require-dir')('./tasks');
+'use strict';

@@ -19,7 +19,6 @@ var taskYargs     = require('../lib/util/task-yargs'),
 
 // TODO @bholloway menus
 // var mainMenu = require('../lib/cli/mainMenu');
-require('../index');
 
 // we need to duplicate some event handlers from the gulp cli since we have bypassed it
 gulp.on('task_start', function (e) {
@@ -77,9 +76,13 @@ taskYargsRun.taskYargs.register('help', {
   checks: []
 });
 
+require('../index');
+
+//TODO move these to ../index.js
 require('../tasks/html')(taskYargsRun);
 require('../tasks/css')(taskYargsRun);
 require('../tasks/javascript')(taskYargsRun);
+require('../tasks/test')(taskYargsRun);
 require('../tasks/build')(taskYargsRun);
 require('../tasks/release')(taskYargsRun);
 require('../tasks/server')(taskYargsRun);
