@@ -1,9 +1,6 @@
 'use strict';
 
 function setUpTaskJavascript(tyRun) {
-  var cliArgs;
-  var transforms;
-
   var jshintReporter  = require('../lib/util/jshint-reporter');
   var karma           = require('../lib/test/karma');
 
@@ -122,6 +119,7 @@ function setUpTaskJavascript(tyRun) {
           streams         = require('../lib/config/streams'),
           jshintReporter  = require('../lib/util/jshint-reporter');
 
+      var cliArgs;
       cliArgs = yargsInstance
           .strict()
           .wrap(80)

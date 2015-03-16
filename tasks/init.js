@@ -221,13 +221,13 @@ function setUpInitTask(tyRun) {
       var cliArgs;
       var templateParams;
 
+      yargsInstance
+        .strict()
+        .wrap(80);
+      cliArgs = yargsInstance.argv;
+
       gulp.task('init', function (done) {
         console.log(hr('-', 80, 'init'));
-
-        yargsInstance
-          .strict()
-          .wrap(80);
-        cliArgs = yargsInstance.argv;
 
         // augment or adjust yargs parameters
         var port = (cliArgs.port === 'random') ? Math.floor(Math.random() * (65536 - 49152) + 49152) : cliArgs.port;

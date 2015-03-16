@@ -186,14 +186,13 @@ function setUpWebstormTask(tyRun) {
       var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
 
       var cliArgs;
+      yargsInstance
+        .strict()
+        .wrap(80);
+      cliArgs = yargsInstance.argv;
 
       gulp.task('webstorm', function (done) {
         console.log(hr('-', 80, 'webstorm'));
-
-        yargsInstance
-          .strict()
-          .wrap(80);
-        cliArgs = yargsInstance.argv;
 
         // set defaults
         if (cliArgs.defaults) {

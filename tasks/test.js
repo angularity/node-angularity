@@ -1,9 +1,6 @@
 'use strict';
 
 function setUpTaskTest(tyRun) {
-  var cliArgs;
-  var transforms;
-
   var taskDefinition = {
     name: 'test',
     description: [
@@ -36,12 +33,15 @@ function setUpTaskTest(tyRun) {
           streams         = require('../lib/config/streams'),
           jshintReporter  = require('../lib/util/jshint-reporter');
 
+      var cliArgs;
+      cliArgs = yargsInstance
+        .strict()
+        .wrap(80)
+        .argv;
+
       gulp.task('test', ['javascript'], function (done) {
         console.log(hr('-', 80, 'javascript'));
-        cliArgs = yargsInstance
-            .strict()
-            .wrap(80)
-            .argv;
+
         gulp
           .src(streams.TEST + '/karma.conf.js')
           .pipe(karma.run());

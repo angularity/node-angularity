@@ -8,22 +8,22 @@ function setUpTaskBuild(tyRun) {
     checks: [],
     options: [],
     onInit: function onBuildTask(yargsInstance) {
-var cliArgs = yargsInstance
-  .strict()
-  .wrap(80)
-  .argv;
+      var gulp        = require('gulp'),
+          wordwrap    = require('wordwrap'),
+          runSequence = require('run-sequence');
 
-var gulp        = require('gulp'),
-    wordwrap    = require('wordwrap'),
-    runSequence = require('run-sequence');
+      var taskYargs       = require('../lib/util/task-yargs'),
+          hr              = require('../lib/util/hr');
 
-var taskYargs       = require('../lib/util/task-yargs'),
-    hr              = require('../lib/util/hr');
+      var cliArgs = yargsInstance
+        .strict()
+        .wrap(80)
+        .argv;
 
-gulp.task('build', function (done) {
-  console.log(hr('-', 80, 'build'));
-  runSequence('javascript', 'css', 'html', done);
-});
+      gulp.task('build', function (done) {
+        console.log(hr('-', 80, 'build'));
+        runSequence('javascript', 'css', 'html', done);
+      });
     },
     onRun: function onBuildTask(yargsInstance) {
       var runSequence = require('run-sequence');
