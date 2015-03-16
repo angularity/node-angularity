@@ -105,7 +105,7 @@
     "yargs": "latest"
   },
   "devDependencies": {
-    "jasmine-diff-matchers": "^1.0.2",
+    "jasmine-diff-matchers": "bholloway/jasmine-diff-matchers",
     "jasmine-node": "2.0.0-beta4"
   }
 }
