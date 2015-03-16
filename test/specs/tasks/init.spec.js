@@ -1,8 +1,20 @@
 /* jshint -W082 */
 'use strict';
 
+var Q = require('q');
+
 var helper   = require('../../helpers/angularity-test'),
     matchers = require('../../helpers/jasmine-matchers');
+
+var fastIt = helper.jasmineFactory({
+  before: 0,
+  after : 500
+});
+
+var slowIt = helper.jasmineFactory({
+  before: 500,
+  after : 1000
+});
 
 var DEFAULT_NAME        = 'my-project';
 var DEFAULT_VERSION     = '0.0.0';
@@ -31,7 +43,7 @@ describe('The Angularity init task', function () {
       .addInvocation('init --help')
       .addInvocation('init -h')
       .addInvocation('init -?')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -46,10 +58,18 @@ describe('The Angularity init task', function () {
         .addInvocation('init')
         .run()
         .then(expectations)
+        .then(delay(500))
         .then(helper.getFileDelete(DEFAULT_NAME, ['*', '.*', 'app', '!**/package.json']))
+        .then(delay(500))
         .then(rerun)
         .then(expectations)
         .finally(done);
+
+      function delay(milliseconds) {
+        return function () {
+          return Q.delay(milliseconds || 0);
+        };
+      }
 
       function rerun(testCase) {
         return testCase.runner.run();
@@ -76,7 +96,7 @@ describe('The Angularity init task', function () {
       .addInvocation('init -n {name}')
       .addParameters({ name: 'foo' })
       .addParameters({ name: '"a name with spaces"' })
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -99,7 +119,7 @@ describe('The Angularity init task', function () {
       .addParameters({ version: '"non semver string"' })
       .addInvocation('init --version {version}')
       .addInvocation('init -v {version}')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -125,7 +145,7 @@ describe('The Angularity init task', function () {
       .addParameters({ description: '"A few words"' })
       .addInvocation('init --description {description}')
       .addInvocation('init -d {description}')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -151,7 +171,7 @@ describe('The Angularity init task', function () {
       .addInvocation('init -t {tag1}')
       .addInvocation('init --tag {tag1} --tag {tag2}')
       .addInvocation('init -t {tag1} -t {tag2}')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -175,7 +195,7 @@ describe('The Angularity init task', function () {
       .addParameters({ port: 'illegal' })
       .addInvocation('init --port {port}')
       .addInvocation('init -p {port}')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -216,7 +236,7 @@ describe('The Angularity init task', function () {
 
     // now run
     runner
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {

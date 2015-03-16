@@ -4,6 +4,11 @@ var path = require('path');
 
 var helper = require('../helpers/angularity-test');
 
+var fastIt = helper.jasmineFactory({
+  before: 0,
+  after : 500
+});
+
 describe('The Angularity cli interface', function () {
 
   afterEach(helper.cleanUp);
@@ -11,7 +16,7 @@ describe('The Angularity cli interface', function () {
   describe('with no other arguments', function (done) {
     helper.runner.create()
       .addInvocation()
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -25,7 +30,7 @@ describe('The Angularity cli interface', function () {
     helper.runner.create()
       .addInvocation('--version')
       .addInvocation('-v')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -39,7 +44,7 @@ describe('The Angularity cli interface', function () {
       .addInvocation('--help')
       .addInvocation('-h')
       .addInvocation('-?')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {

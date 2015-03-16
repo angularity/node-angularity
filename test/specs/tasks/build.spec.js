@@ -5,6 +5,16 @@ var jasmineDiffMatchers = require('jasmine-diff-matchers');
 var helper   = require('../../helpers/angularity-test'),
     matchers = require('../../helpers/jasmine-matchers');
 
+var fastIt = helper.jasmineFactory({
+  before: 0,
+  after : 500
+});
+
+var slowIt = helper.jasmineFactory({
+  before: 500,
+  after : 1000
+});
+
 var BUILD_FOLDER = 'app-build';
 var TEST_FOLDER  = 'app-test';
 
@@ -25,7 +35,7 @@ describe('The Angularity build task', function () {
       .addInvocation('build --help')
       .addInvocation('build -h')
       .addInvocation('build -?')
-      .forEach(helper.getJasmineForRunner(expectations))
+      .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
@@ -40,7 +50,7 @@ describe('The Angularity build task', function () {
       .addInvocation('build')
       .addInvocation('build --unminified false')
       .addInvocation('build -u false')
-      .forEach(helper.getJasmineForRunner(expectations, 500, 1000))
+      .forEach(slowIt(expectations))
       .finally(done);
   });
 
@@ -51,7 +61,7 @@ describe('The Angularity build task', function () {
       .addInvocation('build -u')
       .addInvocation('build --unminified true')
       .addInvocation('build -u true')
-      .forEach(helper.getJasmineForRunner(expectations, 500, 1000))
+      .forEach(slowIt(expectations))
       .finally(done);
   });
 });

@@ -37,32 +37,35 @@ function cleanUp(callback) {
 /**
  * Create a Jasmine <code>it</code> statement for enumerating test-runner cases in a <code>Array.forEach()</code>
  * @param {function} expectations A method containing expectations
- * @param {number} [delayBefore] Optional delay before expectations
- * @param {number} [delayAfter] Optional delay after expectations
- * @param {string} [title] Optional title for the jasmine statement
- * @returns {function} An <code>Array.forEach()</code> handler that itself returns a promise
+ * @param {{before: {number}, after: {number}, title: {string}} options Options for the expectations
+ * @returns {function} A method that when closed produces a <code>Array.forEach()</code> handler that itself returns a
+ *                     promise
  */
-function getJasmineForRunner(expectations, delayBefore, delayAfter, title) {
-  function before() {
-    return Q.delay(delayBefore || 0);
-  }
-  function after() {
-    return Q.delay(delayAfter || 0);
-  }
-  return function (testRunner) {
-    var deferred = Q.defer();
-    it(title || testRunner, function (done) {
-      testRunner
-        .run()
-        .then(before)
-        .then(expectations)
-        .then(after)
-        .finally(done)
-        .finally(deferred.resolve.bind(deferred));
-    });
-    return deferred.promise;
+function jasmineFactory(options) {
+  return function forExpectations(expectations) {
+    options = options || {};
+    function before() {
+      return Q.delay(options.before || 0);
+    }
+    function after() {
+      return Q.delay(options.after || 0);
+    }
+    return function itForRunner(testRunner) {
+      var deferred = Q.defer();
+      it(options.title || testRunner, function (done) {
+        testRunner
+          .run()
+          .then(before)
+          .then(expectations)
+          .then(after)
+          .finally(done)
+          .finally(deferred.resolve.bind(deferred));
+      });
+      return deferred.promise;
+    };
   };
 }
+
 
 /**
  * Create a method that will return a promise to delete the given files
@@ -178,10 +181,10 @@ function getTimeoutSwitch(value) {
 }
 
 module.exports = {
-  runner             : runner,
-  cleanUp            : cleanUp,
-  getJasmineForRunner: getJasmineForRunner,
-  getFileDelete      : getFileDelete,
-  randomFlags        : randomFlags,
-  getTimeoutSwitch   : getTimeoutSwitch
+  runner          : runner,
+  cleanUp         : cleanUp,
+  jasmineFactory  : jasmineFactory,
+  getFileDelete   : getFileDelete,
+  randomFlags     : randomFlags,
+  getTimeoutSwitch: getTimeoutSwitch
 };
