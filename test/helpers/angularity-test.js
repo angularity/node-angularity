@@ -37,12 +37,12 @@ function cleanUp(callback) {
 /**
  * Create a Jasmine <code>it</code> statement for enumerating test-runner cases in a <code>Array.forEach()</code>
  * @param {function} expectations A method containing expectations
- * @param {{before: {number}, after: {number}, title: {string}} options Options for the expectations
+ * @param {{before: {number}, after: {number}} options Options for the expectations
  * @returns {function} A method that when closed produces a <code>Array.forEach()</code> handler that itself returns a
  *                     promise
  */
 function jasmineFactory(options) {
-  return function forExpectations(expectations) {
+  return function forExpectations(expectations, title) {
     options = options || {};
     function before() {
       return Q.delay(options.before || 0);
@@ -52,7 +52,7 @@ function jasmineFactory(options) {
     }
     return function itForRunner(testRunner) {
       var deferred = Q.defer();
-      it(options.title || testRunner, function (done) {
+      it(title || testRunner, function (done) {
         testRunner
           .run()
           .then(before)

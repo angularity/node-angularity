@@ -57,11 +57,12 @@ describe('The Angularity init task', function () {
       helper.runner.create()
         .addInvocation('init')
         .run()
+        .then(delay(500))
         .then(expectations)
-        .then(delay(500))
         .then(helper.getFileDelete(DEFAULT_NAME, ['*', '.*', 'app', '!**/package.json']))
-        .then(delay(500))
+        .then(delay(1000))
         .then(rerun)
+        .then(delay(500))
         .then(expectations)
         .finally(done);
 
