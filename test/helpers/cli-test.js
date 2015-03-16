@@ -77,7 +77,7 @@ function factory(base) {
     params = {
       directories  : {},
       sources      : [],
-      filter       : /.*/,
+      filter       : null,
       program      : null,
       expectations : [],
       invocations  : [],
@@ -139,11 +139,11 @@ function factory(base) {
 
   /**
    * Set the filter to control which source files are copied to the working directory
-   * @param {RegExp} regexp A test or a function that tests a given directory path
+   * @param {RegExp|function} filter A regular expression or a function that tests a given directory path
    * @returns {object} The same instance with mutated properties
    */
-  function withSourceFilter(regexp) {
-    params.filter = regexp;
+  function withSourceFilter(filter) {
+    params.filter = filter;
     return self;
   }
 
@@ -256,12 +256,13 @@ function factory(base) {
         else {
           childProcess.exec(command, {cwd: cwd}, function onProcessComplete(exitcode, stdout, stderr) {
             var testCase = defaults({
-              runner  : self,
-              cwd     : cwd,
-              command : command,
-              exitcode: exitcode,
-              stdout  : stdout,
-              stderr  : stderr
+              sourceDir : src,
+              runner    : self,
+              cwd       : cwd,
+              command   : command,
+              exitcode  : exitcode,
+              stdout    : stdout,
+              stderr    : stderr
             }, paramSet);
             params.hasRun = true;
             deferred.resolve(testCase);
@@ -280,7 +281,9 @@ function factory(base) {
    */
   function copySources(src, dest, callback) {
     if (src) {
-      ncp(src, dest, {filter: params.filter}, callback);
+      ncp(src, dest, {
+        filter: params.filter || /.*/
+      }, callback);
     } else {
       ensureDirectory(dest);
       callback();

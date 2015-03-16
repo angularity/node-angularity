@@ -58,7 +58,7 @@ function toBeEmptyDirectory() {
   return {
     compare: function compare(directory) {
       var fullPath = path.resolve.apply(path, [].concat(directory));
-      var pass     = (fs.readdirSync(fullPath).length === 0);
+      var pass     = !fs.existsSync(fullPath) || (fs.readdirSync(fullPath).length === 0);
       return {
         pass   : pass,
         message: ['directory', quote(directory), (pass ? 'is' : 'is not'), 'empty'].join(' ')

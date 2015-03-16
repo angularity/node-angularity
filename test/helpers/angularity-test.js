@@ -21,7 +21,9 @@ var runner = cliTest
   .create()
   .forProgram('angularity')
   .withDirectories(TEST_SRC, TEST_TEMP)
-  .withSourceFilter(/!app-*/)
+  .withSourceFilter(function removeBuildFiles(value) {
+    return !(/app-\w+[\\\/]/.test(value));
+  })
   .seal();
 
 /**
@@ -35,16 +37,26 @@ function cleanUp(callback) {
 /**
  * Create a Jasmine <code>it</code> statement for enumerating test-runner cases in a <code>Array.forEach()</code>
  * @param {function} expectations A method containing expectations
+ * @param {number} [delayBefore] Optional delay before expectations
+ * @param {number} [delayAfter] Optional delay after expectations
  * @param {string} [title] Optional title for the jasmine statement
  * @returns {function} An <code>Array.forEach()</code> handler that itself returns a promise
  */
-function getJasmineForRunner(expectations, title) {
+function getJasmineForRunner(expectations, delayBefore, delayAfter, title) {
+  function before() {
+    return Q.delay(delayBefore || 0);
+  }
+  function after() {
+    return Q.delay(delayAfter || 0);
+  }
   return function (testRunner) {
     var deferred = Q.defer();
     it(title || testRunner, function (done) {
       testRunner
         .run()
+        .then(before)
         .then(expectations)
+        .then(after)
         .finally(done)
         .finally(deferred.resolve.bind(deferred));
     });
@@ -147,10 +159,29 @@ function joinWide(terms) {
   }
 }
 
+var timeoutIntervals = [];
+
+/**
+ * Switch to a different watchdog timeout length
+ * @param {number} [value] The timeout value in milliseconds or missing to reinstate the previous timeout
+ * @returns {Function} A closure that will apply the change
+ */
+function getTimeoutSwitch(value) {
+  return function () {
+    if (value) {
+      timeoutIntervals.push(jasmine.DEFAULT_TIMEOUT_INTERVAL);
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = value;
+    } else {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = timeoutIntervals.pop();
+    }
+  };
+}
+
 module.exports = {
   runner             : runner,
   cleanUp            : cleanUp,
   getJasmineForRunner: getJasmineForRunner,
   getFileDelete      : getFileDelete,
-  randomFlags        : randomFlags
+  randomFlags        : randomFlags,
+  getTimeoutSwitch   : getTimeoutSwitch
 };

@@ -1,15 +1,15 @@
 {
   "version": 3,
   "sources": [
-    "\\_prelude.js",
-    "\\app/index.js",
-    "\\hello-world/hello-world.js",
-    "\\minimal/app-routes.js",
-    "\\minimal/app.html"
+    "/_prelude.js",
+    "/app/index.js",
+    "/hello-world/hello-world.js",
+    "/minimal/app-routes.js",
+    "/minimal/app.html"
   ],
   "names": [
     "module",
     "exports"
   ],
-  "mappings": "AAAA;ACAA,YAIA,IAAI,GAAY,QAAQ,wBACxB,IAAI,GAAuB,QAAQ,6BAEnC,SAAQ,OAAO,6BAA8B,cAAc,WAAW,aAAc,GAAsB,OAAO;;ACPjH,YAMA,SAAS,KACP,GAAI,GAAK,IACT,GAAG,QAAU,cAGf,OAAO,QAAU;;ACXjB,YAEA,QAAO,QAAU,SAAmB,EAAgB,GAGlD,EAAmB,UAAU,IAC7B,GAAe,MAAM,QACnB,IAAK,IACL,SAAU,QAAQ,cAClB,WAAY;;ACThBA,OAAOC,QAAU"
+  "mappings": "AAAA;ACAA,YAEA,IAAI,GAAY,QAAQ,wBACxB,IAAI,GAAuB,QAAQ,6BAEnC,SAAQ,OAAO,6BAA8B,cACxC,WAAW,aAAc,GACzB,OAAO;;ACPZ,YAIA,SAAS,KACL,GAAI,GAAK,IACT,GAAG,QAAU,cAGjB,OAAO,QAAU;;ACTjB,YAEA,QAAO,QAAU,SAAmB,EAAgB,GAClD,EAAmB,UAAU,IAC7B,GAAe,MAAM,QACnB,IAAK,IACL,SAAU,QAAQ,cAClB,WAAY;;ACPhBA,OAAOC,QAAU"
 }
