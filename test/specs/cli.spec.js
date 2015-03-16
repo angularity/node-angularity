@@ -11,6 +11,10 @@ var fastIt = helper.jasmineFactory({
 
 describe('The Angularity cli interface', function () {
 
+  beforeEach(helper.getTimeoutSwitch(30000));
+
+  afterEach(helper.getTimeoutSwitch());
+
   afterEach(helper.cleanUp);
 
   describe('with no other arguments', function (done) {
