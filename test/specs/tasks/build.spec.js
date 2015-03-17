@@ -1,9 +1,6 @@
 'use strict';
 
-var fs   = require('fs'),
-    path = require('path');
-
-var jasmineDiffMatchers = require('jasmine-diff-matchers');
+var diffMatchers = require('jasmine-diff-matchers');
 
 var helper   = require('../../helpers/angularity-test'),
     matchers = require('../../helpers/jasmine-matchers');
@@ -33,7 +30,7 @@ describe('The Angularity build task', function () {
 
   afterEach(helper.cleanUp);
 
-  describe('with help switch', function (done) {
+  describe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('build --help')
       .addInvocation('build -h')
@@ -47,7 +44,7 @@ describe('The Angularity build task', function () {
     }
   });
 
-  describe('with the minimal-es5 project', function(done) {
+  describe('should operate minified (by default)', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('build')
@@ -57,7 +54,7 @@ describe('The Angularity build task', function () {
       .finally(done);
   });
 
-  describe('with the minimal-es5 project unminified', function(done) {
+  describe('should operate unminified', function(done) {
     helper.runner.create()
       .addSource('minimal-es5-unminified')
       .addInvocation('build --unminified')
@@ -80,13 +77,14 @@ function expectations(testCase) {
   expect(testCase.cwd).toHaveExpectedItemsExcept();
 
   // build output
+  expect(workingBuildFile('index.html')).diffFilePatch(sourceBuildFile('index.html'));
   expect(workingBuildFile('index.js')).diffFilePatch(sourceBuildFile('index.js'));
   expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));
 //  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
 //  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
 
-  // must remove basePath to allow karam.conf.js to be correctly diff'd
-  var replace = replacer()
+  // must remove basePath to allow karma.conf.js to be correctly diff'd
+  var replace = helper.replacer()
     .add(/^\s*basePath:.*$/gm, '')
     .add(/\\{2}/g, '/')
     .commit();
@@ -95,11 +93,10 @@ function expectations(testCase) {
   expect(replace(workingTestFile('karma.conf.js'))).diffPatch(replace(sourceTestFile('karma.conf.js')));
   expect(workingTestFile('index.js')).diffFilePatch(sourceTestFile('index.js'));
 //  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));    // TODO @bholloway solve repeatability of .map files
-
 }
 
 function customMatchers() {
-  jasmine.addMatchers(jasmineDiffMatchers.diffPatch);
+  jasmine.addMatchers(diffMatchers.diffPatch);
   jasmine.addMatchers({
     toBeHelpWithError        : matchers
       .getHelpMatcher(/^\s*The "build" task/),
@@ -114,36 +111,6 @@ function customMatchers() {
   });
 }
 
-function replacer() {
-  var list = [];
-  var self = {
-    add: function(before, after) {
-      list.push({
-        before: before,
-        after : after
-      });
-      return self;
-    },
-    commit: function() {
-      return function(pathElements) {
-        var filePath = path.resolve.apply(path, [].concat(pathElements));
-        var text     = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
-        function replaceSingle(item) {
-          if (text) {
-            if (typeof item.before === 'string') {
-              while (text.indexOf(item.before) >= 0) {
-                text = text.replace(item.before, item.after);
-              }
-            } else if ((typeof item.before === 'object') && ('test' in item.before)) {
-              text = text.replace(item.before, item.after);
-            }
-          }
-          return text;
-        }
-        list.forEach(replaceSingle);
-        return text;
-      };
-    }
-  };
-  return self;
-}
+module.exports = {
+  expectations: expectations
+};

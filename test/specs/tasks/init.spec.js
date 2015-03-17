@@ -40,7 +40,7 @@ describe('The Angularity init task', function () {
 
   afterEach(helper.cleanUp);
 
-  describe('with help switch', function (done) {
+  describe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('init --help')
       .addInvocation('init -h')
@@ -54,8 +54,8 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('directory creation', function () {
-    it('should rerun in any directory with package.json', function(done) {
+  describe('should rerun in any directory with package.json', function () {
+    it('init', function(done) {
       helper.runner.create()
         .addInvocation('init')
         .run()

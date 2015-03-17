@@ -1,60 +1,110 @@
 'use strict';
-var path   = require('path');
 
-var helper = require('../../helpers/helper');
-var expectedBuildFolder = helper.expectedFolder('minimal-es5');
-var buildFolder = helper.resolveTestTempPath('minimal-es5-release');
-var buildName = 'app-release';
+var diffMatchers = require('jasmine-diff-matchers');
 
-// TODO @bholloway convert and reinstate this test
-xdescribe('The Angularity release task should correctly build a release version.', function () {
-  beforeEach(function (done) {
-    this.addMatchers(require('jasmine-diff-matchers').diffPatch);
-    helper.prepareExpectedDir(done, buildFolder, buildName, expectedBuildFolder);
-  });
+var helper   = require('../../helpers/angularity-test'),
+    matchers = require('../../helpers/jasmine-matchers');
 
-  it('should successfully release the minimal-es5 project\'s js.', function (done) {
-    helper.runAngularity('release', {cwd : buildFolder})
-      .then(function () {
-        var expectedJSBundle = path.join(expectedBuildFolder, buildName, 'index.js');
-        var builtJSBundle = path.join(buildFolder, buildName, 'index.js');
-        expect(builtJSBundle).diffFilePatch(expectedJSBundle);
-
-        done();
-      });
-  });
-
-  it('should successfully release the minimal-es5 project\'s css.', function (done) {
-    helper.runAngularity('release', {cwd : buildFolder})
-      .then(function () {
-        var expectedCSS = path.join(expectedBuildFolder, buildName, 'index.css');
-        var buildCSS = path.join(buildFolder, buildName, 'index.css');
-        expect(buildCSS).diffFilePatch(expectedCSS);
-
-        done();
-      });
-  });
-
-  it('should successfully release the minimal-es5 project\'s vendor files.', function (done) {
-    var expectedVendorFolder = path.join(expectedBuildFolder, buildName, 'vendor');
-    var buildVendorFolder = path.join(buildFolder, buildName, 'vendor');
-
-    helper.runAngularity('release', {cwd : buildFolder})
-      .then(function () {
-        var expectedManifest = path.join(expectedVendorFolder, 'manifest.json');
-        var buildManifest = path.join(buildVendorFolder, 'manifest.json');
-        expect(buildManifest).diffFilePatch(expectedManifest);
-
-        var expectedAngular = path.join(expectedVendorFolder, 'angular', 'angular.js');
-        var buildAngular = path.join(buildVendorFolder, 'angular', 'angular.js');
-        expect(buildAngular).diffFilePatch(expectedAngular);
-
-        var expectedAngularUIRouter = path.join(expectedVendorFolder, 'angular-ui-router', 'angular-ui-router.js');
-        var buildAngularUIRouter = path.join(buildVendorFolder, 'angular-ui-router', 'angular-ui-router.js');
-        expect(expectedAngularUIRouter).diffFilePatch(buildAngularUIRouter);
-
-        done();
-      });
-  });
-
+var fastIt = helper.jasmineFactory({
+  before: 0,
+  after : 500
 });
+
+var slowIt = helper.jasmineFactory({
+  before: 500,
+  after : 1000
+});
+
+var RELEASE_FOLDER = 'app-release';
+var VENDOR_FOLDER  = 'vendor';
+
+describe('The Angularity release task', function () {
+
+  beforeEach(matchers.addMatchers);
+
+  beforeEach(customMatchers);
+
+  beforeEach(helper.getTimeoutSwitch(30000));
+
+  afterEach(helper.getTimeoutSwitch());
+
+  afterEach(helper.cleanUp);
+
+  describe('should display help where requested', function (done) {
+    helper.runner.create()
+      .addInvocation('release --help')
+      .addInvocation('release -h')
+//    .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
+      .forEach(fastIt(expectations))
+      .finally(done);
+
+    function expectations(testCase) {
+      expect([testCase.cwd, RELEASE_FOLDER]).toBeEmptyDirectory();
+      expect(testCase.stderr).toBeHelpWithError(false);
+    }
+  });
+
+  describe('should operate minified (by default)', function(done) {
+    helper.runner.create()
+      .addSource('minimal-es5')
+      .addInvocation('release')
+      .addInvocation('release --unminified false')
+      .addInvocation('release -u false')
+      .forEach(slowIt(expectations))
+      .finally(done);
+  });
+
+  describe('should operate unminified', function(done) {
+    helper.runner.create()
+      .addSource('minimal-es5-unminified')
+      .addInvocation('release --unminified')
+      .addInvocation('release -u')
+      .addInvocation('release --unminified true')
+      .addInvocation('release -u true')
+      .forEach(slowIt(expectations))
+      .finally(done);
+  });
+});
+
+function expectations(testCase) {
+  var workingReleaseFile = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER);
+  var workingVendorFile = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER, VENDOR_FOLDER);
+  var sourceReleaseFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER);
+  var sourceVendorFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER, VENDOR_FOLDER);
+
+  // general
+  expect(testCase.stdout).toBeTask(['build', 'javascript', 'css']);
+  expect(testCase.cwd).toHaveExpectedItemsExcept();
+
+  // release output
+  expect(workingReleaseFile('index.html')).diffFilePatch(sourceReleaseFile('index.html'));
+  expect(workingReleaseFile('index.js')).diffFilePatch(sourceReleaseFile('index.js'));
+  expect(workingReleaseFile('index.css')).diffFilePatch(sourceReleaseFile('index.css'));
+//  expect(workingReleaseFile('index.js.map' )).diffFilePatch(sourceReleaseFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
+//  expect(workingReleaseFile('index.css.map')).diffFilePatch(sourceReleaseFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
+
+  // vendor files
+  expect(workingVendorFile('manifest.json')).diffFilePatch(sourceVendorFile('manifest.json'));
+  expect(workingVendorFile('jquery', 'jquery.js')).diffFilePatch(sourceVendorFile('jquery', 'jquery.js'));
+  expect(workingVendorFile('angular', 'angular.js')).diffFilePatch(sourceVendorFile('angular', 'angular.js'));
+  expect(workingVendorFile('angular-ui-router', 'angular-ui-router.js'))
+    .diffFilePatch(sourceVendorFile('angular-ui-router', 'angular-ui-router.js'));
+}
+
+function customMatchers() {
+  jasmine.addMatchers(diffMatchers.diffPatch);
+  jasmine.addMatchers({
+    toBeHelpWithError        : matchers
+      .getHelpMatcher(/^\s*The "release" task/),
+    toHaveExpectedItemsExcept: matchers
+      .getFileMatcher(
+        'app-release/index.html',
+        'app-release/index.js',  'app-build/index.js.map',
+        'app-release/index.css', 'app-build/index.css.map',
+        'app-release/vendor/manifest.json',
+        'app-release/vendor/jquery/jquery.js',
+        'app-release/vendor/angular/angular.js',
+        'app-release/vendor/angular-ui-router/angular-ui-router.js'
+      )
+  });
+}

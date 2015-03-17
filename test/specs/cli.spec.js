@@ -17,7 +17,7 @@ describe('The Angularity cli interface', function () {
 
   afterEach(helper.cleanUp);
 
-  describe('with no other arguments', function (done) {
+  describe('should exit cleanly where there are no other arguments', function (done) {
     helper.runner.create()
       .addInvocation()
       .forEach(fastIt(expectations))
@@ -30,20 +30,7 @@ describe('The Angularity cli interface', function () {
     }
   });
 
-  describe('with version switch', function (done) {
-    helper.runner.create()
-      .addInvocation('--version')
-      .addInvocation('-v')
-      .forEach(fastIt(expectations))
-      .finally(done);
-
-    function expectations(testCase) {
-      var version = require(path.resolve('package.json')).version;
-      expect(testCase.stdout).toMatch(new RegExp('^angularity\\:\\s*' + version));
-    }
-  });
-
-  describe('with help switch', function (done) {
+  describe('should display help where requested', function (done) {
     helper.runner.create()
       .addInvocation('--help')
       .addInvocation('-h')
@@ -55,6 +42,19 @@ describe('The Angularity cli interface', function () {
       // test the help message begins with the description from the package.json
       var description = require(path.resolve('package.json')).description;
       expect(testCase.stderr).toMatch(new RegExp('^\\s*' + description));
+    }
+  });
+
+  describe('should display version where requested', function (done) {
+    helper.runner.create()
+      .addInvocation('--version')
+      .addInvocation('-v')
+      .forEach(fastIt(expectations))
+      .finally(done);
+
+    function expectations(testCase) {
+      var version = require(path.resolve('package.json')).version;
+      expect(testCase.stdout).toMatch(new RegExp('^angularity\\:\\s*' + version));
     }
   });
 });

@@ -2,6 +2,7 @@
 'use strict';
 
 var Q          = require('q'),
+    fs         = require('fs'),
     path       = require('path'),
     isArray    = require('lodash.isarray'),
     gulp       = require('gulp'),
@@ -202,6 +203,44 @@ function getConcatenation() {
   };
 }
 
+/**
+ * A utility equivalent to performing <code>String.replace()</code> using the contents of each <code>add()</code>
+ * statement
+ * @returns {{add: function, commit: function}}
+ */
+function replacer() {
+  var list = [];
+  var self = {
+    add: function(before, after) {
+      list.push({
+        before: before,
+        after : after
+      });
+      return self;
+    },
+    commit: function() {
+      return function(pathElements) {
+        var filePath = path.resolve.apply(path, [].concat(pathElements));
+        var text     = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
+        function replaceSingle(item) {
+          if (text) {
+            if (typeof item.before === 'string') {
+              while (text.indexOf(item.before) >= 0) {
+                text = text.replace(item.before, item.after);
+              }
+            } else if ((typeof item.before === 'object') && ('test' in item.before)) {
+              text = text.replace(item.before, item.after);
+            }
+          }
+          return text;
+        }
+        list.forEach(replaceSingle);
+        return text;
+      };
+    }
+  };
+  return self;
+}
 
 module.exports = {
   runner          : runner,
@@ -211,5 +250,6 @@ module.exports = {
   getFileDelete   : getFileDelete,
   randomFlags     : randomFlags,
   getTimeoutSwitch: getTimeoutSwitch,
-  getConcatenation: getConcatenation
+  getConcatenation: getConcatenation,
+  replacer        : replacer
 };
