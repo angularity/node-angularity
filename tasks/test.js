@@ -1,38 +1,58 @@
 'use strict';
 
-var path = require('path'),
-    fs   = require('fs');
+function setUpTaskTest(tyRun) {
+  var taskDefinition = {
+    name: 'test',
+    description: [
+      'The "test" task performs a one time build and ' +
+        'karma test of all .spec.js files in the project.',
+      '',
+      'angularity test', 'Run this task'
+    ].join('\n'),
+    prerequisiteTasks: ['javascript'],
+    options: [],
+    checks: [],
+    onInit: function onInitTestTask(yargsInstance) {
+      var path            = require('path'),
+          fs              = require('fs');
 
-var gulp      = require('gulp'),
-    jshint    = require('gulp-jshint'),
-    stringify = require('stringify'),
-    wordwrap  = require('wordwrap');
+      var gulp            = require('gulp'),
+          jshint          = require('gulp-jshint'),
+          rimraf          = require('gulp-rimraf'),
+          runSequence     = require('run-sequence'),
+          combined        = require('combined-stream'),
+          to5ify          = require('6to5ify'),
+          stringify       = require('stringify'),
+          wordwrap        = require('wordwrap'),
+          ngAnnotate      = require('browserify-ngannotate');
 
-var karma          = require('../lib/test/karma'),
-    yargs          = require('../lib/util/yargs'),
-    hr             = require('../lib/util/hr'),
-    streams        = require('../lib/config/streams'),
-    jshintReporter = require('../lib/util/jshint-reporter');
+      var karma           = require('../lib/test/karma'),
+          browserify      = require('../lib/build/browserify'),
+          taskYargs       = require('../lib/util/task-yargs'),
+          hr              = require('../lib/util/hr'),
+          streams         = require('../lib/config/streams'),
+          jshintReporter  = require('../lib/util/jshint-reporter');
 
-yargs.getInstance('test')
-  .usage(wordwrap(2, 80)('The "test" task performs a one time build and karma test of all .spec.js files in the ' +
-    'project.'))
-  .example('angularity test', 'Run this task')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options(karma.yargsOption.key, karma.yargsOption.value)
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(karma.yargsCheck)
-  .check(jshintReporter.yargsCheck)
-  .wrap(80);
+      var cliArgs;
+      cliArgs = yargsInstance
+        .strict()
+        .wrap(80)
+        .argv;
 
-gulp.task('test', ['javascript'], function () {
-  console.log(hr('-', 80, 'test'));
-  gulp.src(streams.TEST + '/karma.conf.js')
-    .pipe(karma.run());
-});
+      gulp.task('test', ['javascript'], function (done) {
+        console.log(hr('-', 80, 'javascript'));
+
+        gulp
+          .src(streams.TEST + '/karma.conf.js')
+          .pipe(karma.run());
+      });
+    },
+    onRun: function onRunTestTask(yargsInstance) {
+      var runSequence = require('run-sequence');
+      runSequence(taskDefinition.name);
+    }
+  };
+  tyRun.taskYargs.register(taskDefinition);
+}
+
+module.exports = setUpTaskTest;

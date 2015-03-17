@@ -1,90 +1,66 @@
 'use strict';
 
-var gulp          = require('gulp'),
-    watch         = require('gulp-watch'),
-    wordwrap      = require('wordwrap'),
-    watchSequence = require('gulp-watch-sequence');
+function setUpTaskWatch(tyRun) {
+  var defaults = require('../lib/config/defaults');
 
-var defaults       = require('../lib/config/defaults'),
-    yargs          = require('../lib/util/yargs'),
-    hr             = require('../lib/util/hr'),
-    karma          = require('../lib/test/karma'),
-    jshintReporter = require('../lib/util/jshint-reporter'),
-    streams        = require('../lib/config/streams');
+  var config = defaults.getInstance()
+    .file('angularity.json')
+    .defaults({
+      port: 55555
+    });
 
-var config = defaults.getInstance()
-  .file('angularity.json')
-  .defaults({
-    port: 55555
-  });
+  var taskDefinition = {
+    name: 'watch',
+    description: ('The "watch" task performs an initial build and then serves the application on localhost at ' +
+      'the given port. It then watches the project and performs rebuild of Javascript and/or SASS compositions upon ' +
+      'change. This is followed by HTML injection and browser reload.'),
+    prerequisiteTasks: ['help', 'server'],
+    checks: [],
+    options: [],
+    onInit: function onInitWatchTask(yargsInstance) {
+      var gulp          = require('gulp'),
+          watch         = require('gulp-watch'),
+          wordwrap      = require('wordwrap'),
+          watchSequence = require('gulp-watch-sequence');
 
-var check = yargs.createCheck()
-  // don't check if we are just accessing help
-  .withGate(function (argv) {
-    return !argv.help;
-  })
-  .withTest({
-    port: function (value) {
-      if ((typeof value !== 'number') || isNaN(parseInt(value)) || (Math.round(value) !== value)) {
-        return 'port must be an integer';
-      }
+      var defaults         = require('../lib/config/defaults'),
+          hr               = require('../lib/util/hr'),
+          karma            = require('../lib/test/karma'),
+          jshintReporter   = require('../lib/util/jshint-reporter'),
+          streams          = require('../lib/config/streams');
+
+      gulp.task('watch', ['server'], function () {
+        var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
+
+        // enqueue actions to avoid multiple trigger
+        var queue = watchSequence(500, function () {
+          console.log(hr('\u2591', 80));
+        });
+
+        // watch statements
+        watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
+          name      : 'JS|HTML',
+          emitOnGlob: false
+        }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
+
+        watch(getGlobAppNodeBower(['**/*.scss', '!*.scss']), {
+          name      : 'CSS',
+          emitOnGlob: false
+        }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
+
+        watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict JS or CSS
+          name      : 'INJECT',
+          emitOnGlob: false
+        }, queue.getHandler('html', 'reload'));
+      });
+    },
+    onRun: function onRunWatchTask(yargsInstance) {
+      var runSequence = require('run-sequence');
+      runSequence(taskDefinition.name);
     }
-  })
-  .commit();
+  };
 
-yargs.getInstance('watch')
-  .usage(wordwrap(2, 80)('The "watch" task performs an initial build and then serves the application on localhost at ' +
-    'the given port. It then watches the project and performs rebuild of Javascript and/or SASS compositions upon ' +
-    'change. This is followed by HTML injection and browser reload.'))
-  .example('angularity watch', 'Run this task')
-  .example('angularity watch -p 8080', 'Run this task and serve at http://localhost:8080')
-  .example('angularity watch -n', 'Run this task but do not minify javascript')
-  .options('help', {
-    describe: 'This help message',
-    alias   : [ 'h', '?' ],
-    boolean : true
-  })
-  .options('unminified', {
-    describe: 'Inhibit minification of javascript',
-    alias   : 'u',
-    boolean : true,
-    default : false
-  })
-  .options('port', {
-    describe: 'A port for the development web server',
-    alias   : 'p',
-    default : config.get('port')
-  })
-  .options(jshintReporter.yargsOption.key, jshintReporter.yargsOption.value)
-  .options(karma.yargsOption.key, karma.yargsOption.value)
-  .strict()
-  .check(yargs.subCommandCheck)
-  .check(check)
-  .check(jshintReporter.yargsCheck)
-  .check(karma.yargsCheck)
-  .wrap(80);
+  tyRun.taskYargs.register(taskDefinition);
+};
 
-gulp.task('watch', ['server'], function () {
-  var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
-
-  // enqueue actions to avoid multiple trigger
-  var queue = watchSequence(500, function () {
-    console.log(hr('\u2591', 80));
-  });
-
-  // watch statements
-  watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
-    name      : 'JS|HTML',
-    emitOnGlob: false
-  }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
-
-  watch(getGlobAppNodeBower(['**/*.scss', '!*.scss']), {
-    name      : 'CSS',
-    emitOnGlob: false
-  }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
-
-  watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict JS or CSS
-    name      : 'INJECT',
-    emitOnGlob: false
-  }, queue.getHandler('html', 'reload'));
-});
+module.exports = setUpTaskWatch;

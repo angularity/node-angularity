@@ -1,6 +1,6 @@
 {
   "name": "angularity",
-  "description": "An oppionated node-js build system for Ecmascript-6 Angular-js projects",
+  "description": "An opinionated NodeJs build system for ECMAScript 6 AngularJs projects",
   "version": "0.1.1",
   "tags": [
     "build",
@@ -98,6 +98,7 @@
     "source-map": "latest",
     "stream-spigot": "latest",
     "stringify": "latest",
+    "task-yargs": "latest",
     "through-pipes": "latest",
     "through2": "latest",
     "wordwrap": "latest",

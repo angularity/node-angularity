@@ -11,13 +11,14 @@ var path        = require('path'),
     wordwrap    = require('wordwrap'),
     runSequence = require('run-sequence'),
     chalk       = require('chalk'),
-    prettyTime  = require('pretty-hrtime');
+    prettyTime  = require('pretty-hrtime'),
+    yargs       = require('yargs');
 
-var yargs = require('./../lib/util/yargs');
+var taskYargs     = require('../lib/util/task-yargs'),
+    taskYargsRun  = require('../lib/util/task-yargs-run');
 
 // TODO @bholloway menus
 // var mainMenu = require('../lib/cli/mainMenu');
-require('../index');
 
 // we need to duplicate some event handlers from the gulp cli since we have bypassed it
 gulp.on('task_start', function (e) {
@@ -32,43 +33,77 @@ gulp.on('task_stop', function (e) {
   );
 });
 
-// describe the top level arguments
-yargs.getInstance()
+var packageJson = require(path.join(__dirname, '..', 'package.json'));
+var helpOption = {
+  key: 'help',
+  value: {
+    describe: 'This help message, or help on a specific task',
+    alias: ['h', '?'],
+    boolean: true
+  }
+};
+var defaultYargsInstance = yargs
   .usage(wordwrap(2, 80)([
-    'Angularity is an opinionated build tool for AngularJS projects.',
+    packageJson.description,
     '',
-    'Tasks include:',
-    yargs.listTasks().join(', ')
+    'Tasks include:'
+    //TODO add task list here
   ].join('\n')))
-  .example('angularity', 'Interactive menu')
+  // .example('angularity', 'Interactive menu') //TODO reinstate when interactive menu is reinstated
   .example('angularity -v', 'Display the version of angularity')
-  .example('angularity -h \<task name\>', 'Get help on a particular task')
+  .example('angularity \<task name\> -h', 'Get help on a particular task')
   .example('angularity \<task name\>', 'Run the given task')
-  .describe('h', 'This help message, or help on a specific task').alias('h', '?').alias('h', 'help')
-  .describe('version', 'Display the version of angularity').alias('version', 'v').boolean('version')
-  .wrap(80);
+  .option('version', {
+    describe: 'Display the curent version',
+    alias: ['v'],
+    boolean: true
+  })
+  .option(helpOption.key, helpOption.value);
 
-// find the yargs instance that is most appropriate for the given command line parameters
-var cliArgs = yargs.resolveArgv();
+taskYargsRun.taskYargs.register('help', {
+  description: (wordwrap(2, 80)('Displays context-specific help messages')),
+  prerequisiteTasks: [],
+  options: [
+    {
+      key: 'help',
+      value: {
+        describe: 'This help message, or help on a specific task',
+        alias: ['h', '?'],
+        boolean: true
+      }
+    }
+  ],
+  checks: []
+});
 
-// show help
-if (cliArgs.help) {
-  yargs
-    .getInstance(cliArgs.taskName || cliArgs.help)
-    .showHelp();
+require('../index');
+
+//TODO move these to ../index.js
+require('../tasks/html')(taskYargsRun);
+require('../tasks/css')(taskYargsRun);
+require('../tasks/javascript')(taskYargsRun);
+require('../tasks/test')(taskYargsRun);
+require('../tasks/build')(taskYargsRun);
+require('../tasks/release')(taskYargsRun);
+require('../tasks/server')(taskYargsRun);
+require('../tasks/watch')(taskYargsRun);
+require('../tasks/init')(taskYargsRun);
+require('../tasks/webstorm')(taskYargsRun);
+
+var cliArgs;
+var taskName = taskYargsRun.taskYargs.getCurrentName();
+if (taskName) {
+  taskYargsRun.current();
 }
-// run a task
-else if (cliArgs.taskName) {
-  runSequence(cliArgs.taskName);
+else {
+  cliArgs = defaultYargsInstance.argv;
+  if (cliArgs.version) {
+    console.log('angularity:', packageJson.version);
+  }
+  else {
+    if (!cliArgs.help) {
+      console.log('Task specified is not recognised');
+    }
+    defaultYargsInstance.showHelp();
+  }
 }
-// show the version string
-else if (cliArgs.version) {
-  var packagePath = path.join(__dirname, '..', 'package.json');
-  var version     = require(packagePath).version;
-  console.log('angularity:', version);
-}
-// interactive menu
-// TODO @bholloway reimplement after yargs refactor regression
-// else {
-//   mainMenu.prompt();
-// }
