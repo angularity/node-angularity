@@ -18,7 +18,7 @@ var TEST_FOLDER  = 'app-test';
 
 describe('The Angularity test task', function () {
 
-  beforeEach(helper.getTimeoutSwitch(30000));
+  beforeEach(helper.getTimeoutSwitch(60000));
 
   afterEach(helper.getTimeoutSwitch());
 
