@@ -85,8 +85,9 @@ function expectations(testCase) {
   expect(workingBuildFile('index.css'    )).diffFilePatch(sourceBuildFile('index.css'));
 //  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
 
-  // must replace cwd to allow karam.conf.js to be correctly diffed
-  replaceInFile(workingTestFile('karma.conf.js'), testCase.cwd, testCase.sourceDir);
+  // must remove basePath to allow karam.conf.js to be correctly diff'd
+  replaceInFile(workingTestFile('karma.conf.js'), /^\s*basePath:.*$/gm, '');
+  replaceInFile( sourceTestFile('karma.conf.js'), /^\s*basePath:.*$/gm, '');
 
   // test output
   expect(workingTestFile('karma.conf.js')).diffFilePatch(sourceTestFile('karma.conf.js'));
@@ -114,7 +115,11 @@ function replaceInFile(pathElements, before, after) {
   var filePath = path.resolve.apply(path, [].concat(pathElements));
   var contents = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
   if (contents) {
-    while (contents.indexOf(before) >= 0) {
+    if (typeof before === 'string') {
+      while (contents.indexOf(before) >= 0) {
+        contents = contents.replace(before, after);
+      }
+    } else if ((typeof before === 'object') && ('test' in before)) {
       contents = contents.replace(before, after);
     }
     fs.writeFileSync(filePath, contents);
