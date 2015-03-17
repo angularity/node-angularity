@@ -1,7 +1,7 @@
 # angularity
 ![Angularity Logo](http://angularity.github.io/assets/logo.png)
 
-[![Build Status](https://travis-ci.org/angularity/node-angularity.svg?branch=master)](https://travis-ci.org/angularity/node-angularity)
+[![Build Status](https://travis-ci.org/angularity/node-angularity.svg?branch=master)](https://travis-ci.org/angularity/node-angularity) [![Build status](https://ci.appveyor.com/api/projects/status/6b1xir7y1j0wm64a/branch/master?svg=true)](https://ci.appveyor.com/project/impaler/node-angularity/branch/master)
 
 An opinionated node.js build system for ECMAScript 6 AngularJS projects
 

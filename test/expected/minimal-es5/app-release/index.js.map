@@ -3,7 +3,7 @@
   "sources": [
     "/_prelude.js",
     "/app/index.js",
-    "/minimal/app-controller.js",
+    "/hello-world/hello-world.js",
     "/minimal/app-routes.js",
     "/minimal/app.html"
   ],
@@ -11,5 +11,5 @@
     "module",
     "exports"
   ],
-  "mappings": "AAAA;YCEA,IAAI,GAAY,QAAQ,wBACxB,IAAI,GAAgB,QAAQ,4BAE5B,SAAQ,OAAO,6BAA8B,cACxC,WAAW,gBAAiB,GAC5B,OAAO;;YCJZ,QAAO,QAAU,SAAuB,GAEtC,EAAO,MAAQ;;YCLjB,QAAO,QAAU,SAAmB,EAAgB,GAGhD,EAAmB,UAAU,IAC7B,GACK,MAAM,QACH,IAAK,IACL,SAAU,QAAQ,cAClB,WAAY;;ACRxBA,OAAOC,QAAU"
+  "mappings": "AAAA;ACAA,YAEA,IAAI,GAAY,QAAQ,wBACxB,IAAI,GAAuB,QAAQ,6BAEnC,SAAQ,OAAO,6BAA8B,cACxC,WAAW,aAAc,GACzB,OAAO;;ACPZ,YAIA,SAAS,KACL,GAAI,GAAK,IACT,GAAG,QAAU,cAGjB,OAAO,QAAU;;ACTjB,YAEA,QAAO,QAAU,SAAmB,EAAgB,GAClD,EAAmB,UAAU,IAC7B,GAAe,MAAM,QACnB,IAAK,IACL,SAAU,QAAQ,cAClB,WAAY;;ACPhBA,OAAOC,QAAU"
 }

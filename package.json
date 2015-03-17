@@ -106,6 +106,6 @@
   },
   "devDependencies": {
     "jasmine-node": "latest",
-    "jasmine-diff-matchers": "^1.0.2"
+    "jasmine-diff-matchers": "~2.0.0"
   }
 }

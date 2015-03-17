@@ -1,0 +1,9 @@
+{
+  "name": "minimal-es5",
+  "version": "0.0.1",
+  "description": "Minimal test es5 project for Angularity.",
+  "private": true,
+  "tags": [],
+  "dependencies": { },
+  "devDependencies": { }
+}
