@@ -80,19 +80,20 @@ function expectations(testCase) {
   expect(testCase.cwd).toHaveExpectedItemsExcept();
 
   // build output
-  expect(workingBuildFile('index.js'     )).diffFilePatch(sourceBuildFile('index.js'));
-//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
-  expect(workingBuildFile('index.css'    )).diffFilePatch(sourceBuildFile('index.css'));
-//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
+  expect(workingBuildFile('index.js')).diffFilePatch(sourceBuildFile('index.js'));
+  expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));
+// TODO @bholloway solve repeatability of .map files
+//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));
+//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));
 
   // must remove basePath to allow karam.conf.js to be correctly diff'd
-  replaceInFile(workingTestFile('karma.conf.js'), /^\s*basePath:.*$/gm, '');
-  replaceInFile( sourceTestFile('karma.conf.js'), /^\s*basePath:.*$/gm, '');
+  var withoutBasePath = getReplacer(/^\s*basePath:.*$/gm, '');
 
   // test output
-  expect(workingTestFile('karma.conf.js')).diffFilePatch(sourceTestFile('karma.conf.js'));
-  expect(workingTestFile('index.js'     )).diffFilePatch(sourceTestFile('index.js'));
-//  expect(workingTestFile('index.js.map' )).diffFilePatch(sourceTestFile('index.js.map'));     // TODO @bholloway solve repeatability of .map files
+  expect(withoutBasePath(workingTestFile('karma.conf.js'))).diffPatch(withoutBasePath(sourceTestFile('karma.conf.js')));
+  expect(workingTestFile('index.js')).diffFilePatch(sourceTestFile('index.js'));
+// TODO @bholloway solve repeatability of .map files
+//  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));
 }
 
 function customMatchers() {
@@ -111,17 +112,19 @@ function customMatchers() {
   });
 }
 
-function replaceInFile(pathElements, before, after) {
-  var filePath = path.resolve.apply(path, [].concat(pathElements));
-  var contents = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
-  if (contents) {
-    if (typeof before === 'string') {
-      while (contents.indexOf(before) >= 0) {
+function getReplacer(before, after) {
+  return function(pathElements) {
+    var filePath = path.resolve.apply(path, [].concat(pathElements));
+    var contents = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
+    if (contents) {
+      if (typeof before === 'string') {
+        while (contents.indexOf(before) >= 0) {
+          contents = contents.replace(before, after);
+        }
+      } else if ((typeof before === 'object') && ('test' in before)) {
         contents = contents.replace(before, after);
       }
-    } else if ((typeof before === 'object') && ('test' in before)) {
-      contents = contents.replace(before, after);
     }
-    fs.writeFileSync(filePath, contents);
-  }
+    return contents;
+  };
 }
