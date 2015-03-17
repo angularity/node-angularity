@@ -87,10 +87,13 @@ function expectations(testCase) {
 //  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));
 
   // must remove basePath to allow karam.conf.js to be correctly diff'd
-  var withoutBasePath = getReplacer(/^\s*basePath:.*$/gm, '');
+  var replace = replacer()
+    .add(/^\s*basePath:.*$/gm, '')
+    .add(/\\{2}/g, '/')
+    .commit();
 
   // test output
-  expect(withoutBasePath(workingTestFile('karma.conf.js'))).diffPatch(withoutBasePath(sourceTestFile('karma.conf.js')));
+  expect(replace(workingTestFile('karma.conf.js'))).diffPatch(replace(sourceTestFile('karma.conf.js')));
   expect(workingTestFile('index.js')).diffFilePatch(sourceTestFile('index.js'));
 // TODO @bholloway solve repeatability of .map files
 //  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));
@@ -112,19 +115,36 @@ function customMatchers() {
   });
 }
 
-function getReplacer(before, after) {
-  return function(pathElements) {
-    var filePath = path.resolve.apply(path, [].concat(pathElements));
-    var contents = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
-    if (contents) {
-      if (typeof before === 'string') {
-        while (contents.indexOf(before) >= 0) {
-          contents = contents.replace(before, after);
+function replacer() {
+  var list = [];
+  var self = {
+    add: function(before, after) {
+      list.push({
+        before: before,
+        after : after
+      });
+      return self;
+    },
+    commit: function() {
+      return function(pathElements) {
+        var filePath = path.resolve.apply(path, [].concat(pathElements));
+        var text     = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
+        function replaceSingle(item) {
+          if (text) {
+            if (typeof item.before === 'string') {
+              while (text.indexOf(item.before) >= 0) {
+                text = text.replace(item.before, item.after);
+              }
+            } else if ((typeof item.before === 'object') && ('test' in item.before)) {
+              text = text.replace(item.before, item.after);
+            }
+          }
+          return text;
         }
-      } else if ((typeof before === 'object') && ('test' in before)) {
-        contents = contents.replace(before, after);
-      }
+        list.forEach(replaceSingle);
+        return text;
+      };
     }
-    return contents;
   };
+  return self;
 }
