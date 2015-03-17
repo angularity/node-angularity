@@ -37,7 +37,7 @@ describe('The Angularity build task', function () {
     helper.runner.create()
       .addInvocation('build --help')
       .addInvocation('build -h')
-//      .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
+//    .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
@@ -82,9 +82,8 @@ function expectations(testCase) {
   // build output
   expect(workingBuildFile('index.js')).diffFilePatch(sourceBuildFile('index.js'));
   expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));
-// TODO @bholloway solve repeatability of .map files
-//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));
-//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));
+//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
+//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
 
   // must remove basePath to allow karam.conf.js to be correctly diff'd
   var replace = replacer()
@@ -95,8 +94,8 @@ function expectations(testCase) {
   // test output
   expect(replace(workingTestFile('karma.conf.js'))).diffPatch(replace(sourceTestFile('karma.conf.js')));
   expect(workingTestFile('index.js')).diffFilePatch(sourceTestFile('index.js'));
-// TODO @bholloway solve repeatability of .map files
-//  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));
+//  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));    // TODO @bholloway solve repeatability of .map files
+
 }
 
 function customMatchers() {

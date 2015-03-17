@@ -44,7 +44,7 @@ describe('The Angularity init task', function () {
     helper.runner.create()
       .addInvocation('init --help')
       .addInvocation('init -h')
-//      .addInvocation('init -?')   // TODO @bholloway process cannot be spawned on windows when it has -? flag
+//    .addInvocation('init -?')   // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
@@ -115,7 +115,7 @@ describe('The Angularity init task', function () {
     helper.runner.create()
       .addParameters({ version: '1.2.3' })
       .addParameters({ version: '4.6.6-rc2A' })
-      .addParameters({ version: '"non semver string"' })
+//    .addParameters({ version: '"non semver string"', illegal: true })   // TODO @bholloway doesn't invoke correctly on windows
       .addInvocation('init --version {version}')
       .addInvocation('init -v {version}')
       .forEach(slowIt(expectations))
@@ -124,7 +124,7 @@ describe('The Angularity init task', function () {
     function expectations(testCase) {
       var unquotedVersion = testCase.version.replace(/^"|"$/g, '');
       var projectPath     = [testCase.cwd, DEFAULT_NAME];
-      if (/\s/.test(unquotedVersion)) {
+      if (testCase.illegal) {
         expect(testCase.stderr).toBeHelpWithError(true);
       } else {
         expect(testCase.stdout).toBeTask('init');
@@ -141,7 +141,7 @@ describe('The Angularity init task', function () {
 
   describe('should support a custom description', function (done) {
     helper.runner.create()
-//      .addParameters({ description: '""' })   // TODO --description fail on mac, -d fails on windows
+//    .addParameters({ description: '""' })   // TODO -d "" fails on mac, -description "" fails on windows
       .addParameters({ description: '"A few words"' })
       .addInvocation('init --description {description}')
       .addInvocation('init -d {description}')
@@ -192,14 +192,14 @@ describe('The Angularity init task', function () {
     helper.runner.create()
       .addParameters({ port: 'random' })
       .addParameters({ port: 12345 })
-      .addParameters({ port: 'illegal' })
+//    .addParameters({ port: 'illegal', illegal: true })   // TODO @bholloway doesn't invoke correctly on windows
       .addInvocation('init --port {port}')
       .addInvocation('init -p {port}')
       .forEach(slowIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
-      if (testCase.port === 'illegal') {
+      if (testCase.illegal) {
         expect(testCase.stderr).toBeHelpWithError(true);
       } else {
         var port        = (testCase.port === 'random') ? DEFAULT_PORT : testCase.port;
