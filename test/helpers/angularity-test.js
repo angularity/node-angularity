@@ -44,20 +44,14 @@ function cleanUp(callback) {
 function jasmineFactory(options) {
   return function forExpectations(expectations, title) {
     options = options || {};
-    function before() {
-      return Q.delay(options.before || 0);
-    }
-    function after() {
-      return Q.delay(options.after || 0);
-    }
     return function itForRunner(testRunner) {
       var deferred = Q.defer();
       it(title || testRunner, function (done) {
         testRunner
           .run()
-          .then(before)
+          .then(getDelay(options.before))
           .then(expectations)
-          .then(after)
+          .then(getDelay(options.after))
           .finally(done)
           .finally(deferred.resolve.bind(deferred));
       });
@@ -66,6 +60,21 @@ function jasmineFactory(options) {
   };
 }
 
+/**
+ * Get a method that passes through its arguments to a promise after the given delay
+ * @param {number} [milliseconds] Optional delay in milliseconds
+ * @returns {Function}
+ */
+function getDelay(milliseconds) {
+  return function () {
+    var args     = Array.prototype.slice.call(arguments);
+    var deferred = Q.defer();
+    setTimeout(function() {
+      deferred.resolve.apply(deferred, args);
+    }, milliseconds || 0);
+    return deferred.promise;
+  };
+}
 
 /**
  * Create a method that will return a promise to delete the given files
@@ -180,11 +189,27 @@ function getTimeoutSwitch(value) {
   };
 }
 
+/**
+ * Get a method whose arguments concatenate following the arguments of the outer function
+ * @param {...string} prefix Any number of leading elements
+ * @returns {function} A method that will concatenate its arguments to the prefix and return an array
+ */
+function getConcatenation() {
+  var prefix = Array.prototype.slice.call(arguments);
+  return function() {
+    var suffix = Array.prototype.slice.call(arguments);
+    return prefix.concat(suffix);
+  };
+}
+
+
 module.exports = {
   runner          : runner,
   cleanUp         : cleanUp,
   jasmineFactory  : jasmineFactory,
+  getDelay        : getDelay,
   getFileDelete   : getFileDelete,
   randomFlags     : randomFlags,
-  getTimeoutSwitch: getTimeoutSwitch
+  getTimeoutSwitch: getTimeoutSwitch,
+  getConcatenation: getConcatenation
 };

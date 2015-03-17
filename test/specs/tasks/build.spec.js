@@ -1,5 +1,8 @@
 'use strict';
 
+var fs   = require('fs'),
+    path = require('path');
+
 var jasmineDiffMatchers = require('jasmine-diff-matchers');
 
 var helper   = require('../../helpers/angularity-test'),
@@ -28,7 +31,7 @@ describe('The Angularity build task', function () {
 
   afterEach(helper.getTimeoutSwitch());
 
-//  afterEach(helper.cleanUp);
+  afterEach(helper.cleanUp);
 
   describe('with help switch', function (done) {
     helper.runner.create()
@@ -67,11 +70,28 @@ describe('The Angularity build task', function () {
 });
 
 function expectations(testCase) {
+  var workingBuildFile = helper.getConcatenation(testCase.cwd, BUILD_FOLDER);
+  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, BUILD_FOLDER);
+  var workingTestFile  = helper.getConcatenation(testCase.cwd, TEST_FOLDER);
+  var sourceTestFile   = helper.getConcatenation(testCase.sourceDir, TEST_FOLDER);
+
+  // general
   expect(testCase.stdout).toBeTask(['build', 'javascript', 'css']);
   expect(testCase.cwd).toHaveExpectedItemsExcept();
-  expect([testCase.cwd, BUILD_FOLDER, 'index.js' ]).diffFilePatch([testCase.sourceDir, BUILD_FOLDER, 'index.js' ]);
-  expect([testCase.cwd, BUILD_FOLDER, 'index.css']).diffFilePatch([testCase.sourceDir, BUILD_FOLDER, 'index.css']);
-  expect([testCase.cwd, TEST_FOLDER,  'index.js ']).diffFilePatch([testCase.sourceDir, TEST_FOLDER,  'index.js ']);
+
+  // build output
+  expect(workingBuildFile('index.js'     )).diffFilePatch(sourceBuildFile('index.js'));
+//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
+  expect(workingBuildFile('index.css'    )).diffFilePatch(sourceBuildFile('index.css'));
+//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
+
+  // must replace cwd to allow karam.conf.js to be correctly diffed
+  replaceInFile(workingTestFile('karma.conf.js'), testCase.cwd, testCase.sourceDir);
+
+  // test output
+  expect(workingTestFile('karma.conf.js')).diffFilePatch(sourceTestFile('karma.conf.js'));
+  expect(workingTestFile('index.js'     )).diffFilePatch(sourceTestFile('index.js'));
+//  expect(workingTestFile('index.js.map' )).diffFilePatch(sourceTestFile('index.js.map'));     // TODO @bholloway solve repeatability of .map files
 }
 
 function customMatchers() {
@@ -88,4 +108,15 @@ function customMatchers() {
         'app-test/index.js',   'app-test/index.js.map'
       )
   });
+}
+
+function replaceInFile(pathElements, before, after) {
+  var filePath = path.resolve.apply(path, [].concat(pathElements));
+  var contents = fs.existsSync(filePath) && fs.readFileSync(filePath).toString();
+  if (contents) {
+    while (contents.indexOf(before) >= 0) {
+      contents = contents.replace(before, after);
+    }
+    fs.writeFileSync(filePath, contents);
+  }
 }

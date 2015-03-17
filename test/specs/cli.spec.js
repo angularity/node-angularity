@@ -52,6 +52,7 @@ describe('The Angularity cli interface', function () {
       .finally(done);
 
     function expectations(testCase) {
+      // test the help message begins with the description from the package.json
       var description = require(path.resolve('package.json')).description;
       expect(testCase.stderr).toMatch(new RegExp('^\\s*' + description));
     }

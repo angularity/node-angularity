@@ -61,34 +61,29 @@ describe('The Angularity init task', function () {
       helper.runner.create()
         .addInvocation('init')
         .run()
-        .then(delay(500))
+        .then(helper.getDelay(500))
         .then(expectations)
         .then(helper.getFileDelete(DEFAULT_NAME, ['*', '.*', 'app', '!**/package.json']))
-        .then(delay(1000))
+        .then(helper.getDelay(1000))
         .then(rerun)
-        .then(delay(500))
+        .then(helper.getDelay(500))
         .then(expectations)
         .finally(done);
-
-      function delay(milliseconds) {
-        return function () {
-          return Q.delay(milliseconds || 0);
-        };
-      }
 
       function rerun(testCase) {
         return testCase.runner.run();
       }
 
       function expectations(testCase) {
+        var projectPath = [testCase.cwd, DEFAULT_NAME];
         expect(testCase.stdout).toBeTask('init');
         expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+        expect(projectPath).toHaveExpectedItemsExcept();
+        expect(projectPath).toHaveJsonWithName(DEFAULT_NAME);
+        expect(projectPath).toHaveJsonWithVersion(DEFAULT_VERSION);
+        expect(projectPath).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+        expect(projectPath).toHaveJsonWithTags(DEFAULT_TAGS);
+        expect(projectPath).toHaveJsonWithPort(DEFAULT_PORT);
         return testCase;
       }
     });
@@ -106,14 +101,15 @@ describe('The Angularity init task', function () {
 
     function expectations(testCase) {
       var unquotedName = testCase.name.replace(/^"|"$/g, '');
+      var projectPath  = [testCase.cwd, unquotedName];
       expect(testCase.stdout).toBeTask('init');
       expect(testCase.cwd).toHaveDirectory(unquotedName);
-      expect([testCase.cwd, unquotedName]).toHaveExpectedItemsExcept();
-      expect([testCase.cwd, unquotedName]).toHaveJsonWithName(unquotedName);
-      expect([testCase.cwd, unquotedName]).toHaveJsonWithVersion(DEFAULT_VERSION);
-      expect([testCase.cwd, unquotedName]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-      expect([testCase.cwd, unquotedName]).toHaveJsonWithTags(DEFAULT_TAGS);
-      expect([testCase.cwd, unquotedName]).toHaveJsonWithPort(DEFAULT_PORT);
+      expect(projectPath).toHaveExpectedItemsExcept();
+      expect(projectPath).toHaveJsonWithName(unquotedName);
+      expect(projectPath).toHaveJsonWithVersion(DEFAULT_VERSION);
+      expect(projectPath).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+      expect(projectPath).toHaveJsonWithTags(DEFAULT_TAGS);
+      expect(projectPath).toHaveJsonWithPort(DEFAULT_PORT);
     }
   });
 
@@ -129,17 +125,18 @@ describe('The Angularity init task', function () {
 
     function expectations(testCase) {
       var unquotedVersion = testCase.version.replace(/^"|"$/g, '');
+      var projectPath     = [testCase.cwd, DEFAULT_NAME];
       if (/\s/.test(unquotedVersion)) {
         expect(testCase.stderr).toBeHelpWithError(true);
       } else {
         expect(testCase.stdout).toBeTask('init');
         expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(unquotedVersion);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+        expect(projectPath).toHaveExpectedItemsExcept();
+        expect(projectPath).toHaveJsonWithName(DEFAULT_NAME);
+        expect(projectPath).toHaveJsonWithVersion(unquotedVersion);
+        expect(projectPath).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+        expect(projectPath).toHaveJsonWithTags(DEFAULT_TAGS);
+        expect(projectPath).toHaveJsonWithPort(DEFAULT_PORT);
       }
     }
   });
@@ -154,17 +151,19 @@ describe('The Angularity init task', function () {
       .finally(done);
 
     function expectations(testCase) {
-      if (testCase.command === 'angularity init -d ""') return; // TODO yargs short form seems to fail with empty string
-
+      if (testCase.command === 'angularity init -d ""') {
+        return; // TODO yargs short form seems to fail with empty string
+      }
       var unquotedDescription = testCase.description.replace(/^"|"$/g, '');
+      var projectPath         = [testCase.cwd, DEFAULT_NAME];
       expect(testCase.stdout).toBeTask('init');
       expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(unquotedDescription);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+      expect(projectPath).toHaveExpectedItemsExcept();
+      expect(projectPath).toHaveJsonWithName(DEFAULT_NAME);
+      expect(projectPath).toHaveJsonWithVersion(DEFAULT_VERSION);
+      expect(projectPath).toHaveJsonWithDescription(unquotedDescription);
+      expect(projectPath).toHaveJsonWithTags(DEFAULT_TAGS);
+      expect(projectPath).toHaveJsonWithPort(DEFAULT_PORT);
     }
   });
 
@@ -180,16 +179,17 @@ describe('The Angularity init task', function () {
       .finally(done);
 
     function expectations(testCase) {
-      var tagCount = testCase.command.split(/-t/g).length - 1;
-      var tags     = testCase.tags.slice(0, tagCount);
+      var tagCount    = testCase.command.split(/-t/g).length - 1;
+      var tags        = testCase.tags.slice(0, tagCount);
+      var projectPath = [testCase.cwd, DEFAULT_NAME];
       expect(testCase.stdout).toBeTask('init');
       expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(tags);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(DEFAULT_PORT);
+      expect(projectPath).toHaveExpectedItemsExcept();
+      expect(projectPath).toHaveJsonWithName(DEFAULT_NAME);
+      expect(projectPath).toHaveJsonWithVersion(DEFAULT_VERSION);
+      expect(projectPath).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+      expect(projectPath).toHaveJsonWithTags(tags);
+      expect(projectPath).toHaveJsonWithPort(DEFAULT_PORT);
     }
   });
 
@@ -207,15 +207,16 @@ describe('The Angularity init task', function () {
       if (testCase.port === 'illegal') {
         expect(testCase.stderr).toBeHelpWithError(true);
       } else {
-        var port = (testCase.port === 'random') ? DEFAULT_PORT : testCase.port;
+        var port        = (testCase.port === 'random') ? DEFAULT_PORT : testCase.port;
+        var projectPath = [testCase.cwd, DEFAULT_NAME];
         expect(testCase.stdout).toBeTask('init');
         expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept();
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithName(DEFAULT_NAME);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithVersion(DEFAULT_VERSION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithTags(DEFAULT_TAGS);
-        expect([testCase.cwd, DEFAULT_NAME]).toHaveJsonWithPort(port);
+        expect(projectPath).toHaveExpectedItemsExcept();
+        expect(projectPath).toHaveJsonWithName(DEFAULT_NAME);
+        expect(projectPath).toHaveJsonWithVersion(DEFAULT_VERSION);
+        expect(projectPath).toHaveJsonWithDescription(DEFAULT_DESCRIPTION);
+        expect(projectPath).toHaveJsonWithTags(DEFAULT_TAGS);
+        expect(projectPath).toHaveJsonWithPort(port);
       }
     }
   });
@@ -245,7 +246,8 @@ describe('The Angularity init task', function () {
       .finally(done);
 
     function expectations(testCase) {
-      var exceptions = fields
+      var projectPath = [testCase.cwd, DEFAULT_NAME];
+      var exceptions  = fields
         .filter(function testNegated(field) {
           return !testCase[field];
         })
@@ -254,7 +256,7 @@ describe('The Angularity init task', function () {
         });
       expect(testCase.stdout).toBeTask('init');
       expect(testCase.cwd).toHaveDirectory(DEFAULT_NAME);
-      expect([testCase.cwd, DEFAULT_NAME]).toHaveExpectedItemsExcept(exceptions);
+      expect(projectPath).toHaveExpectedItemsExcept(exceptions);
     }
   });
 
