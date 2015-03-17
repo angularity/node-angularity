@@ -40,6 +40,7 @@ describe('The Angularity build task', function () {
 
     function expectations(testCase) {
       expect([testCase.cwd, BUILD_FOLDER]).toBeEmptyDirectory();
+      expect([testCase.cwd, TEST_FOLDER ]).toBeEmptyDirectory();
       expect(testCase.stderr).toBeHelpWithError(false);
     }
   });

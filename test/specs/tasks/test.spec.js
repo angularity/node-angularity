@@ -14,6 +14,7 @@ var slowIt = helper.jasmineFactory({
 });
 
 var BUILD_FOLDER = 'app-build';
+var TEST_FOLDER  = 'app-test';
 
 describe('The Angularity test task', function () {
 
@@ -33,6 +34,7 @@ describe('The Angularity test task', function () {
 
     function expectations(testCase) {
       expect([testCase.cwd, BUILD_FOLDER]).toBeEmptyDirectory();
+      expect([testCase.cwd, TEST_FOLDER ]).toBeEmptyDirectory();
       expect(testCase.stderr).toBeHelpWithError(false);
     }
   });
