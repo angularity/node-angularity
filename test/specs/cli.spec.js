@@ -47,7 +47,7 @@ describe('The Angularity cli interface', function () {
     helper.runner.create()
       .addInvocation('--help')
       .addInvocation('-h')
-//      .addInvocation('-?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
+//    .addInvocation('-?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
