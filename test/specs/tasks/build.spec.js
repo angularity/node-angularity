@@ -99,9 +99,9 @@ function expectations(testCase) {
 function customMatchers() {
   jasmine.addMatchers(jasmineDiffMatchers.diffPatch);
   jasmine.addMatchers({
-    toBeHelpWithError         : matchers
+    toBeHelpWithError        : matchers
       .getHelpMatcher(/^\s*The "build" task/),
-    toHaveExpectedItemsExcept : matchers
+    toHaveExpectedItemsExcept: matchers
       .getFileMatcher(
         'app-build/index.html',
         'app-build/index.js',  'app-build/index.js.map',
