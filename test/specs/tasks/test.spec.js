@@ -35,7 +35,7 @@ describe('The Angularity test task', function () {
     helper.runner.create()
       .addInvocation('test --help')
       .addInvocation('test -h')
-      //    .addInvocation('test -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
+//    .addInvocation('test -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
@@ -55,7 +55,7 @@ describe('The Angularity test task', function () {
 
     function expectations(testCase) {
       expect(testCase.stdout).toBeTask('test');
-      expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$|Cannot start Chrome/m);  // TODO @bholloway choose a browser that will work on cloud CI
+      expect(testCase.stdout).toMatch(/INFO\s\[karma\]/);  // TODO @bholloway choose a browser that will work on cloud CI
       javascriptTask.expectations(testCase);
 
       // make replacements to allow karma.conf.js to be correctly diff'd
