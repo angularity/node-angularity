@@ -72,7 +72,7 @@ function getHelpMatcher(regexp) {
     return {
       compare: function compare(buffer, expectError) {
         var text     = buffer.toString();
-        var lastLine = text.split(/\n/g).filter(Boolean).pop();
+        var lastLine = text.split(/\r?\n/g).filter(Boolean).pop();
         var hasError = /^\s*\[Error\:[^\]]*]|^\s*Unknown argument\:.*$/.test(lastLine); // error or unknown argument
         var message  =
           !(regexp.test(text)) ? 'Help message does not match expectation' :

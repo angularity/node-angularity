@@ -4,8 +4,8 @@ var diffMatchers = require('jasmine-diff-matchers');
 
 var helper         = require('../../helpers/angularity-test'),
     matchers       = require('../../helpers/jasmine-matchers'),
-    javascriptSpec = require('./javascript.spec.js'),
-    cssSpec        = require('./css.spec.js');
+    javascriptTask = require('../../helpers/javascript-task'),
+    cssTask        = require('../../helpers/css-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -24,9 +24,9 @@ describe('The Angularity build task', function () {
 
   beforeEach(matchers.addMatchers);
 
-  beforeEach(javascriptSpec.customMatchers);
+  beforeEach(javascriptTask.customMatchers);
 
-  beforeEach(cssSpec.customMatchers);
+  beforeEach(cssTask.customMatchers);
 
   beforeEach(customMatchers);
 
@@ -79,8 +79,8 @@ function expectations(testCase) {
   expect(testCase.stdout).toBeTask('build');
   expect(testCase.cwd).toHaveFile('app-build/index.html');
   expect(workingBuildFile('index.html')).diffFilePatch(sourceBuildFile('index.html'));
-  javascriptSpec.expectations(testCase);
-  cssSpec.expectations(testCase);
+  javascriptTask.expectations(testCase);
+  cssTask.expectations(testCase);
 }
 
 function customMatchers() {
@@ -90,8 +90,3 @@ function customMatchers() {
       .getHelpMatcher(/^\s*The "build" task/)
   });
 }
-
-module.exports = {
-  expectations  : expectations,
-  customMatchers: customMatchers
-};

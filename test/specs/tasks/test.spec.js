@@ -2,7 +2,7 @@
 
 var helper         = require('../../helpers/angularity-test'),
     matchers       = require('../../helpers/jasmine-matchers'),
-    javascriptSpec = require('./javascript.spec');
+    javascriptTask = require('../../helpers/javascript-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -21,7 +21,7 @@ describe('The Angularity test task', function () {
 
   beforeEach(matchers.addMatchers);
 
-  beforeEach(javascriptSpec.customMatchers);
+  beforeEach(javascriptTask.customMatchers);
 
   beforeEach(customMatchers);
 
@@ -56,8 +56,17 @@ describe('The Angularity test task', function () {
     function expectations(testCase) {
       expect(testCase.stdout).toBeTask('test');
       expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$/m);
-      javascriptSpec.expectations(testCase);
-console.log(test);
+      javascriptTask.expectations(testCase);
+
+      // make replacements to allow karma.conf.js to be correctly diff'd
+      var workingTestFile = helper.getConcatenation(testCase.cwd, TEST_FOLDER);
+      var sourceTestFile  = helper.getConcatenation(testCase.sourceDir, TEST_FOLDER);
+      var replace         = helper.replacer()
+        .add(/^(\s*basePath\:\s*['"])[^'"]*(['"].*)$/gm, '$1%redacted%$2')  // basePath should be redacted
+        .add(/^(\s*require\(['"])[^'"]*(['"].*)$/gm,     '$1%redacted%$2')  // all require paths should be redacted
+        .add(/\\{2}/g, '/')
+        .commit();
+      expect(replace(workingTestFile('karma.conf.js'))).diffPatch(replace(sourceTestFile('karma.conf.js')));
     }
   });
 

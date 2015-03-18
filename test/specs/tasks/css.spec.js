@@ -1,9 +1,8 @@
 'use strict';
 
-var diffMatchers = require('jasmine-diff-matchers');
-
 var helper   = require('../../helpers/angularity-test'),
-    matchers = require('../../helpers/jasmine-matchers');
+    matchers = require('../../helpers/jasmine-matchers'),
+    cssTask  = require('../../helpers/css-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -21,7 +20,7 @@ describe('The Angularity css task', function () {
 
   beforeEach(matchers.addMatchers);
 
-  beforeEach(customMatchers);
+  beforeEach(cssTask.customMatchers);
 
   beforeEach(helper.getTimeoutSwitch(60000));
 
@@ -47,31 +46,7 @@ describe('The Angularity css task', function () {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('css')
-      .forEach(slowIt(expectations))
+      .forEach(slowIt(cssTask.expectations))
       .finally(done);
   });
 });
-
-function expectations(testCase) {
-  var workingBuildFile = helper.getConcatenation(testCase.cwd, BUILD_FOLDER);
-  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, BUILD_FOLDER);
-  expect(testCase.stdout).toBeTask('css');
-  expect(testCase.cwd).toHaveExpectedCssExcept();
-  expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));
-//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
-}
-
-function customMatchers() {
-  jasmine.addMatchers(diffMatchers.diffPatch);
-  jasmine.addMatchers({
-    toBeCssHelpWithError   : matchers
-      .getHelpMatcher(/^\s*The "css" task/),
-    toHaveExpectedCssExcept: matchers
-      .getFileMatcher('app-build/index.css', 'app-build/index.css.map')
-  });
-}
-
-module.exports = {
-  expectations  : expectations,
-  customMatchers: customMatchers
-};
