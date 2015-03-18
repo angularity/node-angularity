@@ -2,7 +2,7 @@
 
 var helper   = require('../../helpers/angularity-test'),
     matchers = require('../../helpers/jasmine-matchers'),
-    cssTask  = require('../../helpers/css-task');
+    cssTask  = require('./css-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,

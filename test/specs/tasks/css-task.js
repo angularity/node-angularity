@@ -2,8 +2,8 @@
 
 var diffMatchers = require('jasmine-diff-matchers');
 
-var helper   = require('./angularity-test'),
-    matchers = require('./jasmine-matchers');
+var helper   = require('./../../helpers/angularity-test'),
+    matchers = require('./../../helpers/jasmine-matchers');
 
 var BUILD_FOLDER = 'app-build';
 

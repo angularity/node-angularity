@@ -4,8 +4,8 @@ var diffMatchers = require('jasmine-diff-matchers');
 
 var helper         = require('../../helpers/angularity-test'),
     matchers       = require('../../helpers/jasmine-matchers'),
-    javascriptTask = require('../../helpers/javascript-task'),
-    cssTask        = require('../../helpers/css-task');
+    javascriptTask = require('./javascript-task'),
+    cssTask        = require('./css-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
