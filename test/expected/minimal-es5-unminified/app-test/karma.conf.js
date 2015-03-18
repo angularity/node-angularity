@@ -7,7 +7,7 @@
 module.exports = function(config) {
   config.set({
     // base path, that will be used to resolve files and exclude
-    basePath: '/Users/benholloway/Documents/WebstormProjects/angularity/node-angularity/test/expected/minimal-es5',
+    basePath: '%redacted%',
 
     //make sure we use karma-jasmine as the test framework
     frameworks: ['jasmine'],
@@ -41,7 +41,7 @@ module.exports = function(config) {
     // installation and thus need to be registered manually
     // append to existing value to preserve plugins loaded automatically
     plugins: [].concat(config.plugins).concat([
-require("/Users/benholloway/Documents/WebstormProjects/angularity/node-angularity/node_modules/karma-angularity-reporter")
+require("%redacted%")
 ]),
 
     // use dots reporter, as travis terminal does not support escaping sequences

@@ -1,7 +1,8 @@
 'use strict';
 
-var helper    = require('../../helpers/angularity-test'),
-    buildSpec = require('./build.spec')
+var helper         = require('../../helpers/angularity-test'),
+    matchers       = require('../../helpers/jasmine-matchers'),
+    javascriptSpec = require('./javascript.spec');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -17,6 +18,12 @@ var BUILD_FOLDER = 'app-build';
 var TEST_FOLDER  = 'app-test';
 
 describe('The Angularity test task', function () {
+
+  beforeEach(matchers.addMatchers);
+
+  beforeEach(javascriptSpec.customMatchers);
+
+  beforeEach(customMatchers);
 
   beforeEach(helper.getTimeoutSwitch(60000));
 
@@ -39,30 +46,37 @@ describe('The Angularity test task', function () {
     }
   });
 
-  describe('should build minified (by default)', function(done) {
+  describe('should build unminified javascript and run tests', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('test')
-      .addInvocation('test --unminified false')
-      .addInvocation('test -u false')
       .forEach(slowIt(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      expect(testCase.stdout).toBeTask('test');
+      expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$/m);
+      javascriptSpec.expectations(testCase);
+console.log(test);
+    }
   });
 
-  describe('should build unminified', function(done) {
+  describe('should not support unminified option', function(done) {
     helper.runner.create()
       .addSource('minimal-es5-unminified')
       .addInvocation('test --unminified')
       .addInvocation('test -u')
-      .addInvocation('test --unminified true')
-      .addInvocation('test -u true')
       .forEach(slowIt(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      expect(testCase.stderr).toBeHelpWithError(true);
+    }
   });
 });
 
-function expectations(testCase) {
-  expect(testCase.stdout).toBeTask('test');
-  expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$/m);
-  buildSpec.expectations(testCase);
+function customMatchers() {
+  jasmine.addMatchers({
+    toBeHelpWithError: matchers.getHelpMatcher(/^\s*The "test" task/)
+  });
 }
