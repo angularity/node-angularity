@@ -63,5 +63,6 @@ describe('The Angularity test task', function () {
 
 function expectations(testCase) {
   expect(testCase.stdout).toBeTask('test');
+  expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$/m);
   buildSpec.expectations(testCase);
 }

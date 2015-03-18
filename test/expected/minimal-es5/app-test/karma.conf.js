@@ -41,12 +41,14 @@ module.exports = function(config) {
     // installation and thus need to be registered manually
     // append to existing value to preserve plugins loaded automatically
     plugins: [].concat(config.plugins).concat([
-
+require("/Users/benholloway/Documents/WebstormProjects/angularity/node-angularity/node_modules/karma-angularity-reporter")
 ]),
 
     // use dots reporter, as travis terminal does not support escaping sequences
     // possible values: 'dots', 'progress', 'junit', 'teamcity'
-    reporters: [].concat([]),
+    reporters: [].concat([
+  'angularity'
+]),
 
     // web server port
     port: 61680,
