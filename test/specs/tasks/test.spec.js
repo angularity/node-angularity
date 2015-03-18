@@ -79,7 +79,7 @@ describe('The Angularity test task', function () {
       .finally(done);
 
     function expectations(testCase) {
-      if (!testCase.errorcode) {  // TODO @bholloway windows invocation fails in test but not in real use
+      if (!testCase.exitcode) {  // TODO @bholloway windows invocation fails in test but not in real use
         expect(testCase.stderr).toBeHelpWithError(true);
       }
     }
