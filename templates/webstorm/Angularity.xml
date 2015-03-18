@@ -1,10 +1,10 @@
-<code_scheme name="Angularity PISS">
-  <option name="AUTODETECT_INDENTS" value="true" />
-  <JSCodeStyleSettings>
-    <option name="ALIGN_OBJECT_PROPERTIES" value="2" />
-    <option name="ALIGN_MULTILINE_VAR_DECLARATION" value="true" />
-  </JSCodeStyleSettings>
-  <XML>
-    <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
-  </XML>
+<code_scheme name="Angularity">
+    <option name="AUTODETECT_INDENTS" value="true" />
+    <JSCodeStyleSettings>
+        <option name="ALIGN_OBJECT_PROPERTIES" value="2" />
+        <option name="ALIGN_MULTILINE_VAR_DECLARATION" value="true" />
+    </JSCodeStyleSettings>
+    <XML>
+        <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+    </XML>
 </code_scheme>

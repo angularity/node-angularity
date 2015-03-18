@@ -107,6 +107,7 @@ function setUpWebstormTask(tyRun) {
           if (!isValid) {
             throw new Error('The specified subdirectory does not exist.');
           }
+          angularityProjectPresent(argv);
           if (!argv.defaults) {
             // when defaults are not present, check whether angularity project is present
             var projectPath = (value) ? path.join(value, 'angularity.json') : 'angularity.json';
@@ -175,10 +176,7 @@ function setUpWebstormTask(tyRun) {
     onInit: function onInitWebstormTask(yargsInstance) {
       var gulp            = require('gulp'),
           gutil           = require('gulp-util'),
-          wordwrap        = require('wordwrap'),
-          runSequence     = require('run-sequence'),
-          childProcess    = require('child_process'),
-          template        = require('lodash.template');
+          runSequence     = require('run-sequence');
 
       var streams         = require('../lib/config/streams'),
           hr              = require('../lib/util/hr');
@@ -228,7 +226,7 @@ function setUpWebstormTask(tyRun) {
           projectName             : properties.name,
           jshintPath              : '$PROJECT_DIR$/.jshintrc',
           jsDebugPort             : properties.port,
-          javascriptVersion       : 'es6',
+          javascriptVersion       : 'ES6',
           watcherSuppressedTasks  : 'Traceur compiler;SCSS',
           JsKarmaPackageDirSetting: path.resolve(__dirname, '..', 'node_modules', 'karma'),
           contentPaths            : [
@@ -269,10 +267,9 @@ function setUpWebstormTask(tyRun) {
             'file://$PROJECT_DIR$/node_modules',
             'file://$PROJECT_DIR$/bower_components'
           ],
-          projectPane             : template(fs.readFileSync(path.join(TEMPLATE_PATH, 'projectPane.xml')), {
-            rootPath: properties
-          })
+          projectView             : properties.name
         };
+
         ideTemplate.webStorm.createProject(process.cwd(), context);
       });
 
@@ -289,7 +286,7 @@ function setUpWebstormTask(tyRun) {
       });
 
       gulp.task('webstorm:codestyle', function () {
-        ideTemplate.webStorm.copyCodeStyle(path.join(TEMPLATE_PATH, 'Angularity.xml'));
+        ideTemplate.webStorm.copyCodeStyle(path.join(TEMPLATE_PATH, 'Angularity.xml'), 'Angularity', process.cwd());
       });
 
       gulp.task('webstorm:launch', function () {
@@ -330,62 +327,46 @@ function setUpWebstormTask(tyRun) {
           }]
         };
       }
-
-      /**
-       * Validator function for the sub-directory property.
-       * @param {*} value The value of the property to test
-       * @returns {string|undefined} Error message on failure
-       */
-      function validateSubDirectory(value) {
-        if (value) {
-          var subdir = path.resolve(value);
-          var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
-          if (!isValid) {
-            return 'The specified subdirectory does not exist.';
-          }
-        }
-      }
-
-      /**
-       * Find all subdirectories of the base, recursively
-       * @param base The base directory to start in
-       * @param filename A filename that needs to be found for the path to be added
-       * @return all subdirectories of the base, split by path separator
-       */
-      function subdirectoriesWithFile(base, filename) {
-        var result = [];
-        if (fs.existsSync(base) && fs.statSync(base).isDirectory()) {
-          if (fs.existsSync(path.join(base, filename))) {
-            result.push(base);
-          }
-          fs.readdirSync(base)
-            .forEach(function (subdir) {
-              result.push.apply(result, subdirectoriesWithFile(path.join(base, subdir), filename));
-            });
-        }
-        return result;
-      }
-
-      /**
-       * Validator function for an angularity project being present in the current working directory
-       * @param {object} argv The yargs command line parameter set
-       * @returns {string|undefined} Error message on failure
-       */
-      function angularityProjectPresent(argv) { // Todo @impaler move method to util location
-        var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
-        if (!fs.existsSync(path.resolve(projectPath))) {
-          return 'Current working directory (or specified subdir) is not a valid angularity project. Try running the ' +
-            '"init" command first.';
-        }
-      }
     },
-    onRun: function onRunWebstormTask(yargsInstance) {
+    onRun: function onRunWebstormTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
   };
 
   tyRun.taskYargs.register(taskDefinition);
-}
 
+  /**
+   * Validator function for an angularity project being present in the current working directory
+   * @param {object} argv The yargs command line parameter set
+   * @returns {string|undefined} Error message on failure
+   */
+  function angularityProjectPresent(argv) { // Todo @impaler move method to util location
+    var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
+    if (!fs.existsSync(path.resolve(projectPath))) {
+      return 'Current working directory (or specified subdir) is not a valid angularity project. Try running the ' +
+        '"init" command first.';
+    }
+  }
+
+  /**
+   * Find all subdirectories of the base, recursively
+   * @param base The base directory to start in
+   * @param filename A filename that needs to be found for the path to be added
+   * @return all subdirectories of the base, split by path separator
+   */
+  function subdirectoriesWithFile(base, filename) {
+    var result = [];
+    if (fs.existsSync(base) && fs.statSync(base).isDirectory()) {
+      if (fs.existsSync(path.join(base, filename))) {
+        result.push(base);
+      }
+      fs.readdirSync(base)
+        .forEach(function (subdir) {
+          result.push.apply(result, subdirectoriesWithFile(path.join(base, subdir), filename));
+        });
+    }
+    return result;
+  }
+}
 module.exports = setUpWebstormTask;
