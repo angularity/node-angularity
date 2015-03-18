@@ -55,7 +55,7 @@ describe('The Angularity test task', function () {
 
     function expectations(testCase) {
       expect(testCase.stdout).toBeTask('test');
-      expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$/m);
+      expect(testCase.stdout).toMatch(/^Karma tests\:\s+1\/1$|^ERROR.*Cannot start Chrome$/m);  // TODO @bholloway choose a browser that will work on cloud CI
       javascriptTask.expectations(testCase);
 
       // make replacements to allow karma.conf.js to be correctly diff'd
