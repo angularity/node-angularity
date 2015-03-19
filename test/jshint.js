@@ -12,7 +12,8 @@ gulp.task('lint', function() {
       glob   = ['lib/**/*.js', 'tasks/**/*.js', 'bin/**/*.js', 'test/specs/**/*.js'];
   return gulp.src(glob, {cwd: cwd})
     .pipe(jshint(config))
-    .pipe(jshint.reporter(stylish));
+    .pipe(jshint.reporter(stylish))
+    .pipe(jshint.reporter('fail'));
 });
 
 gulp.start('lint');
