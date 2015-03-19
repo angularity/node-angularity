@@ -116,9 +116,9 @@ function setUpTaskJavascript(tyRun) {
 
       var cliArgs;
       cliArgs = yargsInstance
-          .strict()
-          .wrap(80)
-          .argv;
+        .strict()
+        .wrap(80)
+        .argv;
 
       gulp.task('javascript', function (done) {
         console.log(hr('-', 80, 'javascript'));

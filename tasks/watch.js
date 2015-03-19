@@ -1,14 +1,6 @@
 'use strict';
 
 function setUpTaskWatch(tyRun) {
-  var defaults = require('../lib/config/defaults');
-
-  defaults.getInstance()
-    .file('angularity.json')
-    .defaults({
-      port: 55555
-    });
-
   var taskDefinition = {
     name: 'watch',
     description: ('The "watch" task performs an initial build and then serves the application on localhost at ' +

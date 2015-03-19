@@ -8,7 +8,7 @@ function setUpTaskHtml(tyRun) {
     prerequisiteTasks: ['help'],
     checks: [],
     options: [],
-    onInit: function onInitHtmlTask(yargsInstance) {
+    onInit: function onInitHtmlTask() {
       var gulp            = require('gulp'),
           inject          = require('gulp-inject'),
           plumber         = require('gulp-plumber'),
@@ -19,10 +19,6 @@ function setUpTaskHtml(tyRun) {
           bowerFiles      = require('../lib/inject/bower-files'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams');
-
-      yargsInstance
-        .strict()
-        .wrap(80);
 
       // `cliArgs` are available within gulp tasks by means of closure,
       // as they are only called after `onRun` has been invoked, and they have been passed

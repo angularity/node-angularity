@@ -7,15 +7,11 @@ function setUpTaskBuild(tyRun) {
     prerequisiteTasks: ['help', 'javascript', 'css', 'html'],
     checks: [],
     options: [],
-    onInit: function onBuildTask(yargsInstance) {
+    onInit: function onBuildTask() {
       var gulp        = require('gulp'),
           runSequence = require('run-sequence');
 
       var hr          = require('../lib/util/hr');
-
-      yargsInstance
-        .strict()
-        .wrap(80);
 
       gulp.task('build', function (done) {
         console.log(hr('-', 80, 'build'));

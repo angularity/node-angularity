@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "test": "npm run lint && node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs",
+    "testonly": "node node_modules/jasmine-node/bin/jasmine-node --captureExceptions test/specs",
     "lint": "gulp lint --gulpfile ./test/jshint.js"
   },
   "contributors": [

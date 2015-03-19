@@ -220,10 +220,10 @@ function setUpInitTask(tyRun) {
       var cliArgs;
       var templateParams;
 
-      yargsInstance
+      cliArgs = yargsInstance
         .strict()
-        .wrap(80);
-      cliArgs = yargsInstance.argv;
+        .wrap(80)
+        .argv;
 
       gulp.task('init', function (done) {
         console.log(hr('-', 80, 'init'));

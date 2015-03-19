@@ -7,7 +7,7 @@ function setUpTaskCss(tyRun) {
     prerequisiteTasks: ['help'],
     checks: [],
     options: [],
-    onInit: function onInitCssTask(yargsInstance) {
+    onInit: function onInitCssTask() {
       var gulp            = require('gulp'),
           rimraf          = require('gulp-rimraf'),
           runSequence     = require('run-sequence');
@@ -15,10 +15,6 @@ function setUpTaskCss(tyRun) {
       var nodeSass        = require('../lib/build/node-sass'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams');
-
-      yargsInstance
-        .strict()
-        .wrap(80);
 
       gulp.task('css', function (done) {
         console.log(hr('-', 80, 'css'));
