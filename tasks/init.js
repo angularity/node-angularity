@@ -191,7 +191,7 @@ function setUpInitTask(tyRun) {
       'If a package.json is present initialisation will occur in the current directory. Otherwise a sub-directory is' +
       'created per the project name',
       '',
-      'Where run on an exising project existing files will not be altered, delete existing files in order to change ' +
+      'Where run on an existing project existing files will not be altered, delete existing files in order to change ' +
       'properties.',
       '',
       'Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
@@ -206,7 +206,6 @@ function setUpInitTask(tyRun) {
     onInit: function onInitInitTask(yargsInstance) {
       var gulp        = require('gulp'),
           gutil       = require('gulp-util'),
-          wordwrap    = require('wordwrap'),
           runSequence = require('run-sequence'),
           path        = require('path'),
           fs          = require('fs'),
@@ -310,12 +309,6 @@ function setUpInitTask(tyRun) {
         copyTemplateSync('.editorconfig');
       });
 
-      function padded(length) {
-        return function(text) {
-          return (text + (new Array(length)).join(' ')).slice(0, length);
-        }
-      }
-
       function mkdirIfNotExisting(projectRelativePath) {
         var absolute = path.resolve(projectRelativePath);
         var exists   = fs.existsSync(absolute);
@@ -362,7 +355,7 @@ function setUpInitTask(tyRun) {
         }
       }
     },
-    onRun: function onRunInitTask(yargsInstance) {
+    onRun: function onRunInitTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
