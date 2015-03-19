@@ -10,11 +10,10 @@ matrix:
   fast_finish: true
 before_install:
   - npm install -g npm@2.1.7
-  - npm i -g
-  - npm i -g jasmine-node
+  - npm install -g
   - node -v
   - npm -v
-  - jasmine-node --version
 script:
   - pwd && ls
-  - jasmine-node --verbose --test-dir /home/travis/build/angularity/node-angularity/test
+  - node node_modules/jasmine-node/bin/jasmine-node --version
+  - npm run test
