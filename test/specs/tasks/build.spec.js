@@ -2,8 +2,10 @@
 
 var diffMatchers = require('jasmine-diff-matchers');
 
-var helper   = require('../../helpers/angularity-test'),
-    matchers = require('../../helpers/jasmine-matchers');
+var helper         = require('../../helpers/angularity-test'),
+    matchers       = require('../../helpers/jasmine-matchers'),
+    javascriptTask = require('./javascript-task'),
+    cssTask        = require('./css-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -22,9 +24,13 @@ describe('The Angularity build task', function () {
 
   beforeEach(matchers.addMatchers);
 
+  beforeEach(javascriptTask.customMatchers);
+
+  beforeEach(cssTask.customMatchers);
+
   beforeEach(customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(30000));
+  beforeEach(helper.getTimeoutSwitch(60000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -40,7 +46,8 @@ describe('The Angularity build task', function () {
 
     function expectations(testCase) {
       expect([testCase.cwd, BUILD_FOLDER]).toBeEmptyDirectory();
-      expect(testCase.stderr).toBeHelpWithError(false);
+      expect([testCase.cwd, TEST_FOLDER ]).toBeEmptyDirectory();
+      expect(testCase.stderr).toBeBuildHelpWithError(false);
     }
   });
 
@@ -69,48 +76,17 @@ describe('The Angularity build task', function () {
 function expectations(testCase) {
   var workingBuildFile = helper.getConcatenation(testCase.cwd, BUILD_FOLDER);
   var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, BUILD_FOLDER);
-  var workingTestFile  = helper.getConcatenation(testCase.cwd, TEST_FOLDER);
-  var sourceTestFile   = helper.getConcatenation(testCase.sourceDir, TEST_FOLDER);
-
-  // general
-  expect(testCase.stdout).toBeTask(['build', 'javascript', 'css']);
-  expect(testCase.cwd).toHaveExpectedItemsExcept();
-
-  // build output
+  expect(testCase.stdout).toBeTask('build');
+  expect(testCase.cwd).toHaveFile('app-build/index.html');
   expect(workingBuildFile('index.html')).diffFilePatch(sourceBuildFile('index.html'));
-  expect(workingBuildFile('index.js')).diffFilePatch(sourceBuildFile('index.js'));
-  expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));
-//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
-//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
-
-  // must remove basePath to allow karma.conf.js to be correctly diff'd
-  var replace = helper.replacer()
-    .add(/^\s*basePath:.*$/gm, '')
-    .add(/\\{2}/g, '/')
-    .commit();
-
-  // test output
-  expect(replace(workingTestFile('karma.conf.js'))).diffPatch(replace(sourceTestFile('karma.conf.js')));
-  expect(workingTestFile('index.js')).diffFilePatch(sourceTestFile('index.js'));
-//  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));    // TODO @bholloway solve repeatability of .map files
+  javascriptTask.expectations(testCase);
+  cssTask.expectations(testCase);
 }
 
 function customMatchers() {
   jasmine.addMatchers(diffMatchers.diffPatch);
   jasmine.addMatchers({
-    toBeHelpWithError        : matchers
-      .getHelpMatcher(/^\s*The "build" task/),
-    toHaveExpectedItemsExcept: matchers
-      .getFileMatcher(
-        'app-build/index.html',
-        'app-build/index.js',  'app-build/index.js.map',
-        'app-build/index.css', 'app-build/index.css.map',
-        'app-test/karma.conf.js',
-        'app-test/index.js',   'app-test/index.js.map'
-      )
+    toBeBuildHelpWithError  : matchers
+      .getHelpMatcher(/^\s*The "build" task/)
   });
 }
-
-module.exports = {
-  expectations: expectations
-};

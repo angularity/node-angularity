@@ -12,7 +12,7 @@
     "es6",
     "esnext",
     "browserify",
-    "es6ify"
+    "babel"
   ],
   "scripts": {
     "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs"
@@ -86,6 +86,7 @@
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
+    "ncp": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
     "q": "latest",

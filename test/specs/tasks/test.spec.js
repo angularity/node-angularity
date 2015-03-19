@@ -1,7 +1,8 @@
 'use strict';
 
-var helper    = require('../../helpers/angularity-test'),
-    buildSpec = require('./build.spec')
+var helper         = require('../../helpers/angularity-test'),
+    matchers       = require('../../helpers/jasmine-matchers'),
+    javascriptTask = require('./javascript-task');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -14,10 +15,17 @@ var slowIt = helper.jasmineFactory({
 });
 
 var BUILD_FOLDER = 'app-build';
+var TEST_FOLDER  = 'app-test';
 
 describe('The Angularity test task', function () {
 
-  beforeEach(helper.getTimeoutSwitch(30000));
+  beforeEach(matchers.addMatchers);
+
+  beforeEach(javascriptTask.customMatchers);
+
+  beforeEach(customMatchers);
+
+  beforeEach(helper.getTimeoutSwitch(60000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -27,39 +35,59 @@ describe('The Angularity test task', function () {
     helper.runner.create()
       .addInvocation('test --help')
       .addInvocation('test -h')
-      //    .addInvocation('test -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
+//    .addInvocation('test -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
       expect([testCase.cwd, BUILD_FOLDER]).toBeEmptyDirectory();
+      expect([testCase.cwd, TEST_FOLDER ]).toBeEmptyDirectory();
       expect(testCase.stderr).toBeHelpWithError(false);
     }
   });
 
-  describe('should build minified (by default)', function(done) {
+  describe('should build unminified javascript and run tests', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('test')
-      .addInvocation('test --unminified false')
-      .addInvocation('test -u false')
       .forEach(slowIt(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      expect(testCase.stdout).toBeTask('test');
+      expect(testCase.stdout).toMatch(/INFO\s\[karma\]/);  // TODO @bholloway choose a browser that will work on cloud CI
+      javascriptTask.expectations(testCase);
+
+      // make replacements to allow karma.conf.js to be correctly diff'd
+      var workingTestFile = helper.getConcatenation(testCase.cwd, TEST_FOLDER);
+      var sourceTestFile  = helper.getConcatenation(testCase.sourceDir, TEST_FOLDER);
+      var replace         = helper.replacer()
+        .add(/^(\s*basePath\:\s*['"])[^'"]*(['"].*)$/gm, '$1%redacted%$2')  // basePath should be redacted
+        .add(/^(\s*require\(['"])[^'"]*(['"].*)$/gm,     '$1%redacted%$2')  // all require paths should be redacted
+        .add(/\\{2}/g, '/')
+        .commit();
+      expect(replace(workingTestFile('karma.conf.js'))).diffPatch(replace(sourceTestFile('karma.conf.js')));
+    }
   });
 
-  describe('should build unminified', function(done) {
+  describe('should not support unminified option', function(done) {
     helper.runner.create()
       .addSource('minimal-es5-unminified')
       .addInvocation('test --unminified')
       .addInvocation('test -u')
-      .addInvocation('test --unminified true')
-      .addInvocation('test -u true')
       .forEach(slowIt(expectations))
       .finally(done);
+
+    function expectations(testCase) {
+      if (!testCase.exitcode) {  // TODO @bholloway windows invocation fails in test but not in real use
+        expect(testCase.stderr).toBeHelpWithError(true);
+      }
+    }
   });
 });
 
-function expectations(testCase) {
-  expect(testCase.stdout).toBeTask('test');
-  buildSpec.expectations(testCase);
+function customMatchers() {
+  jasmine.addMatchers({
+    toBeHelpWithError: matchers.getHelpMatcher(/^\s*The "test" task/)
+  });
 }

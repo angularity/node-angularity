@@ -24,7 +24,7 @@ describe('The Angularity release task', function () {
 
   beforeEach(customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(30000));
+  beforeEach(helper.getTimeoutSwitch(60000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -73,7 +73,7 @@ function expectations(testCase) {
   var sourceVendorFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER, VENDOR_FOLDER);
 
   // general
-  expect(testCase.stdout).toBeTask(['build', 'javascript', 'css']);
+  expect(testCase.stdout).toBeTask(['release', 'build', 'javascript', 'css']);
   expect(testCase.cwd).toHaveExpectedItemsExcept();
 
   // release output
