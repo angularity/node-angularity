@@ -17,11 +17,13 @@ var slowIt = helper.jasmineFactory({
 var BUILD_FOLDER = 'app-build';
 var TEST_FOLDER  = 'app-test';
 
-describe('The Angularity build task', function () {
+describe('The Angularity watch task', function () {
 
   beforeEach(matchers.addMatchers);
 
   beforeEach(buildTask.customMatchers);
+
+  beforeEach(customMatchers);
 
   beforeEach(helper.getTimeoutSwitch(60000));
 
@@ -31,37 +33,51 @@ describe('The Angularity build task', function () {
 
   describe('should display help when requested', function (done) {
     helper.runner.create()
-      .addInvocation('build --help')
-      .addInvocation('build -h')
-//    .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
+      .addInvocation('watch --help')
+      .addInvocation('watch -h')
+//    .addInvocation('watch -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
     function expectations(testCase) {
       expect([testCase.cwd, BUILD_FOLDER]).toBeEmptyDirectory();
       expect([testCase.cwd, TEST_FOLDER ]).toBeEmptyDirectory();
-      expect(testCase.stderr).toBeBuildHelpWithError(false);
+      expect(testCase.stderr).toBeWatchHelpWithError(false);
     }
   });
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
+      .withTimeout(30000)
       .addSource('minimal-es5')
-      .addInvocation('build')
-      .addInvocation('build --unminified false')
-      .addInvocation('build -u false')
-      .forEach(slowIt(buildTask.expectations))
+      .addInvocation('watch')
+      .addInvocation('watch --unminified false')
+      .addInvocation('watch -u false')
+      .forEach(slowIt(expectations))
       .finally(done);
   });
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
+      .withTimeout(30000)
       .addSource('minimal-es5-unminified')
-      .addInvocation('build --unminified')
-      .addInvocation('build -u')
-      .addInvocation('build --unminified true')
-      .addInvocation('build -u true')
-      .forEach(slowIt(buildTask.expectations))
+      .addInvocation('watch --unminified')
+      .addInvocation('watch -u')
+      .addInvocation('watch --unminified true')
+      .addInvocation('watch -u true')
+      .forEach(slowIt(expectations))
       .finally(done);
   });
 });
+
+function expectations(testCase) {
+  expect(testCase.stdout).toBeTask('watch', 'sever');
+  buildTask.expectations(testCase);
+  // TODO @bholloway more test coverage on webstorm task
+}
+
+function customMatchers() {
+  jasmine.addMatchers({
+    toBeWatchHelpWithError: matchers.getHelpMatcher(/^\s*The "watch" task/)
+  });
+}

@@ -32,6 +32,7 @@ function factory(base) {
     reset           : reset,
     seal            : seal,
     withDirectories : withDirectories,
+    withTimeout     : withTimeout,
     forProgram      : forProgram,
     addSource       : addSource,
     withSourceFilter: withSourceFilter,
@@ -78,6 +79,7 @@ function factory(base) {
       directories  : {},
       sources      : [],
       filter       : null,
+      timeout      : false,
       program      : null,
       expectations : [],
       invocations  : [],
@@ -114,6 +116,16 @@ function factory(base) {
   function withDirectories(source, temp) {
     params.directories.source = source;
     params.directories.temp   = temp;
+    return self;
+  }
+
+  /**
+   * Set the watchdog timeout that will end the process when elapsed
+   * @param {number} [milliseconds] The timeout in milliseconds or omitted for no timeout
+   * @returns {object} The same instance with mutated properties
+   */
+  function withTimeout(milliseconds) {
+    params.timeout = (typeof milliseconds === 'number') && Math.max(0, milliseconds);
     return self;
   }
 
@@ -219,6 +231,10 @@ function factory(base) {
    * @returns {{then: {function}, catch: {function}, finally: {function}} A promise that resolves when tests complete
    */
   function run() {
+    var process;
+    function doKill() {
+      process.kill();
+    }
 
     // if we can get a list of single instances we recurse them
     var list = toArray();
@@ -254,7 +270,9 @@ function factory(base) {
         }
         // run the command
         else {
-          childProcess.exec(command, {cwd: cwd}, function onProcessComplete(exitcode, stdout, stderr) {
+          var timeout = setTimeout(doKill, params.timeout || 1E+9);
+          process = childProcess.exec(command, {cwd: cwd}, function onProcessComplete(exitcode, stdout, stderr) {
+            clearTimeout(timeout);
             var testCase = defaults({
               sourceDir : src,
               runner    : self,
