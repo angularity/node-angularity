@@ -40,7 +40,7 @@ function setUpTaskTest(tyRun) {
         .argv;
 
       gulp.task('test', ['javascript'], function (done) {
-        console.log(hr('-', 80, 'javascript'));
+        console.log(hr('-', 80, 'test'));
 
         gulp
           .src(streams.TEST + '/karma.conf.js')
