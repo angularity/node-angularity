@@ -7,8 +7,8 @@ function setUpTaskJavascript(tyRun) {
   var optionDefinitionJsHintReporter = {
     key: 'jshint-reporter',
     value: {
-      describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module, or the absolute path ' +
-        'to one.',
+      describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module,' +
+      ' or the absolute path to one.',
       alias: ['j'],
       //TODO @bguiz get this from config
       default: 'angularity-jshint-reporter',
@@ -98,9 +98,6 @@ function setUpTaskJavascript(tyRun) {
       checkKarmaReporter
     ],
     onInit: function onInitJavascriptTask(yargsInstance) {
-      var path            = require('path'),
-          fs              = require('fs');
-
       var gulp            = require('gulp'),
           jshint          = require('gulp-jshint'),
           rimraf          = require('gulp-rimraf'),
@@ -109,12 +106,10 @@ function setUpTaskJavascript(tyRun) {
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
           stringify       = require('stringify'),
-          wordwrap        = require('wordwrap'),
           ngAnnotate      = require('browserify-ngannotate');
 
       var karma           = require('../lib/test/karma'),
           browserify      = require('../lib/build/browserify'),
-          taskYargs       = require('../lib/util/task-yargs'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams'),
           jshintReporter  = require('../lib/util/jshint-reporter');
@@ -162,7 +157,7 @@ function setUpTaskJavascript(tyRun) {
       });
 
       // clean javascript from the test directory
-      //  don't remove the karma conf or Webstorm ide will have problems
+      //  don't remove the karma conf or WebStorm ide will have problems
       gulp.task('javascript:cleanunit', function () {
         return gulp
           .src([streams.TEST + '/**/*.js*', '!**/karma.conf.js'], {read: false}) // keep configuration
@@ -192,7 +187,7 @@ function setUpTaskJavascript(tyRun) {
           )
           .pipe(semiflat(process.cwd()))
           .pipe(karma.createConfig(reporters))
-          .pipe(gulp.dest(streams.TEST))
+          .pipe(gulp.dest(streams.TEST));
       });
 
       /**
@@ -210,10 +205,10 @@ function setUpTaskJavascript(tyRun) {
       }
 
       // Augment exported function with utility functions because
-      // dependant tasks would liek to share this
+      // dependant tasks would like to share this
       setUpTaskJavascript.getTransforms = getTransforms;
     },
-    onRun: function onRunJavascriptTask(yargsInstance) {
+    onRun: function onRunJavascriptTask() {
       console.log('onRunJavascriptTask');
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
