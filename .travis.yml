@@ -10,6 +10,7 @@ matrix:
   fast_finish: true
 before_install:
   - npm install -g npm@2.1.7
+  - npm install -g
   - node -v
   - npm -v
 script:
