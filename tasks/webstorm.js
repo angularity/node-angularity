@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpWebstormTask(tyRun) {
+function setUpWebStormTask(tyRun) {
   var fs              = require('fs'),
       path            = require('path'),
       ideTemplate     = require('ide-template'),
@@ -369,4 +369,4 @@ function setUpWebstormTask(tyRun) {
     return result;
   }
 }
-module.exports = setUpWebstormTask;
+module.exports = setUpWebStormTask;
