@@ -15,4 +15,4 @@ before_install:
 script:
   - pwd && ls
   - node node_modules/jasmine-node/bin/jasmine-node --version
-  - node node_modules/jasmine-node/bin/jasmine-node --captureExceptions --test-dir /home/travis/build/angularity/node-angularity/test
+  - node node_modules/jasmine-node/bin/jasmine-node --captureExceptions test/specs
