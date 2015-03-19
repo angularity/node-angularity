@@ -15,7 +15,8 @@
     "babel"
   ],
   "scripts": {
-    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs"
+    "test": "npm run lint && node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs",
+    "lint": "gulp lint --gulpfile ./test/jshint.js"
   },
   "contributors": [
     "bholloway",
@@ -106,8 +107,9 @@
     "yargs": "latest"
   },
   "devDependencies": {
+    "jasmine-diff-matchers": "~2.0.0",
     "jasmine-node": "2.0.0-beta4",
-    "ncp": "~2.0.0",
-    "jasmine-diff-matchers": "~2.0.0"
+    "jshint-stylish": "^1.0.1",
+    "ncp": "~2.0.0"
   }
 }
