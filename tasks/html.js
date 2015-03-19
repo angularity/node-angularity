@@ -10,26 +10,22 @@ function setUpTaskHtml(tyRun) {
     options: [],
     onInit: function onInitHtmlTask(yargsInstance) {
       var gulp            = require('gulp'),
-          concat          = require('gulp-concat'),
           inject          = require('gulp-inject'),
           plumber         = require('gulp-plumber'),
           rimraf          = require('gulp-rimraf'),
-          runSequence     = require('run-sequence'),
-          wordwrap        = require('wordwrap');
+          runSequence     = require('run-sequence');
 
       var injectAdjacent  = require('../lib/inject/adjacent-files'),
           bowerFiles      = require('../lib/inject/bower-files'),
-          taskYargs       = require('../lib/util/task-yargs'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams');
 
-      var cliArgs = yargsInstance
+      yargsInstance
         .strict()
-        .wrap(80)
-        .argv;
+        .wrap(80);
 
       // `cliArgs` are available within gulp tasks by means of closure,
-      // as they are only called after `onRun` has been invoked, and they have been passeds
+      // as they are only called after `onRun` has been invoked, and they have been passed
       gulp.task('html', function (done) {
         console.log(hr('-', 80, 'html'));
         runSequence(
@@ -65,7 +61,7 @@ function setUpTaskHtml(tyRun) {
           .pipe(gulp.dest(streams.BUILD));
       });
     },
-    onRun: function onRunHtmlTask(yargsInstance) {
+    onRun: function onRunHtmlTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
