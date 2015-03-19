@@ -10,19 +10,15 @@ function setUpTaskCss(tyRun) {
     onInit: function onInitCssTask(yargsInstance) {
       var gulp            = require('gulp'),
           rimraf          = require('gulp-rimraf'),
-          runSequence     = require('run-sequence'),
-          wordwrap        = require('wordwrap'),
-          path            = require('path');
+          runSequence     = require('run-sequence');
 
       var nodeSass        = require('../lib/build/node-sass'),
-          taskYargs       = require('../lib/util/task-yargs'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams');
 
-      var cliArgs = yargsInstance
+      yargsInstance
         .strict()
-        .wrap(80)
-        .argv;
+        .wrap(80);
 
       gulp.task('css', function (done) {
         console.log(hr('-', 80, 'css'));
@@ -46,7 +42,7 @@ function setUpTaskCss(tyRun) {
           .pipe(gulp.dest(streams.BUILD));
       });
     },
-    onRun: function onRunCssTask(yargsInstance) {
+    onRun: function onRunCssTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
