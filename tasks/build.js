@@ -9,27 +9,24 @@ function setUpTaskBuild(tyRun) {
     options: [],
     onInit: function onBuildTask(yargsInstance) {
       var gulp        = require('gulp'),
-          wordwrap    = require('wordwrap'),
           runSequence = require('run-sequence');
 
-      var taskYargs       = require('../lib/util/task-yargs'),
-          hr              = require('../lib/util/hr');
+      var hr          = require('../lib/util/hr');
 
-      var cliArgs = yargsInstance
+      yargsInstance
         .strict()
-        .wrap(80)
-        .argv;
+        .wrap(80);
 
       gulp.task('build', function (done) {
         console.log(hr('-', 80, 'build'));
         runSequence('javascript', 'css', 'html', done);
       });
     },
-    onRun: function onBuildTask(yargsInstance) {
+    onRun: function onBuildTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
-  }
+  };
 
   tyRun.taskYargs.register(taskDefinition);
 }
