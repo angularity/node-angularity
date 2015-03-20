@@ -40,6 +40,7 @@ describe('The Angularity webstorm task', function () {
     }
   });
 
+  /* globals xdescribe */
   xdescribe('should fail where angularity.json is not present', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
