@@ -69,9 +69,7 @@ describe('The Angularity watch task', function () {
 });
 
 function progress(testCase) {
-  console.log(testCase.stdout, testCase.stderr);  // TODO @bholloway remove temporary logging
   if (/Finished 'watch'/.test(testCase.stdout)) {
-    console.log('!!!!!!KILL!!!!!!');              // TODO @bholloway remove temporary logging
     testCase.kill();
   }
 }
