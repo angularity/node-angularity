@@ -40,7 +40,7 @@ describe('The Angularity webstorm task', function () {
     }
   });
 
-  describe('should fail where angularity.json is not present', function(done) {
+  xdescribe('should fail where angularity.json is not present', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .withSourceFilter(function removeBuildFiles(value) {
@@ -55,7 +55,7 @@ describe('The Angularity webstorm task', function () {
     }
   });
 
-  describe('should operate with all flags false', function(done) {
+  xdescribe('should operate with all flags false', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('webstorm', FLAGS.map(composeOption(false)))
