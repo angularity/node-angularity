@@ -80,8 +80,10 @@ function expectations(testCase) {
   expect(workingReleaseFile('index.html')).diffFilePatch(sourceReleaseFile('index.html'));
   expect(workingReleaseFile('index.js')).diffFilePatch(sourceReleaseFile('index.js'));
   expect(workingReleaseFile('index.css')).diffFilePatch(sourceReleaseFile('index.css'));
-//  expect(workingReleaseFile('index.js.map' )).diffFilePatch(sourceReleaseFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
-//  expect(workingReleaseFile('index.css.map')).diffFilePatch(sourceReleaseFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
+//  expect(workingReleaseFile('index.js.map' )).diffFilePatch(sourceReleaseFile('index.js.map'));
+// TODO @bholloway solve repeatability of .map files
+//  expect(workingReleaseFile('index.css.map')).diffFilePatch(sourceReleaseFile('index.css.map'));
+// TODO @bholloway solve repeatability of .map files
 
   // vendor files
   expect(workingVendorFile('manifest.json')).diffFilePatch(sourceVendorFile('manifest.json'));

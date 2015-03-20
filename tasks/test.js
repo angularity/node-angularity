@@ -13,25 +13,11 @@ function setUpTaskTest(tyRun) {
     options: [],
     checks: [],
     onInit: function onInitTestTask(yargsInstance) {
-      var path            = require('path'),
-          fs              = require('fs');
-
-      var gulp            = require('gulp'),
-          jshint          = require('gulp-jshint'),
-          rimraf          = require('gulp-rimraf'),
-          runSequence     = require('run-sequence'),
-          combined        = require('combined-stream'),
-          to5ify          = require('6to5ify'),
-          stringify       = require('stringify'),
-          wordwrap        = require('wordwrap'),
-          ngAnnotate      = require('browserify-ngannotate');
+      var gulp            = require('gulp');
 
       var karma           = require('../lib/test/karma'),
-          browserify      = require('../lib/build/browserify'),
-          taskYargs       = require('../lib/util/task-yargs'),
           hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams'),
-          jshintReporter  = require('../lib/util/jshint-reporter');
+          streams         = require('../lib/config/streams');
 
       var cliArgs;
       cliArgs = yargsInstance
@@ -39,7 +25,7 @@ function setUpTaskTest(tyRun) {
         .wrap(80)
         .argv;
 
-      gulp.task('test', ['javascript'], function (done) {
+      gulp.task('test', ['javascript'], function () {
         console.log(hr('-', 80, 'test'));
 
         gulp
@@ -47,7 +33,7 @@ function setUpTaskTest(tyRun) {
           .pipe(karma.run());
       });
     },
-    onRun: function onRunTestTask(yargsInstance) {
+    onRun: function onRunTestTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

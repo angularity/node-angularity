@@ -8,10 +8,8 @@ function setUpTaskRelease(tyRun) {
     prerequisiteTasks: ['help', 'build'],
     checks: [],
     options: [],
-    onInit: function onInitReleaseTask(yargsInstance) {
+    onInit: function onInitReleaseTask() {
       var gulp        = require('gulp'),
-          concat      = require('gulp-concat'),
-          wrap        = require('gulp-wrap'),
           inject      = require('gulp-inject'),
           plumber     = require('gulp-plumber'),
           rimraf      = require('gulp-rimraf'),
@@ -22,15 +20,13 @@ function setUpTaskRelease(tyRun) {
       var injectAdjacent   = require('../lib/inject/adjacent-files'),
           injectTransform  = require('../lib/inject/relative-transform'),
           bowerFiles       = require('../lib/inject/bower-files'),
-          versionDirectory = require('../lib/release/version-directory'),
           taskYargs        = require('../lib/util/task-yargs'),
           hr               = require('../lib/util/hr'),
-          jshintReporter   = require('../lib/util/jshint-reporter'),
           streams          = require('../lib/config/streams');
 
       taskYargs.register('release', {
-        description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build files along with bower ' +
-          'components to a release directory.')),
+        description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build ' +
+        'files along with bower components to a release directory.')),
         prerequisiteTasks: ['help', 'build'],
         checks: [],
         options: []
@@ -80,19 +76,19 @@ function setUpTaskRelease(tyRun) {
       });
 
       // version the release app directory
-      /* TODO resolve versioning and CDN release
+      /* TODO resolve visioning and CDN release
       gulp.task('release:versionapp', function () {
         return gulp.src(streams.RELEASE_APP + '/**')
           .pipe(versionDirectory('$', true));
       });
       */
     },
-    onRun: function onRunReleaseTask(yargsInstance) {
+    onRun: function onRunReleaseTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
-  }
+  };
   tyRun.taskYargs.register(taskDefinition);
-};
+}
 
 module.exports = setUpTaskRelease;
