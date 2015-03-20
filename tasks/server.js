@@ -40,12 +40,9 @@ function setUpTaskServer(tyRun) {
     onInit: function onInitServerTask(yargsInstance) {
       var gulp        = require('gulp'),
           gutil       = require('gulp-util'),
-          wordwrap    = require('wordwrap'),
           browserSync = require('browser-sync');
 
-      var taskYargs       = require('../lib/util/task-yargs'),
-          hr             = require('../lib/util/hr'),
-          jshintReporter = require('../lib/util/jshint-reporter'),
+      var hr             = require('../lib/util/hr'),
           streams        = require('../lib/config/streams');
 
       var cliArgs;
@@ -78,7 +75,7 @@ function setUpTaskServer(tyRun) {
         browserSync.reload();
       });
     },
-    onRun: function onRunServerTask(yargsInstance) {
+    onRun: function onRunServerTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }

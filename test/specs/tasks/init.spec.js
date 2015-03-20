@@ -115,7 +115,8 @@ describe('The Angularity init task', function () {
     helper.runner.create()
       .addParameters({ version: '1.2.3' })
       .addParameters({ version: '4.6.6-rc2A' })
-//    .addParameters({ version: '"non semver string"', illegal: true })   // TODO @bholloway doesn't invoke correctly on windows
+//    .addParameters({ version: '"non semver string"', illegal: true })
+//    TODO @bholloway doesn't invoke correctly on windows
       .addInvocation('init --version {version}')
       .addInvocation('init -v {version}')
       .forEach(slowIt(expectations))
