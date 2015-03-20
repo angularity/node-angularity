@@ -287,9 +287,7 @@ function factory(base) {
 
         // spawn a child process in an exec()-like manner
         //  https://github.com/joyent/node/issues/2318#issuecomment-32706753
-        var args = platform.isWindows() ?
-          ['cmd.exe', ['/s', '/c', '"' + command + '"']] :
-          ['/bin/sh', ['-c', command]];
+        var args = platform.isWindows() ? ['cmd.exe', ['/c', command]] : ['/bin/sh', ['-c', command]];
         child = childProcess.spawn.apply(childProcess, args.concat({
           cwd  : cwd,
           stdio: 'pipe'
