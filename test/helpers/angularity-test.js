@@ -5,6 +5,7 @@ var Q          = require('q'),
     fs         = require('fs'),
     path       = require('path'),
     isArray    = require('lodash.isarray'),
+    merge      = require('lodash.merge'),
     gulp       = require('gulp'),
     gulpRimraf = require('gulp-rimraf'),
     rimraf     = require('rimraf');
@@ -37,22 +38,40 @@ function cleanUp(callback) {
 
 /**
  * Create a Jasmine <code>it</code> statement for enumerating test-runner cases in a <code>Array.forEach()</code>
- * @param {function} expectations A method containing expectations
+ * @param {function} [onComplete] A method containing expectations to run on complete
+ * @param {function} [onNotify] A method containing expectations to run on notify
+ * @param {string} [title] Optional title for the jasmine <code>it</code> statement
  * @param {{before: {number}, after: {number}} options Options for the expectations
  * @returns {function} A method that when closed produces a <code>Array.forEach()</code> handler that itself returns a
  *                     promise
  */
 function jasmineFactory(options) {
-  return function forExpectations(expectations, title) {
-    options = options || {};
+  function defaultHandler(testCase) {
+    return testCase;
+  }
+  return function forExpectations(onComplete, onProgress, title) {
+    var params = merge({
+        title     : null,
+        before    : 0,
+        after     : 0,
+        onComplete: defaultHandler,
+        onProgress: defaultHandler
+      },
+      options,
+      {
+        onComplete: onComplete,
+        onProgress: onProgress,
+        title     : title
+      });
     return function itForRunner(testRunner) {
       var deferred = Q.defer();
       it(title || testRunner, function (done) {
         testRunner
           .run()
-          .then(getDelay(options.before))
-          .then(expectations)
-          .then(getDelay(options.after))
+          .progress(params.onProgress)
+          .then(getDelay(params.before))
+          .then(params.onComplete)
+          .then(getDelay(params.after))
           .finally(done)
           .finally(deferred.resolve.bind(deferred));
       });

@@ -48,27 +48,31 @@ describe('The Angularity watch task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .withTimeout(30000)
       .addSource('minimal-es5')
       .addInvocation('watch')
       .addInvocation('watch --unminified false')
       .addInvocation('watch -u false')
-      .forEach(slowIt(expectations))
+      .forEach(slowIt(expectations, progress))
       .finally(done);
   });
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .withTimeout(30000)
       .addSource('minimal-es5-unminified')
       .addInvocation('watch --unminified')
       .addInvocation('watch -u')
       .addInvocation('watch --unminified true')
       .addInvocation('watch -u true')
-      .forEach(slowIt(expectations))
+      .forEach(slowIt(expectations, progress))
       .finally(done);
   });
 });
+
+function progress(testCase) {
+  if (/Finished 'watch'/.test(testCase.stdout)) {
+    testCase.kill();
+  }
+}
 
 function expectations(testCase) {
   expect(testCase.stdout).toBeTask('watch', 'sever');

@@ -10,6 +10,8 @@ var path         = require('path'),
     isArray      = require('lodash.isarray'),
     childProcess = require('child_process');
 
+var platform = require('../../lib/config/platform');
+
 /**
  * Create an instance based with the given parameter defaults.
  * Since this method is not exposed to the user we can rely on <code>base</code> to be correctly formed with array
@@ -231,10 +233,6 @@ function factory(base) {
    * @returns {{then: {function}, catch: {function}, finally: {function}} A promise that resolves when tests complete
    */
   function run() {
-    var process;
-    function doKill() {
-      process.kill();
-    }
 
     // if we can get a list of single instances we recurse them
     var list = toArray();
@@ -247,48 +245,131 @@ function factory(base) {
     }
     // otherwise single instance
     else {
-      var resolveSrc  = ensureDirectory(params.directories.source);
-      var resolveDest = ensureDirectory(params.directories.temp);
-      var source      = params.sources[0];
-      var paramSet    = params.parameterSets[0];
+      return runSingle();
+    }
+  }
 
-      // each combination is async
-      var deferred = Q.defer();
+  /**
+   * Run the first permutation of sources and parameter sets
+   * @returns {{then: {function}, catch: {function}, finally: {function}, notify: {function}} A promise that resolves
+   *          when test completes and notifies when buffers are updated
+   */
+  function runSingle() {
+    var resolveSrc  = ensureDirectory(params.directories.source);
+    var resolveDest = ensureDirectory(params.directories.temp);
+    var source      = params.sources[0];
+    var paramSet    = params.parameterSets[0];
+    var stdio       = {stdout: '', stderr: ''};
+    var child;
+    var timeout;
 
-      // determine the overall command we will run
-      var command = toString();
+    // each combination is async
+    var deferred = Q.defer();
 
-      // organise a working directory
-      var signature = escapeFilenameString(source, command);
-      var src       = !params.hasRun && resolveSrc(source);
-      var cwd       = resolveDest(signature);
-      copySources(src, cwd, function onCopyComplete(error) {
+    // determine the overall command we will run
+    var command = toString();
 
-        // error in copying implies rejected async
-        if (error) {
-          deferred.reject(error);
-        }
-        // run the command
-        else {
-          var timeout = setTimeout(doKill, params.timeout || 1E+9);
-          process = childProcess.exec(command, {cwd: cwd}, function onProcessComplete(exitcode, stdout, stderr) {
-            clearTimeout(timeout);
-            var testCase = defaults({
-              sourceDir : src,
-              runner    : self,
-              cwd       : cwd,
-              command   : command,
-              exitcode  : exitcode,
-              stdout    : stdout,
-              stderr    : stderr
-            }, paramSet);
-            params.hasRun = true;
-            deferred.resolve(testCase);
-          });
+    // organise a working directory
+    var signature = escapeFilenameString(source, command);
+    var src       = !params.hasRun && resolveSrc(source);
+    var cwd       = resolveDest(signature);
+    copySources(src, cwd, onCopyComplete);
+
+    // handler for end of copy process
+    function onCopyComplete(error) {
+
+      // error in copying implies rejected async
+      if (error) {
+        deferred.reject(error);
+      }
+      // run the command
+      else {
+
+        // spawn a child process in an exec()-like manner
+        //  https://github.com/joyent/node/issues/2318#issuecomment-32706753
+        var args = platform.isWindows() ?
+          ['cmd.exe', ['/s', '/c', '"' + command + '"']] :
+          ['/bin/sh', ['-c', command]];
+        child = childProcess.spawn.apply(childProcess, args.concat({
+          cwd  : cwd,
+          stdio: 'pipe'
+        }));
+
+        // add listeners to the child process
+        notifyOn('stdout');
+        notifyOn('stderr');
+        child.on('close', onClose);
+
+        // start the watchdog timer
+        useTimeout(true);
+      }
+    }
+
+    // clear the watchdog timeout and optionally start another
+    function useTimeout(isStart) {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      if (isStart) {
+        timeout = setTimeout(kill, params.timeout || 1E+9);
+      }
+    }
+
+    // progress on stdio
+    function notifyOn(name) {
+      var stream = child[name];
+      stream.on('readable', function onReadable() {
+        var chunk = stream.read();
+        if (chunk !== null) {
+
+          // cancel watchdog timeout
+          useTimeout(true);
+
+          // append the chunk to the stream text
+          stdio[name] = (stdio[name] || '') + chunk.toString();
+
+          // progress the promise
+          var testCase = getTestCase({kill: kill}, paramSet);
+          deferred.notify(testCase);
         }
       });
-      return deferred.promise;
     }
+
+    // async resolution on process complete or timeout
+    function onClose(exitcode) {
+      process.nextTick(function nextTickResolve() {
+
+        // cancel watchdog timeout and mark as run
+        useTimeout(false);
+        params.hasRun = true;
+
+        // resolve the promise
+        var testCase = getTestCase({exitcode: exitcode}, paramSet);
+        deferred.resolve(testCase);
+      });
+    }
+
+    // the test case is the merge of the test stats and the given arguments, usually the parameter set
+    function getTestCase() {
+      var args      = Array.prototype.slice.call(arguments);
+      var testStats = {
+        sourceDir: src,
+        runner   : self,
+        cwd      : cwd,
+        command  : command,
+        stdout   : stdio.stdout,
+        stderr   : stdio.stderr
+      };
+      return defaults.apply(null, [testStats].concat(args));
+    }
+
+    // kill the child process
+    function kill() {
+      child.kill();
+    }
+
+    // async until process completes
+    return deferred.promise;
   }
 
   /**
