@@ -255,12 +255,16 @@ function factory(base) {
    *          when test completes and notifies when buffers are updated
    */
   function runSingle() {
+
+    // execution parameters
     var resolveSrc  = ensureDirectory(params.directories.source);
     var resolveDest = ensureDirectory(params.directories.temp);
     var source      = params.sources[0];
     var paramSet    = params.parameterSets[0];
-    var stdio       = {stdout: '', stderr: ''};
-    var child;
+
+    // execution state
+    var stdio = {stdout: '', stderr: ''};
+    var child = null;
     var timeout;
 
     // each combination is async
@@ -338,18 +342,23 @@ function factory(base) {
 
     // async resolution on process complete or timeout
     function onClose(exitcode) {
-console.log('!!!!ONCLOSE!!!!');
-      process.setImmediate(function nextTickResolve() {
-console.log('setImmediate() resolve');
+
+      // ensure idempotence
+      if (child) {
+        child = undefined;
 
         // cancel watchdog timeout and mark as run
         useTimeout(false);
         params.hasRun = true;
 
-        // resolve the promise
-        var testCase = getTestCase({exitcode: exitcode}, paramSet);
-        deferred.resolve(testCase);
-      });
+        // wait for next tick in case to avoid any possibility of race condiion
+        process.nextTick(function nextTickResolve() {
+
+          // resolve the promise
+          var testCase = getTestCase({exitcode: exitcode}, paramSet);
+          deferred.resolve(testCase);
+        });
+      }
     }
 
     // the test case is the merge of the test stats and the given arguments, usually the parameter set
@@ -368,7 +377,18 @@ console.log('setImmediate() resolve');
 
     // kill the child process
     function kill() {
-      child.kill();
+
+      // child will be valid unless onClose() has already run
+      //  and if onClose() has already run we don't want to be here anyhow
+      if (child) {
+
+        // send a kill signal to the process and hope that it terminates
+        child.kill();
+
+        // process may not respond to the kill signal in a timely manner
+        //  https://github.com/travis-ci/travis-ci/issues/704
+        setTimeout(onClose, 500);
+      }
     }
 
     // async until process completes
