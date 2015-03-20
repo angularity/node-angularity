@@ -339,8 +339,8 @@ function factory(base) {
     // async resolution on process complete or timeout
     function onClose(exitcode) {
 console.log('!!!!ONCLOSE!!!!');
-      process.nextTick(function nextTickResolve() {
-console.log('nextTick() resolve');
+      process.setImmediate(function nextTickResolve() {
+console.log('setImmediate() resolve');
 
         // cancel watchdog timeout and mark as run
         useTimeout(false);
