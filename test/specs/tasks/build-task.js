@@ -29,4 +29,4 @@ function customMatchers() {
 module.exports = {
   expectations  : expectations,
   customMatchers: customMatchers
-}
+};
