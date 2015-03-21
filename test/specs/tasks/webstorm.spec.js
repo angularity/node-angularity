@@ -42,6 +42,8 @@ function progress(testCase) {
 }
 
     function expectations(testCase) {
+console.log('>COMPLETE');
+console.log(testCase.stderr, testCase.stdout);
       expect(testCase.stderr).toBeBuildHelpWithError(false);
     }
   });
