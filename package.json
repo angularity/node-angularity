@@ -15,7 +15,7 @@
     "babel"
   ],
   "scripts": {
-    "test": "npm run lint && npm run e2e",
+    "test": "npm run lint & npm run e2e",
     "e2e": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs",
     "lint": "node test/jshint.js"
   },
