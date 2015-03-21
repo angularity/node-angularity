@@ -382,27 +382,14 @@ function factory(base) {
       //  and if onClose() has already run we don't want to be here anyhow
       if (child) {
 
-        // send a kill signal to the process and then disconnect
-//        child.kill();
-
-        // process may not respond to the kill signal on some platforms
+        // process may not respond to the SIGTERM signal on some platforms, only killing the full task tree will work
+        // consistently
         //  https://github.com/travis-ci/travis-ci/issues/704
-        setTimeout(forceKill, 500);
-      }
-    }
-
-    // kill the child process
-    function forceKill() {
-
-      // child will be valid unless onClose() has already run
-      //  and if onClose() has already run we don't want to be here anyhow
-      if (child) {
-
-        // run a forced task kill
-        var command = (platform.isWindows() ? ['taskkill', '/f', '/t', '/PID'] : ['kill', '-9'])
-          .concat(child.pid)
-          .join(' ');
-        childProcess.exec(command);
+        var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -9 #')
+          .replace('#', child.pid);
+        childProcess.exec(command, null, function() {
+          console.log(arguments);
+        });
 
         // lets consider it closed if close is not called as a result
         setTimeout(onClose, 500);
