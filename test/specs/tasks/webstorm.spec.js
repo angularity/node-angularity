@@ -35,9 +35,11 @@ describe('The Angularity webstorm task', function () {
       .forEach(fastIt(expectations, progress))
       .finally(done);
 
-    function progress(testCase) {
-      console.log(testCase.stderr, testCase.stdout);
-    }
+// TODO @bholloway delete this debug code
+function progress(testCase) {
+  console.log('>PROGRESS');
+  console.log(testCase.stderr, testCase.stdout);
+}
 
     function expectations(testCase) {
       expect(testCase.stderr).toBeBuildHelpWithError(false);
