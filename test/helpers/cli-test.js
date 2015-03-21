@@ -387,10 +387,15 @@ function factory(base) {
         //  https://github.com/travis-ci/travis-ci/issues/704
         var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -9 #')
           .replace('#', child.pid);
-        childProcess.exec(command, null, function() {
-          console.log(arguments);
-        });
+        childProcess.exec(command);
 
+setTimeout(function() {
+  childProcess.exec('ps', null, function(error, stdout, stderr) {
+    console.log(error);
+    console.log(stdout);
+    console.log(stderr);
+  });
+}, 500);
         // lets consider it closed if close is not called as a result
         setTimeout(onClose, 500);
       }

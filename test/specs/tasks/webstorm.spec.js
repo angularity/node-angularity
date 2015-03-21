@@ -32,16 +32,11 @@ describe('The Angularity webstorm task', function () {
       .addInvocation('webstorm --help')
       .addInvocation('webstorm -h')
 //    .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
-      .forEach(fastIt(expectations, progress))
+      .forEach(fastIt(expectations))
       .finally(done);
 
-// TODO @bholloway delete this debug code
-function progress(testCase) {
-  console.log('>PROGRESS');
-  console.log(testCase.stderr, testCase.stdout);
-}
-
     function expectations(testCase) {
+// TODO @bholloway this test is consistently not producing any output on appveyor but is fine everywhere else
 console.log('>COMPLETE');
 console.log(testCase.stderr, testCase.stdout);
       expect(testCase.stderr).toBeBuildHelpWithError(false);
