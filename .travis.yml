@@ -17,5 +17,7 @@ install:
 
 script:
   - node node_modules/jasmine-node/bin/jasmine-node --version # expect jasmine 2.x
-  - npm run lint
-  - npm test
+
+  # we would like to just specify 'npm test' and 'npm run lint' but npm scripts don't exit for some reason
+  - node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs
+  - node test/jshint.js
