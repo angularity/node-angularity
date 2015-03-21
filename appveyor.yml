@@ -11,11 +11,12 @@ install:
   - set PATH=%APPDATA%\npm;%PATH%
   - node -v
   - npm -v
-  - npm install -g
 
 test_script:
+  - npm install -g
   - echo %cd%
   - dir /w
+  - node node_modules/jasmine-node/bin/jasmine-node --version
   - npm test
 
 build: off
