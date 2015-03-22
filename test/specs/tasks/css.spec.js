@@ -16,7 +16,7 @@ var slowIt = helper.jasmineFactory({
 
 var BUILD_FOLDER = 'app-build';
 
-xdescribe('The Angularity css task', function () {
+describe('The Angularity css task', function () {
 
   beforeEach(matchers.addMatchers);
 
@@ -28,7 +28,7 @@ xdescribe('The Angularity css task', function () {
 
   afterEach(helper.cleanUp);
 
-  xdescribe('should display help when requested', function (done) {
+  describe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('css --help')
       .addInvocation('css -h')
@@ -42,7 +42,7 @@ xdescribe('The Angularity css task', function () {
     }
   });
 
-  xdescribe('should compile css correctly', function(done) {
+  describe('should compile css correctly', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('css')

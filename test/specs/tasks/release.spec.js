@@ -18,7 +18,7 @@ var slowIt = helper.jasmineFactory({
 var RELEASE_FOLDER = 'app-release';
 var VENDOR_FOLDER  = 'vendor';
 
-xdescribe('The Angularity release task', function () {
+describe('The Angularity release task', function () {
 
   beforeEach(matchers.addMatchers);
 
@@ -30,7 +30,7 @@ xdescribe('The Angularity release task', function () {
 
   afterEach(helper.cleanUp);
 
-  xdescribe('should display help where requested', function (done) {
+  describe('should display help where requested', function (done) {
     helper.runner.create()
       .addInvocation('release --help')
       .addInvocation('release -h')
@@ -44,7 +44,7 @@ xdescribe('The Angularity release task', function () {
     }
   });
 
-  xdescribe('should operate minified (by default)', function(done) {
+  describe('should operate minified (by default)', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('release')
@@ -54,7 +54,7 @@ xdescribe('The Angularity release task', function () {
       .finally(done);
   });
 
-  xdescribe('should operate unminified', function(done) {
+  describe('should operate unminified', function(done) {
     helper.runner.create()
       .addSource('minimal-es5-unminified')
       .addInvocation('release --unminified')

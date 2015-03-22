@@ -15,7 +15,7 @@ var slowIt = helper.jasmineFactory({
 
 var FLAGS = [ 'project', 'external', 'codestyle', 'templates', 'launch' ];
 
-xdescribe('The Angularity webstorm task', function () {
+describe('The Angularity webstorm task', function () {
 
   beforeEach(matchers.addMatchers);
 
@@ -27,7 +27,7 @@ xdescribe('The Angularity webstorm task', function () {
 
   afterEach(helper.cleanUp);
 
-  xdescribe('should display help when requested', function (done) {
+  describe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('webstorm --help')
       .addInvocation('webstorm -h')
@@ -43,7 +43,7 @@ console.log(testCase.stderr, testCase.stdout);
     }
   });
 
-  xdescribe('should fail where angularity.json is not present', function(done) {
+  describe('should fail where angularity.json is not present', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .withSourceFilter(function removeBuildFiles(value) {
@@ -58,7 +58,7 @@ console.log(testCase.stderr, testCase.stdout);
     }
   });
 
-  xdescribe('should operate with all flags false', function(done) {
+  describe('should operate with all flags false', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('webstorm', FLAGS.map(composeOption(false)))

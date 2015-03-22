@@ -343,7 +343,6 @@ function factory(base) {
 
     // async resolution on process complete or timeout
     function onClose(exitcode) {
-console.log('onClose()');
 
       // ensure idempotence
       if (child) {
@@ -391,7 +390,9 @@ console.log('onClose()');
           childProcess.spawn('taskkill', ['/f', '/t', '/PID', child.pid]);
         } else {
           psTree(child.pid, function onProcessTree(err, children) {
-            var pidList = children.map(getField('PID')).concat(child.pid);
+            var pidList = children
+              .map(getField('PID'))
+              .concat(child.pid);
             childProcess.spawn('kill', ['-9'].concat(pidList));
           });
         }

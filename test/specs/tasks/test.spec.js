@@ -17,7 +17,7 @@ var slowIt = helper.jasmineFactory({
 var BUILD_FOLDER = 'app-build';
 var TEST_FOLDER  = 'app-test';
 
-xdescribe('The Angularity test task', function () {
+describe('The Angularity test task', function () {
 
   beforeEach(matchers.addMatchers);
 
@@ -31,7 +31,7 @@ xdescribe('The Angularity test task', function () {
 
   afterEach(helper.cleanUp);
 
-  xdescribe('should display help when requested', function (done) {
+  describe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('test --help')
       .addInvocation('test -h')
@@ -46,7 +46,7 @@ xdescribe('The Angularity test task', function () {
     }
   });
 
-  xdescribe('should build unminified javascript and run tests', function(done) {
+  describe('should build unminified javascript and run tests', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('test')
@@ -54,7 +54,7 @@ xdescribe('The Angularity test task', function () {
       .finally(done);
   });
 
-  xdescribe('should support unminified option, but not minify test output', function(done) {
+  describe('should support unminified option, but not minify test output', function(done) {
     helper.runner.create()
       .addSource('minimal-es5-unminified')
       .addInvocation('test --unminified')
