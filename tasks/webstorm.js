@@ -1,11 +1,10 @@
 'use strict';
 
 function setUpWebStormTask(tyRun) {
-  var fs              = require('fs'),
-      path            = require('path'),
-      ideTemplate     = require('ide-template'),
-      defaults        = require('../lib/config/defaults'),
-      platform        = require('../lib/config/platform');
+  var fs       = require('fs'),
+      path     = require('path'),
+      defaults = require('../lib/config/defaults'),
+      platform = require('../lib/config/platform');
 
   var config = defaults
     .getInstance('webstorm')
@@ -135,6 +134,7 @@ function setUpWebStormTask(tyRun) {
         break;
       case true:
       case 'true':
+        var ideTemplate = require('ide-template');
         if (ideTemplate.webStorm.validateExecutable()) {
           argv.launch = true;
         } else {
@@ -174,12 +174,13 @@ function setUpWebStormTask(tyRun) {
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
-      var gulp            = require('gulp'),
-          gutil           = require('gulp-util'),
-          runSequence     = require('run-sequence');
+      var gulp        = require('gulp'),
+          gutil       = require('gulp-util'),
+          runSequence = require('run-sequence'),
+          ideTemplate = require('ide-template');
 
-      var streams         = require('../lib/config/streams'),
-          hr              = require('../lib/util/hr');
+      var streams = require('../lib/config/streams'),
+          hr      = require('../lib/util/hr');
 
       var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
 
