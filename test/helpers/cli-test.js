@@ -8,18 +8,10 @@ var path         = require('path'),
     flatten      = require('lodash.flatten'),
     template     = require('lodash.template'),
     isArray      = require('lodash.isarray'),
-    childProcess = require('child_process');
+    childProcess = require('child_process'),
+    psTree       = require('ps-tree');
 
 var platform = require('../../lib/config/platform');
-
-function ps(title) {
-  return function () {
-    console.log(title);
-    childProcess.exec('ps', null, function(error, stdout) {
-      console.log(stdout);
-    });
-  };
-}
 
 /**
  * Create an instance based with the given parameter defaults.
@@ -303,13 +295,11 @@ function factory(base) {
         var args = platform.isWindows() ?
           ['cmd.exe', ['/s', '/c', '"' + command + '"']] :
           ['/bin/sh', ['-c', command]];
-ps('before')();
         child = childProcess.spawn.apply(childProcess, args.concat({
           cwd                     : cwd,
           stdio                   : 'pipe',
           windowsVerbatimArguments: true
         }));
-setTimeout(ps('spawn'), 500);
 
         // add listeners to the child process
         notifyOn('stdout');
@@ -394,12 +384,17 @@ console.log('onClose()');
       //  and if onClose() has already run we don't want to be here anyhow
       if (child) {
 
-        // only killing the full process group will work consistently on all platforms
+        // only killing the full process tree will work consistently on windows and unix
         //  https://github.com/travis-ci/travis-ci/issues/704
-        //  http://unix.stackexchange.com/questions/68754/kill-a-group-of-processes-with-negative-pid
-        var template = platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -TERM -- -#';
-        var command  = template.replace('#', child.pid);
-        childProcess.exec(command);
+        //  https://www.npmjs.com/package/ps-tree
+        if (platform.isWindows()) {
+          childProcess.spawn('taskkill', ['/f', '/t', '/PID', child.pid]);
+        } else {
+          psTree(child.pid, function onProcessTree(err, children) {
+            var pidList = children.map(getField('PID')).concat(child.pid);
+            childProcess.spawn('kill', ['-9'].concat(pidList));
+          });
+        }
       }
     }
 
@@ -472,6 +467,12 @@ function ensureDirectory() {
 
   // return the resolver
   return getResolver(resolved);
+}
+
+function getField(field) {
+  return function curriedGetField(candidate) {
+    return (typeof candidate === 'object') ? candidate[field] : undefined;
+  };
 }
 
 module.exports = {

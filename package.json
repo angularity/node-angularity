@@ -109,6 +109,7 @@
     "jasmine-diff-matchers": "~2.0.0",
     "jasmine-node": "2.0.0-beta4",
     "jshint-stylish": "^1.0.1",
-    "ncp": "~2.0.0"
+    "ncp": "~2.0.0",
+    "ps-tree": "~0.0.3"
   }
 }
