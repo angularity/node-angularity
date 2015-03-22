@@ -1,4 +1,5 @@
 'use strict';
+console.log('webstorm.js');
 
 function setUpWebStormTask(tyRun) {
   var fs       = require('fs'),
@@ -6,6 +7,7 @@ function setUpWebStormTask(tyRun) {
       defaults = require('../lib/config/defaults'),
       platform = require('../lib/config/platform');
 
+console.log('webstorm.js setUpWebStormTask()');
   var config = defaults
     .getInstance('webstorm')
     .file(platform.userHomeDirectory(), '.angularity')
@@ -17,6 +19,7 @@ function setUpWebStormTask(tyRun) {
       'templates': true,
       'launch'   : true
     });
+console.log('webstorm.js platform.userHomeDirectory()', platform.userHomeDirectory());
 
   var webstormOptionDefinitions = [
     {
@@ -127,6 +130,7 @@ function setUpWebStormTask(tyRun) {
    * @param argv
    */
   function validateLaunchPath(argv) {
+console.log('webstorm.js validateLaunchPath()');
     switch (argv.launch) {
       case false:
       case 'false':
@@ -174,6 +178,7 @@ function setUpWebStormTask(tyRun) {
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
+console.log('webstorm.js onInit()');
       var gulp        = require('gulp'),
           gutil       = require('gulp-util'),
           runSequence = require('run-sequence'),
