@@ -1,13 +1,12 @@
 'use strict';
-console.log('webstorm.js');
 
 function setUpWebStormTask(tyRun) {
-  var fs       = require('fs'),
-      path     = require('path'),
-      defaults = require('../lib/config/defaults'),
-      platform = require('../lib/config/platform');
+  var fs              = require('fs'),
+      path            = require('path'),
+      ideTemplate     = require('ide-template'),
+      defaults        = require('../lib/config/defaults'),
+      platform        = require('../lib/config/platform');
 
-console.log('webstorm.js setUpWebStormTask()');
   var config = defaults
     .getInstance('webstorm')
     .file(platform.userHomeDirectory(), '.angularity')
@@ -19,7 +18,6 @@ console.log('webstorm.js setUpWebStormTask()');
       'templates': true,
       'launch'   : true
     });
-console.log('webstorm.js platform.userHomeDirectory()', platform.userHomeDirectory());
 
   var webstormOptionDefinitions = [
     {
@@ -130,7 +128,6 @@ console.log('webstorm.js platform.userHomeDirectory()', platform.userHomeDirecto
    * @param argv
    */
   function validateLaunchPath(argv) {
-console.log('webstorm.js validateLaunchPath()');
     switch (argv.launch) {
       case false:
       case 'false':
@@ -138,7 +135,6 @@ console.log('webstorm.js validateLaunchPath()');
         break;
       case true:
       case 'true':
-        var ideTemplate = require('ide-template');
         if (ideTemplate.webStorm.validateExecutable()) {
           argv.launch = true;
         } else {
@@ -178,14 +174,12 @@ console.log('webstorm.js validateLaunchPath()');
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
-console.log('webstorm.js onInit()');
-      var gulp        = require('gulp'),
-          gutil       = require('gulp-util'),
-          runSequence = require('run-sequence'),
-          ideTemplate = require('ide-template');
+      var gulp            = require('gulp'),
+          gutil           = require('gulp-util'),
+          runSequence     = require('run-sequence');
 
-      var streams = require('../lib/config/streams'),
-          hr      = require('../lib/util/hr');
+      var streams         = require('../lib/config/streams'),
+          hr              = require('../lib/util/hr');
 
       var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'webstorm');
 
