@@ -28,7 +28,7 @@ var FILES_BY_FLAG       = {
     editorconfig: '.editorconfig'
   };
 
-describe('The Angularity init task', function () {
+xdescribe('The Angularity init task', function () {
 
   beforeEach(matchers.addMatchers);
 
@@ -40,7 +40,7 @@ describe('The Angularity init task', function () {
 
   afterEach(helper.cleanUp);
 
-  describe('should display help when requested', function (done) {
+  xdescribe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('init --help')
       .addInvocation('init -h')
@@ -54,7 +54,7 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('should rerun in any directory with package.json', function () {
+  xdescribe('should rerun in any directory with package.json', function () {
     it('init', function(done) {
       helper.runner.create()
         .addInvocation('init')
@@ -88,7 +88,7 @@ describe('The Angularity init task', function () {
 
   });
 
-  describe('should support a custom name', function (done) {
+  xdescribe('should support a custom name', function (done) {
     helper.runner.create()
       .addInvocation('init --name {name}')
       .addInvocation('init -n {name}')
@@ -111,7 +111,7 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('should support a custom version', function (done) {
+  xdescribe('should support a custom version', function (done) {
     helper.runner.create()
       .addParameters({ version: '1.2.3' })
       .addParameters({ version: '4.6.6-rc2A' })
@@ -140,7 +140,7 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('should support a custom description', function (done) {
+  xdescribe('should support a custom description', function (done) {
     helper.runner.create()
 //    .addParameters({ description: '""' })   // TODO -d "" fails on mac, -description "" fails on windows
       .addParameters({ description: '"A few words"' })
@@ -163,7 +163,7 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('should support custom tags', function (done) {
+  xdescribe('should support custom tags', function (done) {
     helper.runner.create()
       .addParameters({ tag1: 'a', tag2: 'b', tags: ['a', 'b'] })
       .addParameters({ tag1: 1, tag2: '"some long tag"', tags: ['1', 'some long tag'] })
@@ -189,7 +189,7 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('should support a custom port', function (done) {
+  xdescribe('should support a custom port', function (done) {
     helper.runner.create()
       .addParameters({ port: 'random' })
       .addParameters({ port: 12345 })
@@ -217,7 +217,7 @@ describe('The Angularity init task', function () {
     }
   });
 
-  describe('should gate features using flags', function (done) {
+  xdescribe('should gate features using flags', function (done) {
 
     // invocation will consist of all flags and their boolean values
     var fields     = Object.getOwnPropertyNames(FILES_BY_FLAG);

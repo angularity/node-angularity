@@ -9,7 +9,7 @@ var fastIt = helper.jasmineFactory({
   after : 500
 });
 
-describe('The Angularity cli interface', function () {
+xdescribe('The Angularity cli interface', function () {
 
   beforeEach(helper.getTimeoutSwitch(60000));
 
@@ -17,7 +17,7 @@ describe('The Angularity cli interface', function () {
 
   afterEach(helper.cleanUp);
 
-  describe('should exit cleanly where there are no other arguments', function (done) {
+  xdescribe('should exit cleanly where there are no other arguments', function (done) {
     helper.runner.create()
       .addInvocation()
       .forEach(fastIt(expectations))
@@ -30,7 +30,7 @@ describe('The Angularity cli interface', function () {
     }
   });
 
-  describe('should display help where requested', function (done) {
+  xdescribe('should display help where requested', function (done) {
     helper.runner.create()
       .addInvocation('--help')
       .addInvocation('-h')
@@ -45,7 +45,7 @@ describe('The Angularity cli interface', function () {
     }
   });
 
-  describe('should display version where requested', function (done) {
+  xdescribe('should display version where requested', function (done) {
     helper.runner.create()
       .addInvocation('--version')
       .addInvocation('-v')

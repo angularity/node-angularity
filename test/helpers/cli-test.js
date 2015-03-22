@@ -381,6 +381,10 @@ function factory(base) {
       // child will be valid unless onClose() has already run
       //  and if onClose() has already run we don't want to be here anyhow
       if (child) {
+console.log(child.pid);
+childProcess.exec('ps', null, function(error, stdout, stderr) {
+  console.log(error, stdout, stderr);
+});
 
         // process may not respond to the SIGTERM signal on some platforms, only killing the full task tree will work
         // consistently
@@ -391,11 +395,9 @@ function factory(base) {
 
 setTimeout(function() {
   childProcess.exec('ps', null, function(error, stdout, stderr) {
-    console.log(error);
-    console.log(stdout);
-    console.log(stderr);
+    console.log(error, stdout, stderr);
   });
-}, 500);
+}, 400);
         // lets consider it closed if close is not called as a result
         setTimeout(onClose, 500);
       }

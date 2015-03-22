@@ -17,7 +17,7 @@ var slowIt = helper.jasmineFactory({
 var BUILD_FOLDER = 'app-build';
 var TEST_FOLDER  = 'app-test';
 
-describe('The Angularity build task', function () {
+xdescribe('The Angularity build task', function () {
 
   beforeEach(matchers.addMatchers);
 
@@ -29,7 +29,7 @@ describe('The Angularity build task', function () {
 
   afterEach(helper.cleanUp);
 
-  describe('should display help when requested', function (done) {
+  xdescribe('should display help when requested', function (done) {
     helper.runner.create()
       .addInvocation('build --help')
       .addInvocation('build -h')
@@ -44,7 +44,7 @@ describe('The Angularity build task', function () {
     }
   });
 
-  describe('should operate minified (by default)', function(done) {
+  xdescribe('should operate minified (by default)', function(done) {
     helper.runner.create()
       .addSource('minimal-es5')
       .addInvocation('build')
@@ -54,7 +54,7 @@ describe('The Angularity build task', function () {
       .finally(done);
   });
 
-  describe('should operate unminified', function(done) {
+  xdescribe('should operate unminified', function(done) {
     helper.runner.create()
       .addSource('minimal-es5-unminified')
       .addInvocation('build --unminified')
