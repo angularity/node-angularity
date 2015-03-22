@@ -391,8 +391,10 @@ function factory(base) {
         } else {
           psTree(child.pid, function onProcessTree(err, children) {
             var pidList = children
-              .map(getField('PID'))
-              .concat(child.pid);
+              .map(function getChildPID(child) {
+                return child.PID;
+              })
+              .concat(child.pid)
             childProcess.spawn('kill', ['-9'].concat(pidList));
           });
         }
@@ -468,12 +470,6 @@ function ensureDirectory() {
 
   // return the resolver
   return getResolver(resolved);
-}
-
-function getField(field) {
-  return function curriedGetField(candidate) {
-    return (typeof candidate === 'object') ? candidate[field] : undefined;
-  };
 }
 
 module.exports = {
