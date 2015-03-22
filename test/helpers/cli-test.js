@@ -297,6 +297,7 @@ function factory(base) {
         child = childProcess.spawn.apply(childProcess, args.concat({
           cwd                     : cwd,
           stdio                   : 'pipe',
+          detached                : true,
           windowsVerbatimArguments: true
         }));
 
@@ -381,10 +382,6 @@ function factory(base) {
       // child will be valid unless onClose() has already run
       //  and if onClose() has already run we don't want to be here anyhow
       if (child) {
-console.log(child.pid);
-childProcess.exec('ps', null, function(error, stdout, stderr) {
-  console.log(error, stdout, stderr);
-});
 
         // process may not respond to the SIGTERM signal on some platforms, only killing the full task tree will work
         // consistently
@@ -395,7 +392,7 @@ childProcess.exec('ps', null, function(error, stdout, stderr) {
 
 setTimeout(function() {
   childProcess.exec('ps', null, function(error, stdout, stderr) {
-    console.log(error, stdout, stderr);
+    console.log(stdout);
   });
 }, 400);
         // lets consider it closed if close is not called as a result
