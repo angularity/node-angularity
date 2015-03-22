@@ -33,7 +33,7 @@ function setUpTaskHtml(tyRun) {
 
       // clean the html build directory
       gulp.task('html:clean', function () {
-        return gulp.src([streams.BUILD + '/**/*.html*', streams.BUILD + '/**/assets/**'], {read: false})
+        return gulp.src([streams.BUILD + '/**/*.html*', streams.BUILD + '/**/assets'], { read: false })
           .pipe(rimraf());
       });
 
