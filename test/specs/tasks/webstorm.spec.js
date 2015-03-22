@@ -36,14 +36,9 @@ describe('The Angularity webstorm task', function () {
       .finally(done);
 
     function expectations(testCase) {
-// TODO @bholloway this test is consistently not producing any output on appveyor but is fine everywhere else
-var deferred = require('q').defer();
-require('child_process').exec('angularity webstorm --help', null, function () {
-  console.log(arguments);
-  deferred.resolve(testCase);
-});
+// TODO @bholloway appveyor fails command with exitcode 1
+console.log('>>> exitcode', testCase.exitcode);
       expect(testCase.stderr).toBeBuildHelpWithError(false);
-return deferred.promise;
     }
   });
 
