@@ -307,7 +307,6 @@ ps('before')();
         child = childProcess.spawn.apply(childProcess, args.concat({
           cwd                     : cwd,
           stdio                   : 'pipe',
-          detached                : true,   // will create a new process group for our kill implementation
           windowsVerbatimArguments: true
         }));
 setTimeout(ps('spawn'), 500);
@@ -354,6 +353,7 @@ setTimeout(ps('spawn'), 500);
 
     // async resolution on process complete or timeout
     function onClose(exitcode) {
+console.log('onClose()');
 
       // ensure idempotence
       if (child) {
@@ -396,13 +396,10 @@ setTimeout(ps('spawn'), 500);
 
         // only killing the full process group will work consistently on all platforms
         //  https://github.com/travis-ci/travis-ci/issues/704
-        var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -TERM -- -#')
-          .replace('#', child.pid);
+        //  http://unix.stackexchange.com/questions/68754/kill-a-group-of-processes-with-negative-pid
+        var template = platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -TERM -- -#';
+        var command  = template.replace('#', child.pid);
         childProcess.exec(command);
-
-setTimeout(ps('killed'), 400);
-        // lets consider it closed if close is not called as a result
-        setTimeout(onClose, 500);
       }
     }
 
