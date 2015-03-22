@@ -12,6 +12,15 @@ var path         = require('path'),
 
 var platform = require('../../lib/config/platform');
 
+function ps(title) {
+  return function () {
+    console.log(title);
+    childProcess.exec('ps', null, function(error, stdout) {
+      console.log(stdout);
+    });
+  };
+}
+
 /**
  * Create an instance based with the given parameter defaults.
  * Since this method is not exposed to the user we can rely on <code>base</code> to be correctly formed with array
@@ -294,12 +303,14 @@ function factory(base) {
         var args = platform.isWindows() ?
           ['cmd.exe', ['/s', '/c', '"' + command + '"']] :
           ['/bin/sh', ['-c', command]];
+ps('before')();
         child = childProcess.spawn.apply(childProcess, args.concat({
           cwd                     : cwd,
           stdio                   : 'pipe',
-          detached                : true,
+          detached                : false,
           windowsVerbatimArguments: true
         }));
+setTimeout(ps('spawn'), 500);
 
         // add listeners to the child process
         notifyOn('stdout');
@@ -386,15 +397,11 @@ function factory(base) {
         // process may not respond to the SIGTERM signal on some platforms, only killing the full task tree will work
         // consistently
         //  https://github.com/travis-ci/travis-ci/issues/704
-        var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -9 #')
+        var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -TERM #')
           .replace('#', child.pid);
         childProcess.exec(command);
 
-setTimeout(function() {
-  childProcess.exec('ps', null, function(error, stdout, stderr) {
-    console.log(stdout);
-  });
-}, 400);
+setTimeout(ps('killed'), 400);
         // lets consider it closed if close is not called as a result
         setTimeout(onClose, 500);
       }
