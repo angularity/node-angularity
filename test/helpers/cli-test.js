@@ -307,7 +307,7 @@ ps('before')();
         child = childProcess.spawn.apply(childProcess, args.concat({
           cwd                     : cwd,
           stdio                   : 'pipe',
-          detached                : false,
+          detached                : true,   // will create a new process group for our kill implementation
           windowsVerbatimArguments: true
         }));
 setTimeout(ps('spawn'), 500);
@@ -394,10 +394,9 @@ setTimeout(ps('spawn'), 500);
       //  and if onClose() has already run we don't want to be here anyhow
       if (child) {
 
-        // process may not respond to the SIGTERM signal on some platforms, only killing the full task tree will work
-        // consistently
+        // only killing the full process group will work consistently on all platforms
         //  https://github.com/travis-ci/travis-ci/issues/704
-        var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -TERM #')
+        var command = (platform.isWindows() ? 'taskkill /f /t /PID #' : 'kill -TERM -- -#')
           .replace('#', child.pid);
         childProcess.exec(command);
 
