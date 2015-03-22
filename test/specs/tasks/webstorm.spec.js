@@ -37,9 +37,13 @@ describe('The Angularity webstorm task', function () {
 
     function expectations(testCase) {
 // TODO @bholloway this test is consistently not producing any output on appveyor but is fine everywhere else
-console.log('>COMPLETE');
-console.log(testCase.stderr, testCase.stdout);
+var deferred = require('q').defer();
+require('child_process').exec('angularity webstorm --help', null, function () {
+  console.log(arguments);
+  deferred.resolve(testCase);
+});
       expect(testCase.stderr).toBeBuildHelpWithError(false);
+return deferred.promise;
     }
   });
 

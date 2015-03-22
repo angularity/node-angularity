@@ -352,7 +352,7 @@ function factory(base) {
         useTimeout(false);
         params.hasRun = true;
 
-        // wait for next tick in case to avoid any possibility of race condiion
+        // wait for next tick to avoid any possibility of race condition
         process.nextTick(function nextTickResolve() {
 
           // resolve the promise
