@@ -17,9 +17,6 @@ var path        = require('path'),
 var taskYargs     = require('../lib/util/task-yargs'),
     taskYargsRun  = require('../lib/util/task-yargs-run');
 
-// TODO @bholloway menus
-// var mainMenu = require('../lib/cli/mainMenu');
-
 // we need to duplicate some event handlers from the gulp cli since we have bypassed it
 gulp.on('task_start', function (e) {
   gutil.log('Starting', '\'' + chalk.cyan(e.task) + '\'...');
