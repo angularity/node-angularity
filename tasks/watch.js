@@ -19,7 +19,7 @@ function setUpTaskWatch(tyRun) {
 
       gulp.task('watch', ['server'], function () {
         console.log(hr('-', 80, 'watch'));
-        var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
+        var getGlobApp = streams.getLocalLibGlob(streams.APP);
 
         // enqueue actions to avoid multiple trigger
         var queue = watchSequence(500, function () {
@@ -27,12 +27,12 @@ function setUpTaskWatch(tyRun) {
         });
 
         // watch statements
-        watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
+        watch(getGlobApp('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
           name      : 'JS|HTML',
           emitOnGlob: false
         }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
 
-        watch(getGlobAppNodeBower(['**/*.scss', '!*.scss']), {
+        watch(getGlobApp(['**/*.scss', '!*.scss']), {
           name      : 'CSS',
           emitOnGlob: false
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
