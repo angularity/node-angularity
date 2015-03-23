@@ -75,25 +75,26 @@ taskYargsRun.taskYargs.register('help', {
 
 var cliArgs;
 cliArgs = defaultYargsInstance.argv;
-if (cliArgs.version) {
-  console.log('angularity:', packageJson.version);
+var hasCommands = (cliArgs._.length > 0);
+if (hasCommands) {
+  require('../index');
+  var taskName = taskYargsRun.taskYargs.getCurrentName();
+  if (taskName) {
+    taskYargsRun.current();
+  }
+  else {
+    console.log('Task specified is not recognised');
+    defaultYargsInstance.showHelp();
+  }
 }
 else {
-  if (cliArgs._.length < 1) {
+  if (cliArgs.version) {
+    console.log('angularity:', packageJson.version);
+  }
+  else {
     if (!cliArgs.help) {
       console.log('No task specified');
     }
     defaultYargsInstance.showHelp();
-  }
-  else {
-    require('../index');
-    var taskName = taskYargsRun.taskYargs.getCurrentName();
-    if (taskName) {
-      taskYargsRun.current();
-    }
-    else {
-      console.log('Task specified is not recognised');
-      defaultYargsInstance.showHelp();
-    }
   }
 }
