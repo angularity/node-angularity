@@ -389,13 +389,18 @@ function factory(base) {
         if (platform.isWindows()) {
           childProcess.spawn('taskkill', ['/f', '/t', '/PID', child.pid]);
         } else {
-          psTree(child.pid, function onProcessTree(err, children) {
-            var pidList = children
-              .map(function getChildPID(child) {
-                return child.PID;
-              })
-              .concat(child.pid);
-            childProcess.spawn('kill', ['-9'].concat(pidList));
+          psTree(child.pid, function onProcessTree(err, processChildren) {
+            //NOTE sometimes child may have been killed or completed
+            // in between, and callback does execute on process.nextTick
+            if (child) {
+              var pidList = processChildren
+                .map(function getChildPID(processChild) {
+                  return processChild.PID;
+                });
+              pidList = pidList
+                .concat(child.pid);
+              childProcess.spawn('kill', ['-9'].concat(pidList));
+            }
           });
         }
       }
