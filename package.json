@@ -15,9 +15,8 @@
     "babel"
   ],
   "scripts": {
-    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs && npm run lint",
-    "testonly": "node node_modules/jasmine-node/bin/jasmine-node --captureExceptions test/specs",
-    "lint": "node ./test/jshint.js"
+    "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs",
+    "lint": "node test/jshint.js"
   },
   "contributors": [
     "bholloway",
@@ -88,7 +87,6 @@
     "mime": "latest",
     "minifyify": "latest",
     "minimatch": "latest",
-    "ncp": "latest",
     "node-sass": "latest",
     "pretty-hrtime": "latest",
     "q": "latest",
@@ -111,6 +109,7 @@
     "jasmine-diff-matchers": "~2.0.0",
     "jasmine-node": "2.0.0-beta4",
     "jshint-stylish": "^1.0.1",
-    "ncp": "~2.0.0"
+    "ncp": "~2.0.0",
+    "ps-tree": "~0.0.3"
   }
 }

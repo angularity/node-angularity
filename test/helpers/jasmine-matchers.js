@@ -14,8 +14,8 @@ function toBeTask() {
       var message = [].concat(tasknames)
         .map(function(taskname) {
           var banner = hr('-', 20, taskname);
-          var pass   = (text.indexOf(banner) >= 0);
-          return !pass && ['Task', quote(taskname), 'did not run'].join(' ');
+          var pass   = text && (text.indexOf(banner) >= 0);
+          return !pass && ['Task', quote(taskname), 'did not run, saw:\n' + text].join(' ');
         })
         .filter(Boolean)
         .join(', ');
@@ -75,7 +75,8 @@ function getHelpMatcher(regexp) {
         var lastLine = text.split(/\r?\n/g).filter(Boolean).pop();
         var hasError = /^\s*\[Error\:[^\]]*]|^\s*Unknown argument\:.*$/.test(lastLine); // error or unknown argument
         var message  =
-          !(regexp.test(text)) ? 'Help message does not match expectation' :
+          !text ? 'Help message not present, saw empty buffer' :
+          !(regexp.test(text)) ? ('Help message does not match expectation, saw\n' + text) :
           (hasError !== expectError) ? ['Help', (expectError ? 'expected' : 'did not expect'), 'an error',
             (expectError) ? ('saw ' + quote(lastLine)) : ''].join(' ') :
           '';

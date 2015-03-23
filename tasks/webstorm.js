@@ -204,14 +204,18 @@ function setUpWebStormTask(tyRun) {
         // else run the selected items
         else {
           var taskList = [
-            cliArgs.subdir && 'webstorm:subdir',
-            cliArgs.project && 'webstorm:project',
-            cliArgs.external && 'webstorm:externaltools',
+            cliArgs.subdir    && 'webstorm:subdir',
+            cliArgs.project   && 'webstorm:project',
+            cliArgs.external  && 'webstorm:externaltools',
             cliArgs.codestyle && 'webstorm:codestyle',
             cliArgs.templates && 'webstorm:templates',
-            cliArgs.launch && 'webstorm:launch'
-          ].filter(Boolean).concat(done);
-          runSequence.apply(runSequence, taskList);
+            cliArgs.launch    && 'webstorm:launch'
+          ].filter(Boolean);
+          if (taskList.length > 0) {
+            runSequence.apply(runSequence, taskList.concat(done));
+          } else {
+            done();
+          }
         }
       });
 

@@ -247,19 +247,22 @@ function setUpInitTask(tyRun) {
         // else run the selected items
         else {
           var taskList = [
-              'init:subdir',
-              'init:composition',
-              'init:angularity',
-              cliArgs.npm && 'init:npm',
-              cliArgs.bower && 'init:bower',
-              cliArgs.karma && 'init:karma',
-              cliArgs.jshint && 'init:jshint',
-              cliArgs.gitignore && 'init:gitignore',
-              cliArgs.editorconfig && 'init:editorconfig'
-            ]
-            .filter(Boolean)
-            .concat(done);
-          runSequence.apply(runSequence, taskList);
+            'init:subdir',
+            'init:composition',
+            'init:angularity',
+            cliArgs.npm          && 'init:npm',
+            cliArgs.bower        && 'init:bower',
+            cliArgs.karma        && 'init:karma',
+            cliArgs.jshint       && 'init:jshint',
+            cliArgs.gitignore    && 'init:gitignore',
+            cliArgs.editorconfig && 'init:editorconfig'
+          ]
+          .filter(Boolean);
+          if (taskList.length > 0) {
+            runSequence.apply(runSequence, taskList.concat(done));
+          } else {
+            done();
+          }
         }
       });
 

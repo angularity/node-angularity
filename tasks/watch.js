@@ -18,6 +18,7 @@ function setUpTaskWatch(tyRun) {
           streams          = require('../lib/config/streams');
 
       gulp.task('watch', ['server'], function () {
+        console.log(hr('-', 80, 'watch'));
         var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
 
         // enqueue actions to avoid multiple trigger
