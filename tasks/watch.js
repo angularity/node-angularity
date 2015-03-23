@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskWatch(tyRun) {
+function setUpTaskWatch(options) {
   var taskDefinition = {
     name: 'watch',
     description: ('The "watch" task performs an initial build and then serves the application on localhost at ' +
@@ -10,7 +10,7 @@ function setUpTaskWatch(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitWatchTask() {
-      var gulp          = require('gulp'),
+      var gulp          = options.gulp || require('gulp'),
           watch         = require('gulp-watch'),
           watchSequence = require('gulp-watch-sequence');
 
@@ -45,12 +45,12 @@ function setUpTaskWatch(tyRun) {
       });
     },
     onRun: function onRunWatchTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskWatch;

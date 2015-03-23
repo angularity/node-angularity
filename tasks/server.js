@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskServer(tyRun) {
+function setUpTaskServer(options) {
   var defaults = require('../lib/config/defaults');
   var config = defaults.getInstance()
     .file('angularity.json')
@@ -38,7 +38,7 @@ function setUpTaskServer(tyRun) {
       }
     ],
     onInit: function onInitServerTask(yargsInstance) {
-      var gulp        = require('gulp'),
+      var gulp        = options.gulp || require('gulp'),
           gutil       = require('gulp-util'),
           browserSync = require('browser-sync');
 
@@ -76,11 +76,11 @@ function setUpTaskServer(tyRun) {
       });
     },
     onRun: function onRunServerTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskServer;

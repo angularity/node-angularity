@@ -1,6 +1,7 @@
 'use strict';
 var path            = require('path');
 
+var gulp            = require('gulp');
 var pluginRegistry  = require('plugin-registry');
 
 var taskYargsRun    = require('./lib/util/task-yargs-run');
@@ -38,7 +39,9 @@ if (configTaskPlugins.constructor !== Array) {
 }
 
 var pluginOptions = {
-  projectPath: __dirname
+  projectPath: __dirname,
+  gulp: gulp,
+  taskYargsRun: taskYargsRun
 };
 
 pluginRegistry
@@ -60,5 +63,5 @@ taskPlugins
       throw new Error('Plugin named ' + pluginDefinition.name + ' does not export a function');
     }
 
-    plugin(taskYargsRun);
+    plugin(pluginOptions);
   });

@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpWebStormTask(tyRun) {
+function setUpWebStormTask(options) {
   var fs              = require('fs'),
       path            = require('path'),
       ideTemplate     = require('ide-template'),
@@ -174,7 +174,7 @@ function setUpWebStormTask(tyRun) {
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
-      var gulp            = require('gulp'),
+      var gulp            = options.gulp || require('gulp'),
           gutil           = require('gulp-util'),
           runSequence     = require('run-sequence');
 
@@ -333,12 +333,12 @@ function setUpWebStormTask(tyRun) {
       }
     },
     onRun: function onRunWebstormTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 
   /**
    * Validator function for an angularity project being present in the current working directory

@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskCss(tyRun) {
+function setUpTaskCss(options) {
   var taskDefinition = {
     name: 'css',
     description: ('The "css" task performs a one time build of the SASS composition root(s).'),
@@ -8,7 +8,7 @@ function setUpTaskCss(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitCssTask() {
-      var gulp            = require('gulp'),
+      var gulp            = options.gulp || require('gulp'),
           rimraf          = require('gulp-rimraf'),
           runSequence     = require('run-sequence');
 
@@ -39,11 +39,11 @@ function setUpTaskCss(tyRun) {
       });
     },
     onRun: function onRunCssTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskCss;

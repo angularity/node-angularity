@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskTest(tyRun) {
+function setUpTaskTest(options) {
   var taskDefinition = {
     name: 'test',
     description: [
@@ -13,7 +13,7 @@ function setUpTaskTest(tyRun) {
     options: [],
     checks: [],
     onInit: function onInitTestTask(yargsInstance) {
-      var gulp            = require('gulp');
+      var gulp            = options.gulp || require('gulp');
 
       var karma           = require('../lib/test/karma'),
           hr              = require('../lib/util/hr'),
@@ -34,11 +34,11 @@ function setUpTaskTest(tyRun) {
       });
     },
     onRun: function onRunTestTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskTest;

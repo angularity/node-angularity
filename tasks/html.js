@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskHtml(tyRun) {
+function setUpTaskHtml(options) {
   var taskDefinition = {
     name: 'html',
     description: ('The "html" task performs a one time injection of ' +
@@ -9,7 +9,7 @@ function setUpTaskHtml(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitHtmlTask() {
-      var gulp            = require('gulp'),
+      var gulp            = options.gulp || require('gulp'),
           inject          = require('gulp-inject'),
           plumber         = require('gulp-plumber'),
           rimraf          = require('gulp-rimraf'),
@@ -58,11 +58,11 @@ function setUpTaskHtml(tyRun) {
       });
     },
     onRun: function onRunHtmlTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskHtml;

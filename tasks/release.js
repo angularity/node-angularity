@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskRelease(tyRun) {
+function setUpTaskRelease(options) {
   var taskDefinition = {
     name: 'release',
     description: ('The "release" task performs a single build and exports the build files along with bower ' +
@@ -9,7 +9,7 @@ function setUpTaskRelease(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitReleaseTask() {
-      var gulp        = require('gulp'),
+      var gulp        = options.gulp || require('gulp'),
           inject      = require('gulp-inject'),
           plumber     = require('gulp-plumber'),
           rimraf      = require('gulp-rimraf'),
@@ -84,11 +84,11 @@ function setUpTaskRelease(tyRun) {
       */
     },
     onRun: function onRunReleaseTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskRelease;

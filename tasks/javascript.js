@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpTaskJavascript(tyRun) {
+function setUpTaskJavascript(options) {
   var jshintReporter  = require('../lib/util/jshint-reporter');
   var karma           = require('../lib/test/karma');
 
@@ -98,7 +98,7 @@ function setUpTaskJavascript(tyRun) {
       checkKarmaReporter
     ],
     onInit: function onInitJavascriptTask(yargsInstance) {
-      var gulp            = require('gulp'),
+      var gulp            = options.gulp || require('gulp'),
           jshint          = require('gulp-jshint'),
           rimraf          = require('gulp-rimraf'),
           semiflat        = require('gulp-semiflat'),
@@ -209,13 +209,12 @@ function setUpTaskJavascript(tyRun) {
       setUpTaskJavascript.getTransforms = getTransforms;
     },
     onRun: function onRunJavascriptTask() {
-      console.log('onRunJavascriptTask');
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpTaskJavascript;

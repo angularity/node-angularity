@@ -1,6 +1,6 @@
 'use strict';
 
-function setUpInitTask(tyRun) {
+function setUpInitTask(options) {
   var platform        = require('../lib/config/platform'),
       defaults        = require('../lib/config/defaults');
 
@@ -204,7 +204,7 @@ function setUpInitTask(tyRun) {
     checks: [checkInitFlags],
     options: initOptionDefinitions,
     onInit: function onInitInitTask(yargsInstance) {
-      var gulp        = require('gulp'),
+      var gulp        = options.gulp || require('gulp'),
           gutil       = require('gulp-util'),
           runSequence = require('run-sequence'),
           path        = require('path'),
@@ -359,12 +359,12 @@ function setUpInitTask(tyRun) {
       }
     },
     onRun: function onRunInitTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = options.gulp || require('gulp');
+      gulp.run(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  options.taskYargsRun.taskYargs.register(taskDefinition);
 }
 
 module.exports = setUpInitTask;
