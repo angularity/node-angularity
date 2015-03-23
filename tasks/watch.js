@@ -46,7 +46,7 @@ function setUpTaskWatch(options) {
     },
     onRun: function onRunWatchTask() {
       var gulp        = options.gulp || require('gulp');
-      gulp.run(taskDefinition.name);
+      gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
 

@@ -87,6 +87,8 @@ function setUpWebStormTask(options) {
   ];
 
   function checkWebstormFlags(argv) {
+    var tyRun = options.taskYargsRun;
+
     if (argv.help) {
       return true;
     }
@@ -334,7 +336,7 @@ function setUpWebStormTask(options) {
     },
     onRun: function onRunWebstormTask() {
       var gulp        = options.gulp || require('gulp');
-      gulp.run(taskDefinition.name);
+      gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
 

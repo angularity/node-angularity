@@ -128,6 +128,8 @@ function setUpInitTask(options) {
   ];
 
   function checkInitFlags(argv) {
+    var tyRun = options.taskYargsRun;
+
     if (argv.help) {
       return true;
     }
@@ -360,7 +362,7 @@ function setUpInitTask(options) {
     },
     onRun: function onRunInitTask() {
       var gulp        = options.gulp || require('gulp');
-      gulp.run(taskDefinition.name);
+      gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
 

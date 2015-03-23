@@ -85,7 +85,7 @@ function setUpTaskRelease(options) {
     },
     onRun: function onRunReleaseTask() {
       var gulp        = options.gulp || require('gulp');
-      gulp.run(taskDefinition.name);
+      gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
   options.taskYargsRun.taskYargs.register(taskDefinition);

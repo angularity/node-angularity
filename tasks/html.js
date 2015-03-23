@@ -59,7 +59,7 @@ function setUpTaskHtml(options) {
     },
     onRun: function onRunHtmlTask() {
       var gulp        = options.gulp || require('gulp');
-      gulp.run(taskDefinition.name);
+      gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
   options.taskYargsRun.taskYargs.register(taskDefinition);
