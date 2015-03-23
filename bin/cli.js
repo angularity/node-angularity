@@ -9,11 +9,13 @@ var path        = require('path'),
     gulp        = require('gulp'),
     gutil       = require('gulp-util'),
     wordwrap    = require('wordwrap'),
+    runSequence = require('run-sequence'),
     chalk       = require('chalk'),
     prettyTime  = require('pretty-hrtime'),
     yargs       = require('yargs');
 
-var taskYargsRun  = require('../lib/util/task-yargs-run');
+var taskYargs     = require('../lib/util/task-yargs'),
+    taskYargsRun  = require('../lib/util/task-yargs-run');
 
 // TODO @bholloway menus
 // var mainMenu = require('../lib/cli/mainMenu');
@@ -49,8 +51,8 @@ var defaultYargsInstance = yargs
   ].join('\n')))
   // .example('angularity', 'Interactive menu') //TODO reinstate when interactive menu is reinstated
   .example('angularity -v', 'Display the version of angularity')
-  .example('angularity <task name> -h', 'Get help on a particular task')
-  .example('angularity <task name>', 'Run the given task')
+  .example('angularity \<task name\> -h', 'Get help on a particular task')
+  .example('angularity \<task name\>', 'Run the given task')
   .option('version', {
     describe: 'Display the curent version',
     alias: ['v'],
@@ -74,34 +76,27 @@ taskYargsRun.taskYargs.register('help', {
   checks: []
 });
 
-require('../index');
-
-//TODO move these to ../index.js
-require('../tasks/html')(taskYargsRun);
-require('../tasks/css')(taskYargsRun);
-require('../tasks/javascript')(taskYargsRun);
-require('../tasks/test')(taskYargsRun);
-require('../tasks/build')(taskYargsRun);
-require('../tasks/release')(taskYargsRun);
-require('../tasks/server')(taskYargsRun);
-require('../tasks/watch')(taskYargsRun);
-require('../tasks/init')(taskYargsRun);
-require('../tasks/webstorm')(taskYargsRun);
-
 var cliArgs;
-var taskName = taskYargsRun.taskYargs.getCurrentName();
-if (taskName) {
-  taskYargsRun.current();
+cliArgs = defaultYargsInstance.argv;
+if (cliArgs.version) {
+  console.log('angularity:', packageJson.version);
 }
 else {
-  cliArgs = defaultYargsInstance.argv;
-  if (cliArgs.version) {
-    console.log('angularity:', packageJson.version);
-  }
-  else {
+  if (cliArgs._.length < 1) {
     if (!cliArgs.help) {
-      console.log('Task specified is not recognised');
+      console.log('No task specified');
     }
     defaultYargsInstance.showHelp();
+  }
+  else {
+    require('../index');
+    var taskName = taskYargsRun.taskYargs.getCurrentName();
+    if (taskName) {
+      taskYargsRun.current();
+    }
+    else {
+      console.log('Task specified is not recognised');
+      defaultYargsInstance.showHelp();
+    }
   }
 }
