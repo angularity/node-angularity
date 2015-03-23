@@ -1,14 +1,6 @@
 'use strict';
 
 function setUpTaskWatch(tyRun) {
-  var defaults = require('../lib/config/defaults');
-
-  var config = defaults.getInstance()
-    .file('angularity.json')
-    .defaults({
-      port: 55555
-    });
-
   var taskDefinition = {
     name: 'watch',
     description: ('The "watch" task performs an initial build and then serves the application on localhost at ' +
@@ -17,19 +9,16 @@ function setUpTaskWatch(tyRun) {
     prerequisiteTasks: ['help', 'server'],
     checks: [],
     options: [],
-    onInit: function onInitWatchTask(yargsInstance) {
+    onInit: function onInitWatchTask() {
       var gulp          = require('gulp'),
           watch         = require('gulp-watch'),
-          wordwrap      = require('wordwrap'),
           watchSequence = require('gulp-watch-sequence');
 
-      var defaults         = require('../lib/config/defaults'),
-          hr               = require('../lib/util/hr'),
-          karma            = require('../lib/test/karma'),
-          jshintReporter   = require('../lib/util/jshint-reporter'),
+      var hr               = require('../lib/util/hr'),
           streams          = require('../lib/config/streams');
 
       gulp.task('watch', ['server'], function () {
+        console.log(hr('-', 80, 'watch'));
         var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
 
         // enqueue actions to avoid multiple trigger
@@ -48,19 +37,20 @@ function setUpTaskWatch(tyRun) {
           emitOnGlob: false
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
-        watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {  // don't conflict JS or CSS
+        // don't conflict JS or CSS
+        watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {
           name      : 'INJECT',
           emitOnGlob: false
         }, queue.getHandler('html', 'reload'));
       });
     },
-    onRun: function onRunWatchTask(yargsInstance) {
+    onRun: function onRunWatchTask() {
       var runSequence = require('run-sequence');
       runSequence(taskDefinition.name);
     }
   };
 
   tyRun.taskYargs.register(taskDefinition);
-};
+}
 
 module.exports = setUpTaskWatch;

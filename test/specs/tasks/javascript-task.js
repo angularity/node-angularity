@@ -20,11 +20,13 @@ function expectations(testCase) {
 
   // build output
   expect(workingBuildFile('index.js')).diffFilePatch(sourceBuildFile('index.js'));
-//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));   // TODO @bholloway solve repeatability of .map files
+//  expect(workingBuildFile('index.js.map' )).diffFilePatch(sourceBuildFile('index.js.map'));
+// TODO @bholloway solve repeatability of .map files
 
   // test output
   expect(workingTestFile('index.js')).diffFilePatch(sourceTestFile('index.js'));
-//  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));    // TODO @bholloway solve repeatability of .map files
+//  expect(workingTestFile('index.js.map')).diffFilePatch(sourceTestFile('index.js.map'));
+// TODO @bholloway solve repeatability of .map files
 }
 
 function customMatchers() {

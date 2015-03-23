@@ -13,7 +13,8 @@ function expectations(testCase) {
   expect(testCase.stdout).toBeTask('css');
   expect(testCase.cwd).toHaveExpectedCssExcept();
   expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));
-//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));  // TODO @bholloway solve repeatability of .map files
+//  expect(workingBuildFile('index.css.map')).diffFilePatch(sourceBuildFile('index.css.map'));
+// TODO @bholloway solve repeatability of .map files
 }
 
 function customMatchers() {

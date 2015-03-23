@@ -8,7 +8,10 @@ var path         = require('path'),
     flatten      = require('lodash.flatten'),
     template     = require('lodash.template'),
     isArray      = require('lodash.isarray'),
-    childProcess = require('child_process');
+    childProcess = require('child_process'),
+    psTree       = require('ps-tree');
+
+var platform = require('../../lib/config/platform');
 
 /**
  * Create an instance based with the given parameter defaults.
@@ -32,6 +35,7 @@ function factory(base) {
     reset           : reset,
     seal            : seal,
     withDirectories : withDirectories,
+    withTimeout     : withTimeout,
     forProgram      : forProgram,
     addSource       : addSource,
     withSourceFilter: withSourceFilter,
@@ -78,6 +82,7 @@ function factory(base) {
       directories  : {},
       sources      : [],
       filter       : null,
+      timeout      : false,
       program      : null,
       expectations : [],
       invocations  : [],
@@ -114,6 +119,16 @@ function factory(base) {
   function withDirectories(source, temp) {
     params.directories.source = source;
     params.directories.temp   = temp;
+    return self;
+  }
+
+  /**
+   * Set the watchdog timeout that will end the process when elapsed
+   * @param {number} [milliseconds] The timeout in milliseconds or omitted for no timeout
+   * @returns {object} The same instance with mutated properties
+   */
+  function withTimeout(milliseconds) {
+    params.timeout = (typeof milliseconds === 'number') && Math.max(0, milliseconds);
     return self;
   }
 
@@ -231,46 +246,163 @@ function factory(base) {
     }
     // otherwise single instance
     else {
-      var resolveSrc  = ensureDirectory(params.directories.source);
-      var resolveDest = ensureDirectory(params.directories.temp);
-      var source      = params.sources[0];
-      var paramSet    = params.parameterSets[0];
+      return runSingle();
+    }
+  }
 
-      // each combination is async
-      var deferred = Q.defer();
+  /**
+   * Run the first permutation of sources and parameter sets
+   * @returns {{then: {function}, catch: {function}, finally: {function}, notify: {function}} A promise that resolves
+   *          when test completes and notifies when buffers are updated
+   */
+  function runSingle() {
 
-      // determine the overall command we will run
-      var command = toString();
+    // execution parameters
+    var resolveSrc  = ensureDirectory(params.directories.source);
+    var resolveDest = ensureDirectory(params.directories.temp);
+    var source      = params.sources[0];
+    var paramSet    = params.parameterSets[0];
 
-      // organise a working directory
-      var signature = escapeFilenameString(source, command);
-      var src       = !params.hasRun && resolveSrc(source);
-      var cwd       = resolveDest(signature);
-      copySources(src, cwd, function onCopyComplete(error) {
+    // execution state
+    var stdio = {stdout: '', stderr: ''};
+    var child = null;
+    var timeout;
 
-        // error in copying implies rejected async
-        if (error) {
-          deferred.reject(error);
-        }
-        // run the command
-        else {
-          childProcess.exec(command, {cwd: cwd}, function onProcessComplete(exitcode, stdout, stderr) {
-            var testCase = defaults({
-              sourceDir : src,
-              runner    : self,
-              cwd       : cwd,
-              command   : command,
-              exitcode  : exitcode,
-              stdout    : stdout,
-              stderr    : stderr
-            }, paramSet);
-            params.hasRun = true;
-            deferred.resolve(testCase);
-          });
+    // each combination is async
+    var deferred = Q.defer();
+
+    // determine the overall command we will run
+    var command = toString();
+
+    // organise a working directory
+    var signature = escapeFilenameString(source, command);
+    var src       = !params.hasRun && resolveSrc(source);
+    var cwd       = resolveDest(signature);
+    copySources(src, cwd, onCopyComplete);
+
+    // handler for end of copy process
+    function onCopyComplete(error) {
+
+      // error in copying implies rejected async
+      if (error) {
+        deferred.reject(error);
+      }
+      // run the command
+      else {
+
+        // spawn a child process in an exec()-like manner
+        //  https://github.com/joyent/node/issues/2318#issuecomment-32706753
+        var args = platform.isWindows() ?
+          ['cmd.exe', ['/s', '/c', '"' + command + '"']] :
+          ['/bin/sh', ['-c', command]];
+        child = childProcess.spawn.apply(childProcess, args.concat({
+          cwd                     : cwd,
+          stdio                   : 'pipe',
+          windowsVerbatimArguments: true
+        }));
+
+        // add listeners to the child process
+        notifyOn('stdout');
+        notifyOn('stderr');
+        child.on('close', onClose);
+
+        // start the watchdog timer
+        useTimeout(true);
+      }
+    }
+
+    // clear the watchdog timeout and optionally start another
+    function useTimeout(isStart) {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      if (isStart) {
+        timeout = setTimeout(kill, params.timeout || 1E+9);
+      }
+    }
+
+    // progress on stdio
+    function notifyOn(name) {
+      var stream = child[name];
+      stream.on('readable', function onReadable() {
+        var chunk = stream.read();
+        if (chunk !== null) {
+
+          // cancel watchdog timeout
+          useTimeout(true);
+
+          // append the chunk to the stream text
+          stdio[name] = (stdio[name] || '') + chunk.toString();
+
+          // progress the promise
+          var testCase = getTestCase({kill: kill}, paramSet);
+          deferred.notify(testCase);
         }
       });
-      return deferred.promise;
     }
+
+    // async resolution on process complete or timeout
+    function onClose(exitcode) {
+
+      // ensure idempotence
+      if (child) {
+        child = undefined;
+
+        // cancel watchdog timeout and mark as run
+        useTimeout(false);
+        params.hasRun = true;
+
+        // wait for next tick to avoid any possibility of race condition
+        process.nextTick(function nextTickResolve() {
+
+          // resolve the promise
+          var testCase = getTestCase({exitcode: exitcode}, paramSet);
+          deferred.resolve(testCase);
+        });
+      }
+    }
+
+    // the test case is the merge of the test stats and the given arguments, usually the parameter set
+    function getTestCase() {
+      var args      = Array.prototype.slice.call(arguments);
+      var testStats = {
+        sourceDir: src,
+        runner   : self,
+        cwd      : cwd,
+        command  : command,
+        stdout   : stdio.stdout,
+        stderr   : stdio.stderr
+      };
+      return defaults.apply(null, [testStats].concat(args));
+    }
+
+    // kill the child process
+    function kill() {
+
+      // child will be valid unless onClose() has already run
+      //  and if onClose() has already run we don't want to be here anyhow
+      if (child) {
+
+        // only killing the full process tree will work consistently on windows and unix
+        //  https://github.com/travis-ci/travis-ci/issues/704
+        //  https://www.npmjs.com/package/ps-tree
+        if (platform.isWindows()) {
+          childProcess.spawn('taskkill', ['/f', '/t', '/PID', child.pid]);
+        } else {
+          psTree(child.pid, function onProcessTree(err, children) {
+            var pidList = children
+              .map(function getChildPID(child) {
+                return child.PID;
+              })
+              .concat(child.pid);
+            childProcess.spawn('kill', ['-9'].concat(pidList));
+          });
+        }
+      }
+    }
+
+    // async until process completes
+    return deferred.promise;
   }
 
   /**
