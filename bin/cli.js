@@ -9,13 +9,11 @@ var path        = require('path'),
     gulp        = require('gulp'),
     gutil       = require('gulp-util'),
     wordwrap    = require('wordwrap'),
-    runSequence = require('run-sequence'),
     chalk       = require('chalk'),
     prettyTime  = require('pretty-hrtime'),
     yargs       = require('yargs');
 
-var taskYargs     = require('../lib/util/task-yargs'),
-    taskYargsRun  = require('../lib/util/task-yargs-run');
+var taskYargsRun  = require('../lib/util/task-yargs-run');
 
 // we need to duplicate some event handlers from the gulp cli since we have bypassed it
 gulp.on('task_start', function (e) {
@@ -39,6 +37,7 @@ var helpOption = {
     boolean: true
   }
 };
+
 var defaultYargsInstance = yargs
   .usage(wordwrap(2, 80)([
     packageJson.description,

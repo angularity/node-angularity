@@ -53,7 +53,7 @@ function setUpTaskWatch(context) {
     },
     onRun: function onRunWatchTask() {
       var gulp        = context.gulp;
-      gulp.start.apply(gulp, [taskDefinition.name]);
+      gulp.start(taskDefinition.name);
     }
   };
 

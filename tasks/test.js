@@ -39,7 +39,7 @@ function setUpTaskTest(context) {
     },
     onRun: function onRunTestTask() {
       var gulp        = context.gulp;
-      gulp.start.apply(gulp, [taskDefinition.name]);
+      gulp.start(taskDefinition.name);
     }
   };
 

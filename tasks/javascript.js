@@ -211,7 +211,7 @@ function setUpTaskJavascript(context) {
     },
     onRun: function onRunJavascriptTask() {
       var gulp        = context.gulp;
-      gulp.start.apply(gulp, [taskDefinition.name]);
+      gulp.start(taskDefinition.name);
     }
   };
 

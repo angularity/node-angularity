@@ -66,7 +66,7 @@ function setUpTaskHtml(context) {
     },
     onRun: function onRunHtmlTask() {
       var gulp        = context.gulp;
-      gulp.start.apply(gulp, [taskDefinition.name]);
+      gulp.start(taskDefinition.name);
     }
   };
 

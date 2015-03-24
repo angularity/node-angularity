@@ -343,7 +343,7 @@ function setUpWebStormTask(context) {
     },
     onRun: function onRunWebstormTask() {
       var gulp        = context.gulp;
-      gulp.start.apply(gulp, [taskDefinition.name]);
+      gulp.start(taskDefinition.name);
     }
   };
 
@@ -357,8 +357,8 @@ function setUpWebStormTask(context) {
   function angularityProjectPresent(argv) { // Todo @impaler move method to util location
     var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
     if (!fs.existsSync(path.resolve(projectPath))) {
-      return 'Current working directory (or specified subdir) is not a valid angularity project. Try running the ' +
-        '"init" command first.';
+      return 'Current working directory (or specified subdir) is not a valid angularity project.' +
+        'Try running the "init" command first.';
     }
   }
 

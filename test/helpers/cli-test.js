@@ -396,8 +396,7 @@ function factory(base) {
               var pidList = processChildren
                 .map(function getChildPID(processChild) {
                   return processChild.PID;
-                });
-              pidList = pidList
+                })
                 .concat(child.pid);
               childProcess.spawn('kill', ['-9'].concat(pidList));
             }

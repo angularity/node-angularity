@@ -21,8 +21,7 @@ function setUpTaskRelease(context) {
           inject      = require('gulp-inject'),
           plumber     = require('gulp-plumber'),
           rimraf      = require('gulp-rimraf'),
-          semiflat    = require('gulp-semiflat'),
-          wordwrap    = require('wordwrap');
+          semiflat    = require('gulp-semiflat');
 
       var injectAdjacent   = require('../lib/inject/adjacent-files'),
           injectTransform  = require('../lib/inject/relative-transform'),
@@ -83,7 +82,7 @@ function setUpTaskRelease(context) {
     },
     onRun: function onRunReleaseTask() {
       var gulp        = context.gulp;
-      gulp.start.apply(gulp, [taskDefinition.name]);
+      gulp.start(taskDefinition.name);
     }
   };
 
