@@ -45,7 +45,7 @@ if (!platform.isAppveyor()) {
 
     describe('should fail where angularity.json is not present', function (done) {
       helper.runner.create()
-        .addSource('minimal-es5')
+        .addSource('angularity-todo-es5-minified')
         .withSourceFilter(function removeBuildFiles(value) {
           return !(/angularity.json$/.test(value));
         })
@@ -60,7 +60,7 @@ if (!platform.isAppveyor()) {
 
     describe('should operate with all flags false', function (done) {
       helper.runner.create()
-        .addSource('minimal-es5')
+        .addSource('angularity-todo-es5-minified')
         .addInvocation('webstorm', FLAGS.map(composeOption(false)))
         .forEach(slowIt(expectations))
         .finally(done);

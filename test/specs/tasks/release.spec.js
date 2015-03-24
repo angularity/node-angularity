@@ -45,7 +45,7 @@ describe('The Angularity release task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-todo-es5-minified')
       .addInvocation('release')
       .addInvocation('release --unminified false')
       .addInvocation('release -u false')
@@ -55,7 +55,7 @@ describe('The Angularity release task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-todo-es5-unminified')
       .addInvocation('release --unminified')
       .addInvocation('release -u')
       .addInvocation('release --unminified true')

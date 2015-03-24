@@ -45,7 +45,7 @@ describe('The Angularity javascript task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-todo-es5-minified')
       .addInvocation('javascript')
       .addInvocation('javascript --unminified false')
       .addInvocation('javascript -u false')
@@ -55,7 +55,7 @@ describe('The Angularity javascript task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-todo-es5-unminified')
       .addInvocation('javascript --unminified')
       .addInvocation('javascript -u')
       .addInvocation('javascript --unminified true')

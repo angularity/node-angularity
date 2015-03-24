@@ -47,7 +47,7 @@ describe('The Angularity test task', function () {
 
   describe('should build unminified javascript and run tests', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-todo-es5-minified')
       .addInvocation('test')
       .forEach(slowIt(expectations))
       .finally(done);
@@ -55,7 +55,7 @@ describe('The Angularity test task', function () {
 
   describe('should support unminified option, but not minify test output', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-todo-es5-unminified')
       .addInvocation('test --unminified')
       .addInvocation('test -u')
       .forEach(slowIt(expectations))

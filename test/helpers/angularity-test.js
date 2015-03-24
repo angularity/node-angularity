@@ -12,7 +12,7 @@ var Q          = require('q'),
 
 var cliTest    = require('./cli-test');
 
-var TEST_SRC  = 'test/expected';
+var TEST_SRC  = 'node_modules';
 var TEST_TEMP = 'test/temp';
 
 /**

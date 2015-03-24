@@ -47,7 +47,7 @@ describe('The Angularity watch task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-todo-es5-minified')
       .addInvocation('watch')
       .addInvocation('watch --unminified false')
       .addInvocation('watch -u false')
@@ -57,7 +57,7 @@ describe('The Angularity watch task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-todo-es5-unminified')
       .addInvocation('watch --unminified')
       .addInvocation('watch -u')
       .addInvocation('watch --unminified true')
