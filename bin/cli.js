@@ -56,6 +56,28 @@ var defaultYargsInstance = yargs
   })
   .option(helpOption.key, helpOption.value);
 
+taskYargsRun.taskYargs.register('help', {
+  description: (wordwrap(2, 80)('Displays context-specific help messages')),
+  prerequisiteTasks: [],
+  options: [
+    {
+      key: 'help',
+      value: {
+        describe: 'This help message, or help on a specific task',
+        alias: ['h', '?'],
+        boolean: true
+      }
+    }
+  ],
+  checks: [],
+  onInit: function onInitHelpTask() {
+    // Do nothing
+  },
+  onRun: function onRunHelpTask() {
+    defaultYargsInstance.showHelp();
+  },
+});
+
 var cliArgs;
 cliArgs = defaultYargsInstance.argv;
 var hasCommands = (cliArgs._.length > 0);
