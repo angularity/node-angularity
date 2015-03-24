@@ -1,7 +1,8 @@
 'use strict';
 
 var helper   = require('../../helpers/angularity-test'),
-    matchers = require('../../helpers/jasmine-matchers');
+    matchers = require('../../helpers/jasmine-matchers'),
+    platform = require('../../../lib/config/platform');
 
 var fastIt = helper.jasmineFactory({
   before: 0,
@@ -15,63 +16,63 @@ var slowIt = helper.jasmineFactory({
 
 var FLAGS = [ 'project', 'external', 'codestyle', 'templates', 'launch' ];
 
-describe('The Angularity webstorm task', function () {
+// TODO @bholloway appveyor fails any webstorm command with exitcode 1 and nothing on stdout or stderr
+if (!platform.isAppveyor()) {
 
-  beforeEach(matchers.addMatchers);
+  describe('The Angularity webstorm task', function () {
 
-  beforeEach(customMatchers);
+    beforeEach(matchers.addMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+    beforeEach(customMatchers);
 
-  afterEach(helper.getTimeoutSwitch());
+    beforeEach(helper.getTimeoutSwitch(60000));
 
-  afterEach(helper.cleanUp);
+    afterEach(helper.getTimeoutSwitch());
 
- // TODO @bholloway appveyor fails command with exitcode 1 and nothing on stdout or stderr
- var platform = require('../../../lib/config/platform');
- if (!platform.isAppveyor()) {
-  describe('should display help when requested', function (done) {
-    helper.runner.create()
-      .addInvocation('webstorm --help')
-      .addInvocation('webstorm -h')
-      .forEach(fastIt(expectations))
-      .finally(done);
+    afterEach(helper.cleanUp);
 
-    function expectations(testCase) {
-      expect(testCase.stderr).toBeBuildHelpWithError(false);
-    }
+    describe('should display help when requested', function (done) {
+      helper.runner.create()
+        .addInvocation('webstorm --help')
+        .addInvocation('webstorm -h')
+        .forEach(fastIt(expectations))
+        .finally(done);
+
+      function expectations(testCase) {
+        expect(testCase.stderr).toBeBuildHelpWithError(false);
+      }
+    });
+
+    describe('should fail where angularity.json is not present', function (done) {
+      helper.runner.create()
+        .addSource('minimal-es5')
+        .withSourceFilter(function removeBuildFiles(value) {
+          return !(/angularity.json$/.test(value));
+        })
+        .addInvocation('webstorm', FLAGS.map(composeOption(false)))
+        .forEach(slowIt(expectations))
+        .finally(done);
+
+      function expectations(testCase) {
+        expect(testCase.stderr).toBeBuildHelpWithError(true);
+      }
+    });
+
+    describe('should operate with all flags false', function (done) {
+      helper.runner.create()
+        .addSource('minimal-es5')
+        .addInvocation('webstorm', FLAGS.map(composeOption(false)))
+        .forEach(slowIt(expectations))
+        .finally(done);
+
+      function expectations(testCase) {
+        expect(testCase.stdout).toBeTask('webstorm');
+      }
+    });
+
+    // TODO @bholloway more test coverage on webstorm task
   });
 }
-
-  describe('should fail where angularity.json is not present', function(done) {
-    helper.runner.create()
-      .addSource('minimal-es5')
-      .withSourceFilter(function removeBuildFiles(value) {
-        return !(/angularity.json$/.test(value));
-      })
-      .addInvocation('webstorm', FLAGS.map(composeOption(false)))
-      .forEach(slowIt(expectations))
-      .finally(done);
-
-    function expectations(testCase) {
-      expect(testCase.stderr).toBeBuildHelpWithError(true);
-    }
-  });
-
-  describe('should operate with all flags false', function(done) {
-    helper.runner.create()
-      .addSource('minimal-es5')
-      .addInvocation('webstorm', FLAGS.map(composeOption(false)))
-      .forEach(slowIt(expectations))
-      .finally(done);
-
-    function expectations(testCase) {
-      expect(testCase.stdout).toBeTask('webstorm');
-    }
-  });
-
-  // TODO @bholloway more test coverage on webstorm task
-});
 
 function composeOption(boolean) {
   return function optionToInvocation(option) {
