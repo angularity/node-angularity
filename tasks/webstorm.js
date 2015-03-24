@@ -116,17 +116,15 @@ function setUpWebStormTask(context) {
           if (!isValid) {
             throw new Error('The specified subdirectory does not exist.');
           }
-          angularityProjectPresent(argv);
-          if (!argv.defaults) {
-            // when defaults are not present, check whether angularity project is present
-            var projectPath = (value) ? path.join(value, 'angularity.json') : 'angularity.json';
-            if (!fs.existsSync(path.resolve(projectPath))) {
-              throw new Error('Current working directory (or specified subdir) is not a valid project. ' +
-                'Try running the "init" command first.');
-            }
-          }
         }
       });
+      if (!argv.defaults) {
+        // when defaults are not present, check whether angularity project is present
+        var angularityProjectPresentErr = angularityProjectPresent(argv);
+        if (angularityProjectPresentErr) {
+          throw new Error(angularityProjectPresentErr);
+        }
+      }
     }
     return true;
   }

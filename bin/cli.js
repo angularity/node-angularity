@@ -69,7 +69,13 @@ taskYargsRun.taskYargs.register('help', {
       }
     }
   ],
-  checks: []
+  checks: [],
+  onInit: function onInitHelpTask() {
+    // Do nothing
+  },
+  onRun: function onRunHelpTask() {
+    defaultYargsInstance.showHelp();
+  }
 });
 
 var cliArgs;
