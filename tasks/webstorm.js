@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpWebStormTask(tyRun) {
+function setUpWebStormTask(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var fs              = require('fs'),
       path            = require('path'),
       ideTemplate     = require('ide-template'),
@@ -87,6 +94,8 @@ function setUpWebStormTask(tyRun) {
   ];
 
   function checkWebstormFlags(argv) {
+    var tyRun = context.taskYargsRun;
+
     if (argv.help) {
       return true;
     }
@@ -174,7 +183,7 @@ function setUpWebStormTask(tyRun) {
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
-      var gulp            = require('gulp'),
+      var gulp            = context.gulp,
           gutil           = require('gulp-util'),
           runSequence     = require('run-sequence');
 
@@ -333,12 +342,12 @@ function setUpWebStormTask(tyRun) {
       }
     },
     onRun: function onRunWebstormTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 
   /**
    * Validator function for an angularity project being present in the current working directory
@@ -348,8 +357,8 @@ function setUpWebStormTask(tyRun) {
   function angularityProjectPresent(argv) { // Todo @impaler move method to util location
     var projectPath = (argv.subdir) ? path.join(argv.subdir, 'angularity.json') : 'angularity.json';
     if (!fs.existsSync(path.resolve(projectPath))) {
-      return 'Current working directory (or specified subdir) is not a valid angularity project. Try running the ' +
-        '"init" command first.';
+      return 'Current working directory (or specified subdir) is not a valid angularity project.' +
+        'Try running the "init" command first.';
     }
   }
 
@@ -373,4 +382,5 @@ function setUpWebStormTask(tyRun) {
     return result;
   }
 }
+
 module.exports = setUpWebStormTask;

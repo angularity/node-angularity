@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskJavascript(tyRun) {
+function setUpTaskJavascript(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var jshintReporter  = require('../lib/util/jshint-reporter');
   var karma           = require('../lib/test/karma');
 
@@ -98,11 +105,11 @@ function setUpTaskJavascript(tyRun) {
       checkKarmaReporter
     ],
     onInit: function onInitJavascriptTask(yargsInstance) {
-      var gulp            = require('gulp'),
+      var gulp            = context.gulp,
+          runSequence     = context.runSequence,
           jshint          = require('gulp-jshint'),
           rimraf          = require('gulp-rimraf'),
           semiflat        = require('gulp-semiflat'),
-          runSequence     = require('run-sequence'),
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
           stringify       = require('stringify'),
@@ -203,13 +210,12 @@ function setUpTaskJavascript(tyRun) {
       }
     },
     onRun: function onRunJavascriptTask() {
-      console.log('onRunJavascriptTask');
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 }
 
 module.exports = setUpTaskJavascript;

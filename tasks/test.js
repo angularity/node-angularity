@@ -1,6 +1,10 @@
 'use strict';
 
-function setUpTaskTest(tyRun) {
+function setUpTaskTest(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+
   var taskDefinition = {
     name: 'test',
     description: [
@@ -13,7 +17,7 @@ function setUpTaskTest(tyRun) {
     options: [],
     checks: [],
     onInit: function onInitTestTask(yargsInstance) {
-      var gulp            = require('gulp');
+      var gulp            = context.gulp;
 
       var karma           = require('../lib/test/karma'),
           hr              = require('../lib/util/hr'),
@@ -34,11 +38,12 @@ function setUpTaskTest(tyRun) {
       });
     },
     onRun: function onRunTestTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+
+  return taskDefinition;
 }
 
 module.exports = setUpTaskTest;

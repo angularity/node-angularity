@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskWatch(tyRun) {
+function setUpTaskWatch(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var taskDefinition = {
     name: 'watch',
     description: ('The "watch" task performs an initial build and then serves the application on localhost at ' +
@@ -10,7 +17,7 @@ function setUpTaskWatch(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitWatchTask() {
-      var gulp          = require('gulp'),
+      var gulp          = context.gulp,
           watch         = require('gulp-watch'),
           watchSequence = require('gulp-watch-sequence');
 
@@ -45,12 +52,12 @@ function setUpTaskWatch(tyRun) {
       });
     },
     onRun: function onRunWatchTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 }
 
 module.exports = setUpTaskWatch;

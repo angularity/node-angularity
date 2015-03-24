@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskRelease(tyRun) {
+function setUpTaskRelease(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var taskDefinition = {
     name: 'release',
     description: ('The "release" task performs a single build and exports the build files along with bower ' +
@@ -9,28 +16,18 @@ function setUpTaskRelease(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitReleaseTask() {
-      var gulp        = require('gulp'),
+      var gulp        = context.gulp,
+          runSequence = context.runSequence,
           inject      = require('gulp-inject'),
           plumber     = require('gulp-plumber'),
           rimraf      = require('gulp-rimraf'),
-          semiflat    = require('gulp-semiflat'),
-          wordwrap    = require('wordwrap'),
-          runSequence = require('run-sequence');
+          semiflat    = require('gulp-semiflat');
 
       var injectAdjacent   = require('../lib/inject/adjacent-files'),
           injectTransform  = require('../lib/inject/relative-transform'),
           bowerFiles       = require('../lib/inject/bower-files'),
-          taskYargs        = require('../lib/util/task-yargs'),
           hr               = require('../lib/util/hr'),
           streams          = require('../lib/config/streams');
-
-      taskYargs.register('release', {
-        description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build ' +
-        'files along with bower components to a release directory.')),
-        prerequisiteTasks: ['help', 'build'],
-        checks: [],
-        options: []
-      });
 
       gulp.task('release', ['build'], function (done) {
         console.log(hr('-', 80, 'release'));
@@ -84,11 +81,12 @@ function setUpTaskRelease(tyRun) {
       */
     },
     onRun: function onRunReleaseTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+
+  return taskDefinition;
 }
 
 module.exports = setUpTaskRelease;

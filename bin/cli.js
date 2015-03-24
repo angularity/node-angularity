@@ -37,6 +37,7 @@ var helpOption = {
     boolean: true
   }
 };
+
 var defaultYargsInstance = yargs
   .usage(wordwrap(2, 80)([
     packageJson.description,
@@ -46,8 +47,8 @@ var defaultYargsInstance = yargs
   ].join('\n')))
   // .example('angularity', 'Interactive menu') //TODO reinstate when interactive menu is reinstated
   .example('angularity -v', 'Display the version of angularity')
-  .example('angularity <task name> -h', 'Get help on a particular task')
-  .example('angularity <task name>', 'Run the given task')
+  .example('angularity \<task name\> -h', 'Get help on a particular task')
+  .example('angularity \<task name\>', 'Run the given task')
   .option('version', {
     describe: 'Display the curent version',
     alias: ['v'],
@@ -71,33 +72,27 @@ taskYargsRun.taskYargs.register('help', {
   checks: []
 });
 
-require('../index');
-
-//TODO move these to ../index.js
-require('../tasks/html')(taskYargsRun);
-require('../tasks/css')(taskYargsRun);
-require('../tasks/javascript')(taskYargsRun);
-require('../tasks/test')(taskYargsRun);
-require('../tasks/build')(taskYargsRun);
-require('../tasks/release')(taskYargsRun);
-require('../tasks/server')(taskYargsRun);
-require('../tasks/watch')(taskYargsRun);
-require('../tasks/init')(taskYargsRun);
-require('../tasks/webstorm')(taskYargsRun);
-
 var cliArgs;
-var taskName = taskYargsRun.taskYargs.getCurrentName();
-if (taskName) {
-  taskYargsRun.current();
+cliArgs = defaultYargsInstance.argv;
+var hasCommands = (cliArgs._.length > 0);
+if (hasCommands) {
+  require('../index');
+  var taskName = taskYargsRun.taskYargs.getCurrentName();
+  if (taskName) {
+    taskYargsRun.current();
+  }
+  else {
+    console.log('Task specified is not recognised');
+    defaultYargsInstance.showHelp();
+  }
 }
 else {
-  cliArgs = defaultYargsInstance.argv;
   if (cliArgs.version) {
     console.log('angularity:', packageJson.version);
   }
   else {
     if (!cliArgs.help) {
-      console.log('Task specified is not recognised');
+      console.log('No task specified');
     }
     defaultYargsInstance.showHelp();
   }
