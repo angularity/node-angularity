@@ -40,15 +40,12 @@ if (configTaskPlugins.constructor !== Array) {
 }
 
 var pluginContext = {
-  toolPath: __dirname,
-  taskYargsRun: taskYargsRun,
-  gulp: gulp,
-  runSequence: runSequence
+  toolPath: __dirname
 };
 
 pluginRegistry
   .get('angularity')
-  .options(pluginContext)
+  .context(pluginContext)
   .add(defaultTaskPlugins)
   .add(configTaskPlugins);
 
@@ -65,6 +62,10 @@ taskPlugins
       throw new Error('Plugin named ' + pluginDefinition.name + ' does not export a function');
     }
 
-    var taskDefinition = plugin(pluginContext);
+    var taskDefinition = plugin({
+      taskYargsRun: taskYargsRun,
+      gulp: gulp,
+      runSequence: runSequence
+    });
     taskYargsRun.taskYargs.register(taskDefinition);
   });
