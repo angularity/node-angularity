@@ -7,24 +7,24 @@ function setUpTaskJavascript(tyRun) {
   var optionDefinitionJsHintReporter = {
     key: 'jshint-reporter',
     value: {
-      describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module,' +
-      ' or the absolute path to one.',
-      alias: ['j'],
+      describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module, or the absolute ' +
+      'path to one.',
+      alias   : ['j'],
       //TODO @bguiz get this from config
-      default: 'angularity-jshint-reporter',
-      string: true
+      default : 'angularity-jshint-reporter',
+      string  : true
     }
   };
 
   var optionDefinitionKarmaReporter = {
     key: 'karma-reporter',
     value: {
-      describe: 'Specify a custom Karma reporter to use. ' +
-        'Either a locally npm installed module, or an absolute path to one.',
-      alias: ['k'],
+      describe: 'Specify a custom Karma reporter to use. Either a locally npm installed module, or an absolute path ' +
+      'to one.',
+      alias   : ['k'],
       //TODO @bguiz get this from config
-      default: 'karma-angularity-reporter',
-      string:true,
+      default : 'karma-angularity-reporter',
+      string  : true
     }
   };
 
@@ -73,12 +73,20 @@ function setUpTaskJavascript(tyRun) {
   var taskDefinition = {
     name: 'javascript',
     description: [
-      'The "javascript" task performs a one time build of the javascript composition root(s)',
-      'and also bundles all .spec.js files in the project.',
+      'The "javascript" task performs a one time build of the javascript composition root(s) and also bundles all ' +
+      '.spec.js files in the project.',
       '',
-      'angularity javascript', 'Run this task',
-      'angularity javascript -u', 'Run this task but do not minify javascript'
-    ].join('/n'),
+      'The composition(s) are minified by default but source maps are generate. These test specs are never ' +
+      'minified, regardless of what options are in effect.',
+      '',
+      'This task generates a karma.conf.js so that you may use an external karma test runner. You therefore have the ' +
+      'ability to specify a karma reporter, even though you are not running the tests.',
+      '',
+      'Examples:',
+      '',
+      'angularity javascript        Run this task',
+      'angularity javascript -u     Run this task but do not minify javascript'
+    ].join('\n'),
     prerequisiteTasks: ['help'],
     options: [
       {

@@ -3,8 +3,13 @@
 function setUpTaskRelease(tyRun) {
   var taskDefinition = {
     name: 'release',
-    description: ('The "release" task performs a single build and exports the build files along with bower ' +
-      'components to a release directory.'),
+    description: [
+      'The "release" task performs a single build and exports the build files along with bower components ' +
+      'to a release directory.',
+      '',
+      'This task inherits from build and so while you have the ability to specify a karma reporter it is superfluous' +
+      'in the context of release.'
+    ].join('\n'),
     prerequisiteTasks: ['help', 'build'],
     checks: [],
     options: [],
@@ -25,8 +30,17 @@ function setUpTaskRelease(tyRun) {
           streams          = require('../lib/config/streams');
 
       taskYargs.register('release', {
-        description: (wordwrap(2, 80)('The "release" task performs a single build and exports the build ' +
-        'files along with bower components to a release directory.')),
+        description: [
+          'The "release" task performs a single build and exports the build files along with bower components to a ' +
+          'release directory.',
+          '',
+          'Because this task generates a karma.conf.js then you have the ability to specify a karma reporter.',
+          '',
+          'Examples:',
+          '',
+          'angularity release        Run this task',
+          'angularity release -u     Run this task but do not minify javascript'
+        ].join('\n'),
         prerequisiteTasks: ['help', 'build'],
         checks: [],
         options: []

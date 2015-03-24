@@ -10,8 +10,17 @@ function setUpTaskServer(tyRun) {
 
   var taskDefinition = {
     name: 'server',
-    description: ('The "release" task performs a single build and exports the build files along with bower ' +
-      'components to a release directory.'),
+    description: [
+      'The "server" task performs an initial build and then serves the application on localhost at the given port.',
+      '',
+      'This task generates a karma.conf.js so that you may use an external karma test runner. You therefore have the ' +
+      'ability to specify a karma reporter, even though you are not running the tests.',
+      '',
+      'Examples:',
+      '',
+      'angularity server              Run this task',
+      'angularity server -p 12345     Run this task and serve on port 12345'
+    ].join('/n'),
     prerequisiteTasks: ['help', 'build'],
     checks: [
       function checkPort(argv) {
@@ -42,8 +51,8 @@ function setUpTaskServer(tyRun) {
           gutil       = require('gulp-util'),
           browserSync = require('browser-sync');
 
-      var hr             = require('../lib/util/hr'),
-          streams        = require('../lib/config/streams');
+      var hr          = require('../lib/util/hr'),
+          streams     = require('../lib/config/streams');
 
       var cliArgs;
       cliArgs = yargsInstance

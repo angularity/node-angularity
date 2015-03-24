@@ -4,10 +4,11 @@ function setUpTaskTest(tyRun) {
   var taskDefinition = {
     name: 'test',
     description: [
-      'The "test" task performs a one time build and ' +
-        'karma test of all .spec.js files in the project.',
+      'The "test" task performs a one time build and karma test of all .spec.js files in the project.',
       '',
-      'angularity test', 'Run this task'
+      'Examples:',
+      '',
+      'angularity test    Run this task'
     ].join('\n'),
     prerequisiteTasks: ['javascript'],
     options: [],

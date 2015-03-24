@@ -166,9 +166,11 @@ function setUpWebStormTask(tyRun) {
       '* Add code templates                                     --templates',
       '* Launch IDE                                             --launch',
       '',
-      'angularity webstorm', 'Run this task',
-      'angularity webstorm --defaults -l <some-path>', 'Set a default executable path',
-      'angularity webstorm --defaults reset', 'Reset defaults'
+      'Examples:',
+      '',
+      'angularity webstorm                              Run this task',
+      'angularity webstorm --defaults -l <some-path>    Set a default executable path',
+      'angularity webstorm --defaults reset             Reset defaults'
     ].join('\n'),
     prerequisiteTasks: ['help'],
     checks: [validateLaunchPath, checkWebstormFlags],
