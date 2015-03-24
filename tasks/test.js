@@ -14,11 +14,11 @@ function setUpTaskTest(tyRun) {
     options: [],
     checks: [],
     onInit: function onInitTestTask(yargsInstance) {
-      var gulp            = require('gulp');
+      var gulp    = require('gulp');
 
-      var karma           = require('../lib/test/karma'),
-          hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams');
+      var karma   = require('../lib/test/karma'),
+          hr      = require('../lib/util/hr'),
+          streams = require('../lib/config/streams');
 
       var cliArgs;
       cliArgs = yargsInstance

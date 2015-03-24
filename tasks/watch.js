@@ -6,8 +6,8 @@ function setUpTaskWatch(tyRun) {
     description: [
       'The "watch" task performs an initial build and then serves the application on localhost at the given port.',
       '',
-      'It then watches the project and performs rebuild of Javascript and/or SASS compositions upon change. This is ' +
-      'followed by HTML injection and browser reload.',
+      'It then watches the project and performs rebuild of Javascript and/or SASS compositions and/or all .spec.js ' +
+      'files upon change. This is followed by HTML injection and browser reload.',
       '',
       'This task generates a karma.conf.js so that you may use an external karma test runner. You therefore have the ' +
       'ability to specify a karma reporter, even though you are not running the tests.',
