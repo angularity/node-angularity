@@ -35,7 +35,6 @@ describe('The Angularity test task', function () {
     helper.runner.create()
       .addInvocation('test --help')
       .addInvocation('test -h')
-//    .addInvocation('test -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 

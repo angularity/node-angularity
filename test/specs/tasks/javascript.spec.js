@@ -33,7 +33,6 @@ describe('The Angularity javascript task', function () {
     helper.runner.create()
       .addInvocation('javascript --help')
       .addInvocation('javascript -h')
-//    .addInvocation('javascript -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 

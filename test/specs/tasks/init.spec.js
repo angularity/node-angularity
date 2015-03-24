@@ -44,7 +44,6 @@ describe('The Angularity init task', function () {
     helper.runner.create()
       .addInvocation('init --help')
       .addInvocation('init -h')
-//    .addInvocation('init -?')   // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 
