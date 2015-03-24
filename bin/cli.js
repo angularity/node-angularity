@@ -36,6 +36,7 @@ var helpOption = {
     boolean: true
   }
 };
+
 var defaultYargsInstance = yargs
   .usage([
     packageJson.description,
@@ -70,36 +71,36 @@ taskYargsRun.taskYargs.register('help', {
       }
     }
   ],
-  checks: []
+  checks: [],
+  onInit: function onInitHelpTask() {
+    // Do nothing
+  },
+  onRun: function onRunHelpTask() {
+    defaultYargsInstance.showHelp();
+  }
 });
 
-require('../index');
-
-//TODO move these to ../index.js
-require('../tasks/html')(taskYargsRun);
-require('../tasks/css')(taskYargsRun);
-require('../tasks/javascript')(taskYargsRun);
-require('../tasks/test')(taskYargsRun);
-require('../tasks/build')(taskYargsRun);
-require('../tasks/release')(taskYargsRun);
-require('../tasks/server')(taskYargsRun);
-require('../tasks/watch')(taskYargsRun);
-require('../tasks/init')(taskYargsRun);
-require('../tasks/webstorm')(taskYargsRun);
-
 var cliArgs;
-var taskName = taskYargsRun.taskYargs.getCurrentName();
-if (taskName) {
-  taskYargsRun.current();
+cliArgs = defaultYargsInstance.argv;
+var hasCommands = (cliArgs._.length > 0);
+if (hasCommands) {
+  require('../index');
+  var taskName = taskYargsRun.taskYargs.getCurrentName();
+  if (taskName) {
+    taskYargsRun.current();
+  }
+  else {
+    console.log('Task specified is not recognised');
+    defaultYargsInstance.showHelp();
+  }
 }
 else {
-  cliArgs = defaultYargsInstance.argv;
   if (cliArgs.version) {
     console.log('angularity:', packageJson.version);
   }
   else {
     if (!cliArgs.help) {
-      console.log('Task specified is not recognised');
+      console.log('No task specified');
     }
     defaultYargsInstance.showHelp();
   }

@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskWatch(tyRun) {
+function setUpTaskWatch(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var taskDefinition = {
     name: 'watch',
     description: [
@@ -22,7 +29,7 @@ function setUpTaskWatch(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitWatchTask() {
-      var gulp          = require('gulp'),
+      var gulp          = context.gulp,
           watch         = require('gulp-watch'),
           watchSequence = require('gulp-watch-sequence');
 
@@ -31,7 +38,7 @@ function setUpTaskWatch(tyRun) {
 
       gulp.task('watch', ['server'], function () {
         console.log(hr('-', 80, 'watch'));
-        var getGlobAppNodeBower = streams.getLocalLibGlob(streams.APP, streams.NODE, streams.BOWER);
+        var getGlobApp = streams.getLocalLibGlob(streams.APP);
 
         // enqueue actions to avoid multiple trigger
         var queue = watchSequence(500, function () {
@@ -39,12 +46,12 @@ function setUpTaskWatch(tyRun) {
         });
 
         // watch statements
-        watch(getGlobAppNodeBower('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
+        watch(getGlobApp('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
           name      : 'JS|HTML',
           emitOnGlob: false
         }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
 
-        watch(getGlobAppNodeBower(['**/*.scss', '!*.scss']), {
+        watch(getGlobApp(['**/*.scss', '!*.scss']), {
           name      : 'CSS',
           emitOnGlob: false
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
@@ -57,12 +64,12 @@ function setUpTaskWatch(tyRun) {
       });
     },
     onRun: function onRunWatchTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 }
 
 module.exports = setUpTaskWatch;

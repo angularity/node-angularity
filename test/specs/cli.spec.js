@@ -30,13 +30,22 @@ describe('The Angularity cli interface', function () {
     }
   });
 
-  describe('should display help where requested', function (done) {
-    helper.runner.create()
-      .addInvocation('--help')
-      .addInvocation('-h')
-//    .addInvocation('-?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
-      .forEach(fastIt(expectations))
-      .finally(done);
+  describe('for help', function () {
+    describe('should display help where requested', function (done) {
+      helper.runner.create()
+        .addInvocation('help')
+        .addInvocation('--help')
+        .addInvocation('-h')
+        .forEach(fastIt(expectations))
+        .finally(done);
+    });
+
+    describe('should display help when task not recognised', function (done) {
+      helper.runner.create()
+        .addInvocation('illegal')
+        .forEach(fastIt(expectations))
+        .finally(done);
+    });
 
     function expectations(testCase) {
       // test the help message begins with the description from the package.json

@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskJavascript(tyRun) {
+function setUpTaskJavascript(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var jshintReporter  = require('../lib/util/jshint-reporter');
   var karma           = require('../lib/test/karma');
 
@@ -106,11 +113,11 @@ function setUpTaskJavascript(tyRun) {
       checkKarmaReporter
     ],
     onInit: function onInitJavascriptTask(yargsInstance) {
-      var gulp            = require('gulp'),
+      var gulp            = context.gulp,
+          runSequence     = context.runSequence,
           jshint          = require('gulp-jshint'),
           rimraf          = require('gulp-rimraf'),
           semiflat        = require('gulp-semiflat'),
-          runSequence     = require('run-sequence'),
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
           stringify       = require('stringify'),
@@ -158,8 +165,7 @@ function setUpTaskJavascript(tyRun) {
       // give a single optimised javascript file in the build directory with source map for each
       gulp.task('javascript:build', function () {
         return streams.jsApp({read: false})
-          .pipe(browserify
-            .compile(80, getTransforms(!cliArgs.unminified))
+          .pipe(browserify(80, getTransforms(!cliArgs.unminified))
             .each(!cliArgs.unminified))
           .pipe(gulp.dest(streams.BUILD));
       });
@@ -188,8 +194,7 @@ function setUpTaskJavascript(tyRun) {
           .append(
             streams
               .jsSpec()
-              .pipe(browserify
-                .compile(80, getTransforms().concat(browserify.jasmineTransform('@')))
+              .pipe(browserify(80, getTransforms(false))
                 .all('index.js', false, '/base'))
               .pipe(gulp.dest(streams.TEST))
           )
@@ -211,19 +216,14 @@ function setUpTaskJavascript(tyRun) {
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
         // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
       }
-
-      // Augment exported function with utility functions because
-      // dependant tasks would like to share this
-      setUpTaskJavascript.getTransforms = getTransforms;
     },
     onRun: function onRunJavascriptTask() {
-      console.log('onRunJavascriptTask');
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
 
-  tyRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 }
 
 module.exports = setUpTaskJavascript;

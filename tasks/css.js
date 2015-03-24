@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskCss(tyRun) {
+function setUpTaskCss(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var taskDefinition = {
     name: 'css',
     description: 'The "css" task performs a one time build of the SASS composition root(s).',
@@ -8,9 +15,9 @@ function setUpTaskCss(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitCssTask() {
-      var gulp            = require('gulp'),
-          rimraf          = require('gulp-rimraf'),
-          runSequence     = require('run-sequence');
+      var gulp            = context.gulp,
+          runSequence     = context.runSequence,
+          rimraf          = require('gulp-rimraf');
 
       var nodeSass        = require('../lib/build/node-sass'),
           hr              = require('../lib/util/hr'),
@@ -39,11 +46,12 @@ function setUpTaskCss(tyRun) {
       });
     },
     onRun: function onRunCssTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+
+  return taskDefinition;
 }
 
 module.exports = setUpTaskCss;

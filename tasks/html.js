@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskHtml(tyRun) {
+function setUpTaskHtml(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var taskDefinition = {
     name: 'html',
     description: 'The "html" task performs a one time injection of pre-built JS and CSS into the application HTML.',
@@ -8,11 +15,11 @@ function setUpTaskHtml(tyRun) {
     checks: [],
     options: [],
     onInit: function onInitHtmlTask() {
-      var gulp            = require('gulp'),
+      var gulp            = context.gulp,
+          runSequence     = context.runSequence,
           inject          = require('gulp-inject'),
           plumber         = require('gulp-plumber'),
-          rimraf          = require('gulp-rimraf'),
-          runSequence     = require('run-sequence');
+          rimraf          = require('gulp-rimraf');
 
       var injectAdjacent  = require('../lib/inject/adjacent-files'),
           bowerFiles      = require('../lib/inject/bower-files'),
@@ -32,7 +39,7 @@ function setUpTaskHtml(tyRun) {
 
       // clean the html build directory
       gulp.task('html:clean', function () {
-        return gulp.src([streams.BUILD + '/**/*.html*', streams.BUILD + '/**/assets/**'], {read: false})
+        return gulp.src([streams.BUILD + '/**/*.html*', streams.BUILD + '/**/assets'], { read: false })
           .pipe(rimraf());
       });
 
@@ -57,11 +64,12 @@ function setUpTaskHtml(tyRun) {
       });
     },
     onRun: function onRunHtmlTask() {
-      var runSequence = require('run-sequence');
-      runSequence(taskDefinition.name);
+      var gulp        = context.gulp;
+      gulp.start(taskDefinition.name);
     }
   };
-  tyRun.taskYargs.register(taskDefinition);
+
+  return taskDefinition;
 }
 
 module.exports = setUpTaskHtml;
