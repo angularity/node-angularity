@@ -8,20 +8,21 @@ function setUpTaskTest(context) {
   var taskDefinition = {
     name: 'test',
     description: [
-      'The "test" task performs a one time build and ' +
-        'karma test of all .spec.js files in the project.',
+      'The "test" task performs a one time build and karma test of all .spec.js files in the project.',
       '',
-      'angularity test', 'Run this task'
+      'Examples:',
+      '',
+      'angularity test    Run this task'
     ].join('\n'),
     prerequisiteTasks: ['javascript'],
     options: [],
     checks: [],
     onInit: function onInitTestTask(yargsInstance) {
-      var gulp            = context.gulp;
+      var gulp    = context.gulp;
 
-      var karma           = require('../lib/test/karma'),
-          hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams');
+      var karma   = require('../lib/test/karma'),
+          hr      = require('../lib/util/hr'),
+          streams = require('../lib/config/streams');
 
       var cliArgs;
       cliArgs = yargsInstance

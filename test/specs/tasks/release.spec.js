@@ -34,7 +34,6 @@ describe('The Angularity release task', function () {
     helper.runner.create()
       .addInvocation('release --help')
       .addInvocation('release -h')
-//    .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 

@@ -32,7 +32,6 @@ describe('The Angularity css task', function () {
     helper.runner.create()
       .addInvocation('css --help')
       .addInvocation('css -h')
-//    .addInvocation('css -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 

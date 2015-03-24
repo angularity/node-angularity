@@ -10,8 +10,18 @@ function setUpTaskRelease(context) {
 
   var taskDefinition = {
     name: 'release',
-    description: ('The "release" task performs a single build and exports the build files along with bower ' +
-      'components to a release directory.'),
+    description: [
+      'The "release" task performs a single build and exports the build files along with bower components ' +
+      'to a release directory.',
+      '',
+      'This task inherits from build and so while you have the ability to specify a karma reporter it is superfluous ' +
+      'in the context of release.',
+      '',
+      'Examples:',
+      '',
+      'angularity release        Run this task',
+      'angularity release -u     Run this task but do not minify javascript'
+    ].join('\n'),
     prerequisiteTasks: ['help', 'build'],
     checks: [],
     options: [],

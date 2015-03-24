@@ -34,7 +34,6 @@ describe('The Angularity webstorm task', function () {
     helper.runner.create()
       .addInvocation('webstorm --help')
       .addInvocation('webstorm -h')
-//    .addInvocation('build -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 

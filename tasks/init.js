@@ -208,9 +208,11 @@ function setUpInitTask(context) {
       '',
       'Both the npm and bower packages are initially set private which you will need to clear in order to publish.',
       '',
-      'angularity init -n todo', 'Create project named "todo"',
-      'angularity init --defaults -n pending', 'Change the name default to "pending',
-      'angularity init --defaults reset', 'Reset defaults'
+      'Examples:',
+      '',
+      'angularity init -n todo                  Create project named "todo"',
+      'angularity init --defaults -n pending    Change the name default to "pending"',
+      'angularity init --defaults reset         Reset defaults'
     ].join('\n'),
     prerequisiteTasks: ['help'],
     checks: [checkInitFlags],

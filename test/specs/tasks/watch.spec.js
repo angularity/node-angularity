@@ -35,7 +35,6 @@ describe('The Angularity watch task', function () {
     helper.runner.create()
       .addInvocation('watch --help')
       .addInvocation('watch -h')
-//    .addInvocation('watch -?')  // TODO @bholloway process cannot be spawned on windows when it has -? flag
       .forEach(fastIt(expectations))
       .finally(done);
 

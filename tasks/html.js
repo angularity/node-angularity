@@ -10,8 +10,7 @@ function setUpTaskHtml(context) {
 
   var taskDefinition = {
     name: 'html',
-    description: ('The "html" task performs a one time injection of ' +
-      'pre-built JS and CSS into the application HTML.'),
+    description: 'The "html" task performs a one time injection of pre-built JS and CSS into the application HTML.',
     prerequisiteTasks: ['help'],
     checks: [],
     options: [],

@@ -10,7 +10,7 @@ function setUpTaskCss(context) {
 
   var taskDefinition = {
     name: 'css',
-    description: ('The "css" task performs a one time build of the SASS composition root(s).'),
+    description: 'The "css" task performs a one time build of the SASS composition root(s).',
     prerequisiteTasks: ['help'],
     checks: [],
     options: [],
