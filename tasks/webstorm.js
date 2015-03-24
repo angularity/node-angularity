@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpWebStormTask(options) {
+function setUpWebStormTask(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var fs              = require('fs'),
       path            = require('path'),
       ideTemplate     = require('ide-template'),
@@ -87,7 +94,7 @@ function setUpWebStormTask(options) {
   ];
 
   function checkWebstormFlags(argv) {
-    var tyRun = options.taskYargsRun;
+    var tyRun = context.taskYargsRun;
 
     if (argv.help) {
       return true;
@@ -176,7 +183,7 @@ function setUpWebStormTask(options) {
     checks: [validateLaunchPath, checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
-      var gulp            = options.gulp || require('gulp'),
+      var gulp            = context.gulp,
           gutil           = require('gulp-util'),
           runSequence     = require('run-sequence');
 
@@ -335,12 +342,12 @@ function setUpWebStormTask(options) {
       }
     },
     onRun: function onRunWebstormTask() {
-      var gulp        = options.gulp || require('gulp');
+      var gulp        = context.gulp;
       gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
 
-  options.taskYargsRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 
   /**
    * Validator function for an angularity project being present in the current working directory
@@ -375,4 +382,5 @@ function setUpWebStormTask(options) {
     return result;
   }
 }
+
 module.exports = setUpWebStormTask;

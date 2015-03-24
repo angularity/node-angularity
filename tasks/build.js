@@ -1,6 +1,13 @@
 'use strict';
 
-function setUpTaskBuild(options) {
+function setUpTaskBuild(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+
   var taskDefinition = {
     name: 'build',
     description: ('The "build" task performs a single build of the javascript and SASS composition root(s).'),
@@ -8,8 +15,8 @@ function setUpTaskBuild(options) {
     checks: [],
     options: [],
     onInit: function onBuildTask() {
-      var gulp        = options.gulp || require('gulp'),
-          runSequence = require('run-sequence');
+      var gulp        = context.gulp,
+          runSequence = context.runSequence;
 
       var hr          = require('../lib/util/hr');
 
@@ -19,12 +26,12 @@ function setUpTaskBuild(options) {
       });
     },
     onRun: function onBuildTask() {
-      var gulp        = options.gulp || require('gulp');
+      var gulp        = context.gulp;
       gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
 
-  options.taskYargsRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 }
 
 module.exports = setUpTaskBuild;

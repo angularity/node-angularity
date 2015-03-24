@@ -1,8 +1,9 @@
 'use strict';
 var path            = require('path');
 
-var gulp            = require('gulp');
-var pluginRegistry  = require('plugin-registry');
+var gulp            = require('gulp'),
+    runSequence     = require('run-sequence'),
+    pluginRegistry  = require('plugin-registry');
 
 var taskYargsRun    = require('./lib/util/task-yargs-run');
 
@@ -38,15 +39,16 @@ if (configTaskPlugins.constructor !== Array) {
   throw new Error('Plugins defined in angularity.json should be an array');
 }
 
-var pluginOptions = {
-  projectPath: __dirname,
+var pluginContext = {
+  toolPath: __dirname,
+  taskYargsRun: taskYargsRun,
   gulp: gulp,
-  taskYargsRun: taskYargsRun
+  runSequence: runSequence
 };
 
 pluginRegistry
   .get('angularity')
-  .options(pluginOptions)
+  .options(pluginContext)
   .add(defaultTaskPlugins)
   .add(configTaskPlugins);
 
@@ -63,5 +65,6 @@ taskPlugins
       throw new Error('Plugin named ' + pluginDefinition.name + ' does not export a function');
     }
 
-    plugin(pluginOptions);
+    var taskDefinition = plugin(pluginContext);
+    taskYargsRun.taskYargs.register(taskDefinition);
   });

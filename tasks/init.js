@@ -1,6 +1,16 @@
 'use strict';
 
-function setUpInitTask(options) {
+function setUpInitTask(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+  if (!context.runSequence) {
+    throw new Error('Context must specify run-sequence instance');
+  }
+  if (!context.taskYargsRun) {
+    throw new Error('Context must specify task-yargs run instance');
+  }
+
   var platform        = require('../lib/config/platform'),
       defaults        = require('../lib/config/defaults');
 
@@ -128,7 +138,7 @@ function setUpInitTask(options) {
   ];
 
   function checkInitFlags(argv) {
-    var tyRun = options.taskYargsRun;
+    var tyRun = context.taskYargsRun;
 
     if (argv.help) {
       return true;
@@ -206,9 +216,9 @@ function setUpInitTask(options) {
     checks: [checkInitFlags],
     options: initOptionDefinitions,
     onInit: function onInitInitTask(yargsInstance) {
-      var gulp        = options.gulp || require('gulp'),
+      var gulp        = context.gulp,
+          runSequence = context.runSequence,
           gutil       = require('gulp-util'),
-          runSequence = require('run-sequence'),
           path        = require('path'),
           fs          = require('fs'),
           template    = require('lodash.template'),
@@ -361,12 +371,12 @@ function setUpInitTask(options) {
       }
     },
     onRun: function onRunInitTask() {
-      var gulp        = options.gulp || require('gulp');
+      var gulp        = context.gulp;
       gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
 
-  options.taskYargsRun.taskYargs.register(taskDefinition);
+  return taskDefinition;
 }
 
 module.exports = setUpInitTask;

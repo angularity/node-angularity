@@ -1,6 +1,10 @@
 'use strict';
 
-function setUpTaskServer(options) {
+function setUpTaskServer(context) {
+  if (!context.gulp) {
+    throw new Error('Context must specify gulp instance');
+  }
+
   var defaults = require('../lib/config/defaults');
   var config = defaults.getInstance()
     .file('angularity.json')
@@ -38,7 +42,7 @@ function setUpTaskServer(options) {
       }
     ],
     onInit: function onInitServerTask(yargsInstance) {
-      var gulp        = options.gulp || require('gulp'),
+      var gulp        = context.gulp,
           gutil       = require('gulp-util'),
           browserSync = require('browser-sync');
 
@@ -76,11 +80,12 @@ function setUpTaskServer(options) {
       });
     },
     onRun: function onRunServerTask() {
-      var gulp        = options.gulp || require('gulp');
+      var gulp        = context.gulp;
       gulp.start.apply(gulp, [taskDefinition.name]);
     }
   };
-  options.taskYargsRun.taskYargs.register(taskDefinition);
+
+  return taskDefinition;
 }
 
 module.exports = setUpTaskServer;
