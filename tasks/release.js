@@ -19,7 +19,6 @@ function setUpTaskRelease(tyRun) {
           plumber     = require('gulp-plumber'),
           rimraf      = require('gulp-rimraf'),
           semiflat    = require('gulp-semiflat'),
-          wordwrap    = require('wordwrap'),
           runSequence = require('run-sequence');
 
       var injectAdjacent   = require('../lib/inject/adjacent-files'),
