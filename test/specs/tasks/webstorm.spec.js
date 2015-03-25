@@ -25,7 +25,7 @@ if (!platform.isAppveyor()) {
 
     beforeEach(customMatchers);
 
-    beforeEach(helper.getTimeoutSwitch(60000));
+    beforeEach(helper.getTimeoutSwitch(90000));
 
     afterEach(helper.getTimeoutSwitch());
 

@@ -23,7 +23,7 @@ describe('The Angularity javascript task', function () {
 
   beforeEach(javascriptTask.customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(120000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
