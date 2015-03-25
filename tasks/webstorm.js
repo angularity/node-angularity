@@ -124,7 +124,7 @@ function setUpWebStormTask(context) {
           }
         }
         else if (key === 'launch') {
-          switch (argv.launch) {
+          switch (String(argv.launch)) {
             case 'false':
               break;
             case 'true':
@@ -209,7 +209,7 @@ function setUpWebStormTask(context) {
         }
         // else run the selected items
         else {
-          var launch   = (cliArgs.launch !== 'false');
+          var launch   = (String(cliArgs.launch) !== 'false');
           var taskList = [
             cliArgs.subdir    && 'webstorm:subdir',
             cliArgs.project   && 'webstorm:project',
