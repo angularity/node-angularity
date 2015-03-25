@@ -30,20 +30,20 @@ function setUpWebStormTask(context) {
     {
       key: 'defaults',
       value: {
-        describe: 'Set defaults',
-        alias   : 'z',
-        boolean : true,
-        isOptional: true
+        describe  : 'Set defaults',
+        alias     : 'z',
+        isOptional: true,
+        default   : false
       }
     },
     {
       key: 'subdir',
       value: {
-        describe: 'Navigate to the sub-directory specified',
-        alias   : 's',
-        string  : true,
+        describe  : 'Navigate to the sub-directory specified',
+        alias     : 's',
+        string    : true,
         isOptional: true,
-        default : config.get('subdir')
+        default   : config.get('subdir')
       }
     },
     {
@@ -108,13 +108,20 @@ function setUpWebStormTask(context) {
         }
 
         // ensure options correspond to the types that they were defined as belonging to
-        tyRun.checkFlagType(opt, key, value);
+        if (key !== 'defaults') {
+          tyRun.checkFlagType(opt, key, value);
+        }
 
         if (key === 'subdir') {
           var subdir  = path.resolve(value);
           var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
           if (!isValid) {
             throw new Error('The specified subdirectory does not exist.');
+          }
+        }
+        else if (key === 'defaults') {
+          if (!(/^(true|false|reset)$/.test(String(argv.defaults)))) {
+            throw new Error('Unrecognised value for defaults flag, expected true|false|reset.');
           }
         }
       });
