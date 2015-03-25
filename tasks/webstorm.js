@@ -124,7 +124,7 @@ function setUpWebStormTask(context) {
           }
         }
         else if (key === 'launch') {
-          switch (argv.launch) {
+          switch (String(argv.launch)) {
             case 'false':
               break;
             case 'true':
@@ -195,6 +195,9 @@ function setUpWebStormTask(context) {
         .wrap(80);
       cliArgs = yargsInstance.argv;
 
+      // launch parameter should be boolean for consistency with defaults
+      cliArgs.launch = (cliArgs.launch === 'true') ? true : (cliArgs.launch === 'false') ? false : cliArgs.launch;
+
       gulp.task('webstorm', function (done) {
         console.log(hr('-', 80, 'webstorm'));
 
@@ -209,14 +212,13 @@ function setUpWebStormTask(context) {
         }
         // else run the selected items
         else {
-          var launch   = (cliArgs.launch !== 'false');
           var taskList = [
             cliArgs.subdir    && 'webstorm:subdir',
             cliArgs.project   && 'webstorm:project',
             cliArgs.external  && 'webstorm:externaltools',
             cliArgs.codestyle && 'webstorm:codestyle',
             cliArgs.templates && 'webstorm:templates',
-            launch            && 'webstorm:launch'
+            cliArgs.launch    && 'webstorm:launch'
           ].filter(Boolean);
           if (taskList.length > 0) {
             runSequence.apply(runSequence, taskList.concat(done));
