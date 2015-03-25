@@ -202,7 +202,7 @@ function setUpWebStormTask(context) {
       yargsInstance
         .strict()
         .wrap(80);
-      cliArgs = yargsInstance.argv;
+      cliArgs = validateLaunchPath(yargsInstance.argv); // cast launch flag to boolean (mutate and return)
 
       gulp.task('webstorm', function (done) {
         console.log(hr('-', 80, 'webstorm'));
