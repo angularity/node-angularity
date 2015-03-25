@@ -34,10 +34,10 @@ function setUpInitTask(context) {
     {
       key: 'defaults',
       value: {
-        describe: 'Set defaults',
-        alias   : 'z',
-        boolean : true,
-        isOptional: true
+        describe  : 'Set defaults',
+        alias     : 'z',
+        isOptional: true,
+        default   : false
       }
     },
     {
@@ -151,7 +151,7 @@ function setUpInitTask(context) {
         if (tyRun.checkFlagMissing(opt, key, value)) {
           return;
         }
-        if (key !== 'port') {
+        if ((key !== 'port') && (key !== 'defaults')) {
           // skip the valid types test for port, as will be done later
           // ensure options correspond to the types that they were defined as belonging to
           tyRun.checkFlagType(opt, key, value);
@@ -172,6 +172,11 @@ function setUpInitTask(context) {
             (valueType !== 'string' && valueType !== 'number')) {
             console.log('port', value, 'valueType', valueType);
             throw new Error('Port must be an integer, or "random"');
+          }
+        }
+        else if (key === 'defaults') {
+          if (!(/^(true|false|reset)$/.test(String(argv.defaults)))) {
+            throw new Error('Unrecognised value for defaults flag, expected true|false|reset.');
           }
         }
       });
@@ -226,8 +231,8 @@ function setUpInitTask(context) {
           template    = require('lodash.template'),
           merge       = require('lodash.merge');
 
-      var hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams');
+      var hr          = require('../lib/util/hr'),
+          streams     = require('../lib/config/streams');
 
       var TEMPLATE_PATH = path.join(__dirname, '..', 'templates', 'angularity');
 

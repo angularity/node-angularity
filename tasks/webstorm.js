@@ -8,11 +8,11 @@ function setUpWebStormTask(context) {
     throw new Error('Context must specify run-sequence instance');
   }
 
-  var fs              = require('fs'),
-      path            = require('path'),
-      ideTemplate     = require('ide-template'),
-      defaults        = require('../lib/config/defaults'),
-      platform        = require('../lib/config/platform');
+  var fs          = require('fs'),
+      path        = require('path'),
+      ideTemplate = require('ide-template'),
+      defaults    = require('../lib/config/defaults'),
+      platform    = require('../lib/config/platform');
 
   var config = defaults
     .getInstance('webstorm')
@@ -30,20 +30,20 @@ function setUpWebStormTask(context) {
     {
       key: 'defaults',
       value: {
-        describe: 'Set defaults',
-        alias   : 'z',
-        boolean : true,
-        isOptional: true
+        describe  : 'Set defaults',
+        alias     : 'z',
+        isOptional: true,
+        default   : false
       }
     },
     {
       key: 'subdir',
       value: {
-        describe: 'Navigate to the sub-directory specified',
-        alias   : 's',
-        string  : true,
+        describe  : 'Navigate to the sub-directory specified',
+        alias     : 's',
+        string    : true,
         isOptional: true,
-        default : config.get('subdir')
+        default   : config.get('subdir')
       }
     },
     {
@@ -87,10 +87,9 @@ function setUpWebStormTask(context) {
       value: {
         describe: 'Launch the IDE following setup',
         alias   : 'l',
-        boolean : true,
         default : config.get('launch')
       }
-    },
+    }
   ];
 
   function checkWebstormFlags(argv) {
@@ -108,13 +107,38 @@ function setUpWebStormTask(context) {
         }
 
         // ensure options correspond to the types that they were defined as belonging to
-        tyRun.checkFlagType(opt, key, value);
+        if ((key !== 'defaults') && (key !== 'launch')) {
+          tyRun.checkFlagType(opt, key, value);
+        }
 
         if (key === 'subdir') {
           var subdir  = path.resolve(value);
           var isValid = fs.existsSync(subdir) && fs.statSync(subdir).isDirectory();
           if (!isValid) {
             throw new Error('The specified subdirectory does not exist.');
+          }
+        }
+        else if (key === 'defaults') {
+          if (!(/^(true|false|reset)$/.test(String(argv.defaults)))) {
+            throw new Error('Unrecognised value for defaults flag, expected true|false|reset.');
+          }
+        }
+        else if (key === 'launch') {
+          switch (argv.launch) {
+            case 'false':
+              break;
+            case 'true':
+              if (!ideTemplate.webStorm.validateExecutable()) {
+                throw new Error('Cannot find Webstorm executable, you will have to specify it explicitly.');
+              }
+              break;
+            default:
+              var customPath = path.normalize(argv.launch);
+              if (fs.existsSync(customPath)) {
+                ideTemplate.webStorm.customExecutable = customPath;
+              } else {
+                throw new Error('Launch path is not valid or does not exist.');
+              }
           }
         }
       });
@@ -127,33 +151,6 @@ function setUpWebStormTask(context) {
       }
     }
     return true;
-  }
-
-  /**
-   * yargs check for a valid --launch parameter
-   * Additionally parses true|false strings to boolean literals
-   * @param argv
-   */
-  function validateLaunchPath(argv) {
-    switch (argv.launch) {
-      case false:
-      case 'false':
-        argv.launch = false;
-        break;
-      case true:
-      case 'true':
-        if (ideTemplate.webStorm.validateExecutable()) {
-          argv.launch = true;
-        } else {
-          return 'Cannot find Webstorm executable, you will have to specify it explicitly.';
-        }
-        break;
-      default:
-        if (!fs.existsSync(path.normalize(argv.launch))) {
-          return 'Launch path is not valid or does not exist.';
-        }
-    }
-    return argv;
   }
 
   var taskDefinition = {
@@ -180,7 +177,7 @@ function setUpWebStormTask(context) {
       'angularity webstorm --defaults reset             Reset defaults'
     ].join('\n'),
     prerequisiteTasks: ['help'],
-    checks: [validateLaunchPath, checkWebstormFlags],
+    checks: [checkWebstormFlags],
     options: webstormOptionDefinitions,
     onInit: function onInitWebstormTask(yargsInstance) {
       var gulp            = context.gulp,
@@ -212,13 +209,14 @@ function setUpWebStormTask(context) {
         }
         // else run the selected items
         else {
+          var launch   = (cliArgs.launch !== 'false');
           var taskList = [
             cliArgs.subdir    && 'webstorm:subdir',
             cliArgs.project   && 'webstorm:project',
             cliArgs.external  && 'webstorm:externaltools',
             cliArgs.codestyle && 'webstorm:codestyle',
             cliArgs.templates && 'webstorm:templates',
-            cliArgs.launch    && 'webstorm:launch'
+            launch            && 'webstorm:launch'
           ].filter(Boolean);
           if (taskList.length > 0) {
             runSequence.apply(runSequence, taskList.concat(done));
