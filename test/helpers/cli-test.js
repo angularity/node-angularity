@@ -285,7 +285,6 @@ function factory(base) {
 
       // error in copying implies rejected async
       if (error) {
-console.log(JSON.stringify(error));
         deferred.reject(error);
       }
       // run the command

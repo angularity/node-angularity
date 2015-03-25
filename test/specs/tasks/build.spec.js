@@ -45,7 +45,8 @@ describe('The Angularity build task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5-minified')
+      .addSource('angularity-todo-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('build')
       .addInvocation('build --unminified false')
       .addInvocation('build -u false')
@@ -55,7 +56,8 @@ describe('The Angularity build task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5-unminified')
+      .addSource('angularity-todo-es5')
+      .addParameters({ subdir: 'app-unminified' })
       .addInvocation('build --unminified')
       .addInvocation('build -u')
       .addInvocation('build --unminified true')

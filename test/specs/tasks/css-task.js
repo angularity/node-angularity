@@ -9,7 +9,7 @@ var BUILD_FOLDER = 'app-build';
 
 function expectations(testCase) {
   var workingBuildFile = helper.getConcatenation(testCase.cwd, BUILD_FOLDER);
-  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, BUILD_FOLDER);
+  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, testCase.subdir, BUILD_FOLDER);
   expect(testCase.stdout).toBeTask('css');
   expect(testCase.cwd).toHaveExpectedCssExcept();
   expect(workingBuildFile('index.css')).diffFilePatch(sourceBuildFile('index.css'));

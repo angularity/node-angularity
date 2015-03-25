@@ -45,7 +45,8 @@ describe('The Angularity release task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5-minified')
+      .addSource('angularity-todo-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('release')
       .addInvocation('release --unminified false')
       .addInvocation('release -u false')
@@ -55,7 +56,8 @@ describe('The Angularity release task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5-unminified')
+      .addSource('angularity-todo-es5')
+      .addParameters({ subdir: 'app-unminified' })
       .addInvocation('release --unminified')
       .addInvocation('release -u')
       .addInvocation('release --unminified true')
@@ -67,9 +69,9 @@ describe('The Angularity release task', function () {
 
 function expectations(testCase) {
   var workingReleaseFile = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER);
-  var workingVendorFile = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER, VENDOR_FOLDER);
-  var sourceReleaseFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER);
-  var sourceVendorFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER, VENDOR_FOLDER);
+  var workingVendorFile  = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER, VENDOR_FOLDER);
+  var sourceReleaseFile  = helper.getConcatenation(testCase.sourceDir, testCase.subdir, RELEASE_FOLDER);
+  var sourceVendorFile   = helper.getConcatenation(testCase.sourceDir, testCase.subdir, RELEASE_FOLDER, VENDOR_FOLDER);
 
   // general
   expect(testCase.stdout).toBeTask(['release', 'build', 'javascript', 'css']);

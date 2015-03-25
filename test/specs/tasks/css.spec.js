@@ -43,7 +43,8 @@ describe('The Angularity css task', function () {
 
   describe('should compile css correctly', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5-minified')
+      .addSource('angularity-todo-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('css')
       .forEach(slowIt(cssTask.expectations))
       .finally(done);

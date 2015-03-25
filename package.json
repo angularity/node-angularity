@@ -112,7 +112,6 @@
     "jshint-stylish": "^1.0.1",
     "ncp": "~2.0.0",
     "ps-tree": "~0.0.3",
-    "angularity-todo-es5-minified": "angularity/angularity-todo-es5#build-minified",
-    "angularity-todo-es5-unminified": "angularity/angularity-todo-es5#build-unminified"
+    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build"
   }
 }
