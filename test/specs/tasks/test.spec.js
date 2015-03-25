@@ -47,7 +47,7 @@ describe('The Angularity test task', function () {
 
   describe('should build unminified javascript and run tests', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5')
+      .addSource('angularity-helloworld-es5')
       .addParameters({ subdir: 'app-minified' })
       .addInvocation('test')
       .forEach(slowIt(expectations))
@@ -56,7 +56,7 @@ describe('The Angularity test task', function () {
 
   describe('should support unminified option, but not minify test output', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5')
+      .addSource('angularity-helloworld-es5')
       .addParameters({ subdir: 'app-unminified' })
       .addInvocation('test --unminified')
       .addInvocation('test -u')

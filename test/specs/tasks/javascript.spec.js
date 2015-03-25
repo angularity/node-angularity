@@ -45,7 +45,7 @@ describe('The Angularity javascript task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5')
+      .addSource('angularity-helloworld-es5')
       .addParameters({ subdir: 'app-minified' })
       .addInvocation('javascript')
       .addInvocation('javascript --unminified false')
@@ -56,7 +56,7 @@ describe('The Angularity javascript task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('angularity-todo-es5')
+      .addSource('angularity-helloworld-es5')
       .addParameters({ subdir: 'app-unminified' })
       .addInvocation('javascript --unminified')
       .addInvocation('javascript -u')
