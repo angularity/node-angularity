@@ -49,17 +49,15 @@ pluginRegistry
   .add(defaultTaskPlugins)
   .add(configTaskPlugins);
 
-var taskPlugins = pluginRegistry
+pluginRegistry
   .get('angularity')
-  .getAllOfCategory('task');
-
-taskPlugins
-  .forEach(function eachTaskPlugin(pluginDefinition) {
-    var plugin = require(pluginDefinition.requirePath);
+  .getAllOfCategory('task')
+  .forEach(function eachTaskPlugin(definition) {
+    var plugin = definition.plugin;
 
     // Task plugins are expected to export a function which should be called with an instance of taskYargsRun
     if (typeof plugin !== 'function') {
-      throw new Error('Plugin named ' + pluginDefinition.name + ' does not export a function');
+      throw new Error('Plugin named ' + definition.name + ' does not export a function');
     }
 
     var taskDefinition = plugin({
