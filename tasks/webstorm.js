@@ -87,10 +87,9 @@ function setUpWebStormTask(context) {
       value: {
         describe: 'Launch the IDE following setup',
         alias   : 'l',
-        boolean : true,
         default : config.get('launch')
       }
-    },
+    }
   ];
 
   function checkWebstormFlags(argv) {
