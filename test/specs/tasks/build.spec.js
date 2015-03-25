@@ -23,7 +23,7 @@ describe('The Angularity build task', function () {
 
   beforeEach(buildTask.customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(120000));
 
   afterEach(helper.getTimeoutSwitch());
 

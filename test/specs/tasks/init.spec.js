@@ -34,7 +34,7 @@ describe('The Angularity init task', function () {
 
   beforeEach(customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(120000));
 
   afterEach(helper.getTimeoutSwitch());
 
