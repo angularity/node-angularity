@@ -23,7 +23,7 @@ describe('The Angularity javascript task', function () {
 
   beforeEach(javascriptTask.customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -45,7 +45,8 @@ describe('The Angularity javascript task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('javascript')
       .addInvocation('javascript --unminified false')
       .addInvocation('javascript -u false')
@@ -55,7 +56,8 @@ describe('The Angularity javascript task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-unminified' })
       .addInvocation('javascript --unminified')
       .addInvocation('javascript -u')
       .addInvocation('javascript --unminified true')

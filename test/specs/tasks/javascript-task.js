@@ -10,7 +10,7 @@ var TEST_FOLDER  = 'app-test';
 
 function expectations(testCase) {
   var workingBuildFile = helper.getConcatenation(testCase.cwd, BUILD_FOLDER);
-  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, BUILD_FOLDER);
+  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, testCase.subdir, BUILD_FOLDER);
   var workingTestFile  = helper.getConcatenation(testCase.cwd, TEST_FOLDER);
   var sourceTestFile   = helper.getConcatenation(testCase.sourceDir, TEST_FOLDER);
 

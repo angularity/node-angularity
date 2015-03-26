@@ -22,7 +22,7 @@ describe('The Angularity css task', function () {
 
   beforeEach(cssTask.customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -43,7 +43,8 @@ describe('The Angularity css task', function () {
 
   describe('should compile css correctly', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('css')
       .forEach(slowIt(cssTask.expectations))
       .finally(done);

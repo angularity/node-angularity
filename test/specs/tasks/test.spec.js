@@ -25,7 +25,7 @@ describe('The Angularity test task', function () {
 
   beforeEach(customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -47,7 +47,8 @@ describe('The Angularity test task', function () {
 
   describe('should build unminified javascript and run tests', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('test')
       .forEach(slowIt(expectations))
       .finally(done);
@@ -55,7 +56,8 @@ describe('The Angularity test task', function () {
 
   describe('should support unminified option, but not minify test output', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-unminified' })
       .addInvocation('test --unminified')
       .addInvocation('test -u')
       .forEach(slowIt(expectations))
