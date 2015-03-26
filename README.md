@@ -11,7 +11,8 @@ Build projects, not build systems.
 
 - Hand picked and industry proven front end technologies.
 - A complete and scalable single page application workflow.
-- AngularJs, Browserify, BabelJs
+
+![AngularJs, Browserify, BabelJs, NodeJs](angularity-library-logos.png)
 
 ## Features
 
