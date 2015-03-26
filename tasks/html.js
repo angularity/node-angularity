@@ -7,12 +7,12 @@ module.exports = function htmlTask(context) {
 
   // task definition
   return {
-    name             : 'html',
-    description      : 'The "html" task performs a one time injection of pre-built JS and CSS into the application HTML.',
-    prerequisiteTasks: ['help'],
-    options          : [],
-    checks           : [],
-    implementation   : implementation
+    name          : 'html',
+    inherit       : ['help'],
+    description   : 'The "html" task performs a one time injection of pre-built JS and CSS into the application HTML.',
+    options       : [],
+    checks        : [],
+    implementation: implementation
   };
 
   /**

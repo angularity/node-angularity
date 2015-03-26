@@ -1,50 +1,47 @@
 'use strict';
 
-function setUpTaskTest(context) {
-  if (!context.gulp) {
-    throw new Error('Context must specify gulp instance');
-  }
+module.exports = function testTask(context) {
 
-  var taskDefinition = {
-    name: 'test',
-    description: [
+  // protect against api change
+  ['gulp', 'streams'].forEach(assertField(context));
+
+  return {
+    name          : 'test',
+    inherit       : ['javascript'],
+    description   : [
       'The "test" task performs a one time build and karma test of all .spec.js files in the project.',
       '',
       'Examples:',
       '',
       'angularity test    Run this task'
     ].join('\n'),
-    prerequisiteTasks: ['javascript'],
-    options: [],
-    checks: [],
-    onInit: function onInitTestTask(yargsInstance) {
-      var gulp    = context.gulp;
-
-      var karma   = require('../lib/test/karma'),
-          hr      = require('../lib/util/hr'),
-          streams = require('../lib/config/streams');
-
-      var cliArgs;
-      cliArgs = yargsInstance
-        .strict()
-        .wrap(80)
-        .argv;
-
-      gulp.task('test', ['javascript'], function () {
-        console.log(hr('-', 80, 'test'));
-
-        gulp
-          .src(streams.TEST + '/karma.conf.js')
-          .pipe(karma.run());
-      });
-    },
-    onRun: function onRunTestTask() {
-      var gulp        = context.gulp;
-      gulp.start(taskDefinition.name);
-    }
+    options       : [],
+    checks        : [],
+    implementation: implementation
   };
 
-  return taskDefinition;
-}
+  function implementation() {
+    var gulp    = context.gulp,
+        streams = context.streams;
 
-module.exports = setUpTaskTest;
+    var karma = require('../lib/test/karma'),
+        hr    = require('../lib/util/hr');
+
+    gulp.task('test', ['javascript'], function () {
+      console.log(hr('-', 80, 'test'));
+      gulp.src(streams.TEST + '/karma.conf.js')
+        .pipe(karma.run());
+    });
+  }
+};
+
+/**
+ * TODO move this to package angularity-util?
+ */
+function assertField(context) {
+  return function assertForField(field) {
+    if (!context[field]) {
+      throw new Error('Plugin Incompatibility: Context must specify "' + field + '"');
+    }
+  };
+}

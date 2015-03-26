@@ -5,6 +5,7 @@ module.exports = function releaseTask(context) {
   // protect against api change
   ['gulp', 'runSequence', 'streams'].forEach(assertField(context));
 
+  // task definition
   return {
     name          : 'release',
     inherit       : ['help', 'build'],

@@ -8,6 +8,9 @@ module.exports = function javascriptTask(context) {
   var jshintReporter = require('../lib/util/jshint-reporter'),
       karma          = require('../lib/test/karma');
 
+// TODO transforms come from the context
+context.browserifyTransforms = browserifyTransforms;
+
   // protect against api change
   ['gulp', 'runSequence', 'streams', 'browserifyTransforms'].forEach(assertField(context));
 
@@ -121,7 +124,7 @@ module.exports = function javascriptTask(context) {
     // karma unit tests in local library only
     gulp.task('javascript:unit', function () {
       var reporters = []
-        .concat(cliArgs[optionDefinitionKarmaReporter.key])
+        .concat(cliArgs[KARMA_REPORTER_FLAG])
         .filter(Boolean);
       return combined.create()
         .append(

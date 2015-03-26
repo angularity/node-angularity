@@ -2,7 +2,8 @@
 
 module.exports = function webstormTask(context) {
   var fs   = require('fs'),
-      path = require('path');
+      path = require('path'),
+      ideTemplate = require('ide-template');
 
   var defaults = require('../lib/config/defaults'),
       platform = require('../lib/config/platform');
@@ -59,7 +60,6 @@ module.exports = function webstormTask(context) {
     }, {
       keys    : ['launch', 'l'],
       describe: 'Launch the IDE following setup',
-      alias   : 'l',
       default : config.get('launch')
     }
   ];
@@ -182,8 +182,7 @@ module.exports = function webstormTask(context) {
         runSequence = context.runSequence,
         streams     = context.streams;
 
-    var gutil       = require('gulp-util'),
-        ideTemplate = require('ide-template');
+    var gutil = require('gulp-util');
 
     var hr = require('../lib/util/hr');
 
