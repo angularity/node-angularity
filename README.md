@@ -28,10 +28,10 @@ modules, minification, source maps, linting, testing, live reloading, release an
 - Use both Bower and NPM for your vendor dependencies
 - Convenient CI integration with custom reporters
 - Plugin system to create your own tasks
-​
+
 ## Documentation
 
-[http://angularity.github.io](http://angularity.github.io)
+[angularity.github.io](http://angularity.github.io)
 
 ## Maintained by
 
