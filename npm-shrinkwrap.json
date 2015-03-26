@@ -1,6 +1,6 @@
 {
   "name": "angularity",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "dependencies": {
     "6to5ify": {
       "version": "3.1.0",
