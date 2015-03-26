@@ -1,9 +1,7 @@
 'use strict';
 var path            = require('path');
 
-var gulp            = require('gulp'),
-    runSequence     = require('run-sequence'),
-    pluginRegistry  = require('plugin-registry');
+var pluginRegistry  = require('plugin-registry');
 
 var taskYargsRun    = require('./lib/util/task-yargs-run');
 
@@ -12,7 +10,6 @@ var defaultTaskPlugins = [
   'css',
   'javascript',
   'test',
-  'build',
   'release',
   'server',
   'watch',
@@ -27,6 +24,10 @@ var defaultTaskPlugins = [
   };
 });
 
+defaultTaskPlugins = defaultTaskPlugins.concat([
+  'angularity-build-task'
+]);
+
 var angularityJson;
 try {
   angularityJson = require(path.resolve('angularity.json'));
@@ -39,13 +40,9 @@ if (configTaskPlugins.constructor !== Array) {
   throw new Error('Plugins defined in angularity.json should be an array');
 }
 
-var pluginContext = {
-  toolPath: __dirname
-};
-
 pluginRegistry
   .get('angularity')
-  .context(pluginContext)
+  .context({})
   .add(defaultTaskPlugins)
   .add(configTaskPlugins);
 
@@ -61,9 +58,23 @@ pluginRegistry
     }
 
     var taskDefinition = plugin({
+      getDependency: function getContextDependency(name) {
+        switch(name) {
+          case 'hr':
+            return require('./lib/util/hr');
+          case 'gulp':
+            return require('gulp');
+          case 'runSequence':
+            return require('run-sequence');
+          case 'taskYargsRun':
+            return taskYargsRun;
+          default:
+            throw new Error('Context dependency ' + name + ' is unknown');
+        }
+      },
       taskYargsRun: taskYargsRun,
-      gulp: gulp,
-      runSequence: runSequence
+      gulp: require('gulp'),
+      runSequence: require('run-sequence')
     });
     taskYargsRun.taskYargs.register(taskDefinition);
   });

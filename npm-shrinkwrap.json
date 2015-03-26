@@ -4007,6 +4007,11 @@
       "from": "https://registry.npmjs.org/plugin-registry/-/plugin-registry-0.1.3.tgz",
       "resolved": "https://registry.npmjs.org/plugin-registry/-/plugin-registry-0.1.3.tgz"
     },
+    "angularity-build-task": {
+      "version": "0.0.1",
+      "from": "https://registry.npmjs.org/angularity-build-task/-/angularity-build-task-0.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/angularity-build-task/-/angularity-build-task-0.0.1.tgz"
+    },
     "pretty-hrtime": {
       "version": "0.2.2",
       "from": "https://registry.npmjs.org/pretty-hrtime/-/pretty-hrtime-0.2.2.tgz",
