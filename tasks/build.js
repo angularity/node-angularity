@@ -1,16 +1,15 @@
 'use strict';
 
-function setUpTaskBuild(context) {
-  if (!context.gulp) {
-    throw new Error('Context must specify gulp instance');
-  }
-  if (!context.runSequence) {
-    throw new Error('Context must specify run-sequence instance');
-  }
+module.exports = function buildTask(context) {
 
-  var taskDefinition = {
-    name: 'build',
-    description: [
+  // protect against api change
+  ['gulp', 'runSequence'].forEach(assertField(context));
+
+  // task definition
+  return {
+    name          : 'build',
+    inherit       : ['help', 'javascript', 'css', 'html'],
+    description   : [
       'The "build" task performs a single build of the javascript and SASS composition root(s) and also bundles all ' +
       '.spec.js files in the project.',
       '',
@@ -22,27 +21,35 @@ function setUpTaskBuild(context) {
       'angularity build        Run this task',
       'angularity build -u     Run this task but do not minify javascript'
     ].join('\n'),
-    prerequisiteTasks: ['help', 'javascript', 'css', 'html'],
-    checks: [],
-    options: [],
-    onInit: function onBuildTask() {
-      var gulp        = context.gulp,
-          runSequence = context.runSequence;
-
-      var hr          = require('../lib/util/hr');
-
-      gulp.task('build', function (done) {
-        console.log(hr('-', 80, 'build'));
-        runSequence('javascript', 'css', 'html', done);
-      });
-    },
-    onRun: function onBuildTask() {
-      var gulp        = context.gulp;
-      gulp.start(taskDefinition.name);
-    }
+    options       : [],
+    checks        : [],
+    implementation: implementation
   };
 
-  return taskDefinition;
-}
+  /**
+   * TODO description
+   */
+  function implementation() {
+    var gulp        = context.gulp,
+        runSequence = context.runSequence;
 
-module.exports = setUpTaskBuild;
+    var hr = require('../lib/util/hr');
+
+    gulp.task('build', function (done) {
+      console.log(hr('-', 80, 'build'));
+      runSequence('javascript', 'css', 'html', done);
+    });
+  }
+
+};
+
+/**
+ * TODO move this to package angularity-util?
+ */
+function assertField(context) {
+  return function assertForField(field) {
+    if (!context[field]) {
+      throw new Error('Plugin Incompatibility: Context must specify "' + field + '"');
+    }
+  };
+}
