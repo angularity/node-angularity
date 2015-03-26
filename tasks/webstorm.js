@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function webstormTask(context) {
-  var fs   = require('fs'),
-      path = require('path'),
+  var fs           = require('fs'),
+      path        = require('path'),
       ideTemplate = require('ide-template');
 
   var defaults = require('../lib/config/defaults'),
