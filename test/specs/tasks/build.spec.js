@@ -23,7 +23,7 @@ describe('The Angularity build task', function () {
 
   beforeEach(buildTask.customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -43,24 +43,48 @@ describe('The Angularity build task', function () {
     }
   });
 
-  describe('should operate minified (by default)', function(done) {
-    helper.runner.create()
-      .addSource('minimal-es5')
-      .addInvocation('build')
-      .addInvocation('build --unminified false')
-      .addInvocation('build -u false')
-      .forEach(slowIt(buildTask.expectations))
-      .finally(done);
+  describe('full test with small application', function() {
+    describe('should operate minified (by default)', function(done) {
+      helper.runner.create()
+        .addSource('angularity-helloworld-es5')
+        .addParameters({ subdir: 'app-minified' })
+        .addInvocation('build')
+        .addInvocation('build --unminified false')
+        .addInvocation('build -u false')
+        .forEach(slowIt(buildTask.expectations))
+        .finally(done);
+    });
+
+    describe('should operate unminified', function(done) {
+      helper.runner.create()
+        .addSource('angularity-helloworld-es5')
+        .addParameters({ subdir: 'app-unminified' })
+        .addInvocation('build --unminified')
+        .addInvocation('build -u')
+        .addInvocation('build --unminified true')
+        .addInvocation('build -u true')
+        .forEach(slowIt(buildTask.expectations))
+        .finally(done);
+    });
   });
 
-  describe('should operate unminified', function(done) {
-    helper.runner.create()
-      .addSource('minimal-es5-unminified')
-      .addInvocation('build --unminified')
-      .addInvocation('build -u')
-      .addInvocation('build --unminified true')
-      .addInvocation('build -u true')
-      .forEach(slowIt(buildTask.expectations))
-      .finally(done);
+  describe('smoke test with larger application', function() {
+    describe('should operate minified (by default)', function (done) {
+      helper.runner.create()
+        .addSource('angularity-todo-es5')
+        .addParameters({subdir: 'app-minified'})
+        .addInvocation('build')
+        .forEach(slowIt(buildTask.expectations))
+        .finally(done);
+    });
+
+    describe('should operate unminified', function (done) {
+      helper.runner.create()
+        .addSource('angularity-todo-es5')
+        .addParameters({subdir: 'app-unminified'})
+        .addInvocation('build -u')
+        .forEach(slowIt(buildTask.expectations))
+        .finally(done);
+    });
   });
 });

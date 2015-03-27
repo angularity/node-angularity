@@ -11,7 +11,7 @@ var BUILD_FOLDER = 'app-build';
 
 function expectations(testCase) {
   var workingBuildFile = helper.getConcatenation(testCase.cwd, BUILD_FOLDER);
-  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, BUILD_FOLDER);
+  var sourceBuildFile  = helper.getConcatenation(testCase.sourceDir, testCase.subdir, BUILD_FOLDER);
   expect(testCase.stdout).toBeTask('build');
   expect(testCase.cwd).toHaveFile('app-build/index.html');
   expect(workingBuildFile('index.html')).diffFilePatch(sourceBuildFile('index.html'));

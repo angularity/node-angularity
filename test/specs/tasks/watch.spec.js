@@ -25,7 +25,7 @@ describe('The Angularity watch task', function () {
 
   beforeEach(customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -47,7 +47,8 @@ describe('The Angularity watch task', function () {
 
   describe('should operate minified (by default)', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-minified' })
       .addInvocation('watch')
       .addInvocation('watch --unminified false')
       .addInvocation('watch -u false')
@@ -57,7 +58,8 @@ describe('The Angularity watch task', function () {
 
   describe('should operate unminified', function(done) {
     helper.runner.create()
-      .addSource('minimal-es5-unminified')
+      .addSource('angularity-helloworld-es5')
+      .addParameters({ subdir: 'app-unminified' })
       .addInvocation('watch --unminified')
       .addInvocation('watch -u')
       .addInvocation('watch --unminified true')

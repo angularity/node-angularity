@@ -24,7 +24,7 @@ describe('The Angularity release task', function () {
 
   beforeEach(customMatchers);
 
-  beforeEach(helper.getTimeoutSwitch(60000));
+  beforeEach(helper.getTimeoutSwitch(90000));
 
   afterEach(helper.getTimeoutSwitch());
 
@@ -43,33 +43,57 @@ describe('The Angularity release task', function () {
     }
   });
 
-  describe('should operate minified (by default)', function(done) {
-    helper.runner.create()
-      .addSource('minimal-es5')
-      .addInvocation('release')
-      .addInvocation('release --unminified false')
-      .addInvocation('release -u false')
-      .forEach(slowIt(expectations))
-      .finally(done);
+  describe('full test with small application', function() {
+    describe('should operate minified (by default)', function (done) {
+      helper.runner.create()
+        .addSource('angularity-helloworld-es5')
+        .addParameters({subdir: 'app-minified'})
+        .addInvocation('release')
+        .addInvocation('release --unminified false')
+        .addInvocation('release -u false')
+        .forEach(slowIt(expectations))
+        .finally(done);
+    });
+
+    describe('should operate unminified', function (done) {
+      helper.runner.create()
+        .addSource('angularity-helloworld-es5')
+        .addParameters({subdir: 'app-unminified'})
+        .addInvocation('release --unminified')
+        .addInvocation('release -u')
+        .addInvocation('release --unminified true')
+        .addInvocation('release -u true')
+        .forEach(slowIt(expectations))
+        .finally(done);
+    });
   });
 
-  describe('should operate unminified', function(done) {
-    helper.runner.create()
-      .addSource('minimal-es5-unminified')
-      .addInvocation('release --unminified')
-      .addInvocation('release -u')
-      .addInvocation('release --unminified true')
-      .addInvocation('release -u true')
-      .forEach(slowIt(expectations))
-      .finally(done);
+  describe('smoke test with larger application', function() {
+    describe('should operate minified (by default)', function (done) {
+      helper.runner.create()
+        .addSource('angularity-todo-es5')
+        .addParameters({subdir: 'app-minified'})
+        .addInvocation('release')
+        .forEach(slowIt(expectations))
+        .finally(done);
+    });
+
+    describe('should operate unminified', function (done) {
+      helper.runner.create()
+        .addSource('angularity-todo-es5')
+        .addParameters({subdir: 'app-unminified'})
+        .addInvocation('release -u')
+        .forEach(slowIt(expectations))
+        .finally(done);
+    });
   });
 });
 
 function expectations(testCase) {
   var workingReleaseFile = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER);
-  var workingVendorFile = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER, VENDOR_FOLDER);
-  var sourceReleaseFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER);
-  var sourceVendorFile  = helper.getConcatenation(testCase.sourceDir, RELEASE_FOLDER, VENDOR_FOLDER);
+  var workingVendorFile  = helper.getConcatenation(testCase.cwd, RELEASE_FOLDER, VENDOR_FOLDER);
+  var sourceReleaseFile  = helper.getConcatenation(testCase.sourceDir, testCase.subdir, RELEASE_FOLDER);
+  var sourceVendorFile   = helper.getConcatenation(testCase.sourceDir, testCase.subdir, RELEASE_FOLDER, VENDOR_FOLDER);
 
   // general
   expect(testCase.stdout).toBeTask(['release', 'build', 'javascript', 'css']);
