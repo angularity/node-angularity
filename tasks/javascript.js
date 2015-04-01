@@ -121,7 +121,9 @@ function setUpTaskJavascript(context) {
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
           stringify       = require('stringify'),
-          ngAnnotate      = require('browserify-ngannotate');
+          ngAnnotate      = require('browserify-ngannotate'),
+          uglifyify       = require('uglifyify');
+
 
       var karma           = require('../lib/test/karma'),
           browserify      = require('../lib/build/browserify'),
@@ -134,6 +136,16 @@ function setUpTaskJavascript(context) {
         .strict()
         .wrap(80)
         .argv;
+
+      var bundlerBuild = browserify({
+        transforms: getTransforms(!cliArgs.unminified),
+        anonymous : cliArgs.unminified
+      });
+
+      var bundlerTest = browserify({
+        transforms   : getTransforms(false),
+        sourceMapBase: '/base'
+      });
 
       gulp.task('javascript', function (done) {
         console.log(hr('-', 80, 'javascript'));
@@ -165,8 +177,7 @@ function setUpTaskJavascript(context) {
       // give a single optimised javascript file in the build directory with source map for each
       gulp.task('javascript:build', function () {
         return streams.jsApp({read: false})
-          .pipe(browserify(80, getTransforms(!cliArgs.unminified))
-            .each(!cliArgs.unminified))
+          .pipe(bundlerBuild.each())
           .pipe(gulp.dest(streams.BUILD));
       });
 
@@ -194,8 +205,7 @@ function setUpTaskJavascript(context) {
           .append(
             streams
               .jsSpec()
-              .pipe(browserify(80, getTransforms(false))
-                .all('index.js', false, '/base'))
+              .pipe(bundlerTest.all('index.js'))
               .pipe(gulp.dest(streams.TEST))
           )
           .pipe(semiflat(process.cwd()))
@@ -208,10 +218,21 @@ function setUpTaskJavascript(context) {
        * @param {boolean} isMinify Indicates whether minification will be used
        */
       function getTransforms(isMinify) {
+        var MINIFY_OPTIONS = {
+          map     : true,
+          compress: { // anything that changes semicolons to commas will cause debugger problems
+            sequences: false,
+            join_vars: false // jshint ignore:line
+          },
+          mangle  : {
+            toplevel: true
+          }
+        };
         return [
-          to5ify.configure({ ignoreRegex: /(?!)/ }),   // convert any es6 to es5 (degenerate regex)
-          stringify({ minify: false }),                // allow import of html to a string
-          isMinify && ngAnnotate, { sourcemap: true }  // @ngInject for angular injection points
+          to5ify.configure({ ignoreRegex: /(?!)/ }),    // convert any es6 to es5 (degenerate regex)
+          stringify({ minify: false }),                 // allow import of html to a string
+          isMinify && ngAnnotate, { sourcemap: true },  // @ngInject for angular injection points
+          isMinify && uglifyify, MINIFY_OPTIONS
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
         // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying

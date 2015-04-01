@@ -44,7 +44,6 @@
   "dependencies": {
     "6to5ify": "latest",
     "angularity-jshint-reporter": "latest",
-    "asks": "latest",
     "bower-directory": "latest",
     "browser-sync": "latest",
     "browserify": "latest",
@@ -65,7 +64,6 @@
     "gulp-rimraf": "latest",
     "gulp-semiflat": "latest",
     "gulp-slash": "latest",
-    "gulp-track-filenames": "latest",
     "gulp-util": "latest",
     "gulp-watch": "latest",
     "gulp-watch-sequence": "latest",
@@ -85,7 +83,6 @@
     "lodash.reduce": "latest",
     "lodash.template": "latest",
     "mime": "latest",
-    "minifyify": "latest",
     "minimatch": "latest",
     "node-sass": "latest",
     "plugin-registry": "latest",
@@ -103,7 +100,8 @@
     "task-yargs": "latest",
     "through-pipes": "latest",
     "through2": "latest",
-    "wordwrap": "latest",
+    "uglifyify": "latest",
+    "watchify": "latest",
     "yargs": "latest"
   },
   "devDependencies": {
