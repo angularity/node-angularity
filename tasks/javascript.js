@@ -140,7 +140,7 @@ function setUpTaskJavascript(context) {
       var bundlerBuild = browserify({
         bowerRelative: true,
         transforms   : getTransforms(!cliArgs.unminified),
-        anonymous    : cliArgs.unminified
+        anonymous    : !cliArgs.unminified
       });
 
       var bundlerTest = browserify({
