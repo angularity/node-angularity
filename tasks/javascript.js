@@ -227,8 +227,7 @@ function setUpTaskJavascript(context) {
             join_vars: false
           },
           mangle  : {
-            toplevel : true,
-            screw_ie8: true
+            toplevel: true
           }
         };
         /* jshint +W106 */
