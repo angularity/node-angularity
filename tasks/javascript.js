@@ -121,12 +121,12 @@ function setUpTaskJavascript(context) {
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
           stringify       = require('stringify'),
-          ngAnnotate      = require('browserify-ngannotate'),
           uglifyify       = require('uglifyify');
 
 
       var karma           = require('../lib/test/karma'),
           browserify      = require('../lib/build/browserify'),
+          ngInject        = require('../lib/build/browserify-nginject'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams'),
           jshintReporter  = require('../lib/util/jshint-reporter');
@@ -138,11 +138,13 @@ function setUpTaskJavascript(context) {
         .argv;
 
       var bundlerBuild = browserify({
-        transforms: getTransforms(!cliArgs.unminified),
-        anonymous : cliArgs.unminified
+        bowerRelative: true,
+        transforms   : getTransforms(!cliArgs.unminified),
+        anonymous    : cliArgs.unminified
       });
 
       var bundlerTest = browserify({
+        bowerRelative: true,
         transforms   : getTransforms(false),
         sourceMapBase: '/base'
       });
@@ -218,24 +220,25 @@ function setUpTaskJavascript(context) {
        * @param {boolean} isMinify Indicates whether minification will be used
        */
       function getTransforms(isMinify) {
+        /* jshint -W106 */
         var MINIFY_OPTIONS = {
-          map     : true,
           compress: { // anything that changes semicolons to commas will cause debugger problems
             sequences: false,
-            join_vars: false // jshint ignore:line
+            join_vars: false
           },
           mangle  : {
-            toplevel: true
+            toplevel : true,
+            screw_ie8: true
           }
         };
+        /* jshint +W106 */
         return [
-          to5ify.configure({ ignoreRegex: /(?!)/ }),    // convert any es6 to es5 (degenerate regex)
-          stringify({ minify: false }),                 // allow import of html to a string
-          isMinify && ngAnnotate, { sourcemap: true },  // @ngInject for angular injection points
+          to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (degenerate regex)
+          stringify({ minify: false }),               // allow import of html to a string
+          ngInject(),                                 // annotate dependencies for angularjs
           isMinify && uglifyify, MINIFY_OPTIONS
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
-        // TODO @bholloway fix sourcemaps in ngAnnotate so that it may be included even when not minifying
       }
     },
     onRun: function onRunJavascriptTask() {
