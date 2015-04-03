@@ -120,8 +120,7 @@ function setUpTaskJavascript(context) {
           semiflat        = require('gulp-semiflat'),
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
-          stringify       = require('stringify'),
-          uglifyify       = require('uglifyify');
+          stringify       = require('stringify');
 
       var karma           = require('../lib/test/karma'),
           browserify      = require('../lib/build/browserify'),
@@ -235,8 +234,8 @@ function setUpTaskJavascript(context) {
           to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (degenerate regex)
           stringify({ minify: false }),               // allow import of html to a string
           ngInject(),                                 // annotate dependencies for angularjs
-//          isMinify && uglifyify, MINIFY_OPTIONS
-          isMinify && esmangleify()
+          isMinify && esmangleify(),
+          require('../lib/build/browserify-debug')()
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
