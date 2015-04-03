@@ -123,10 +123,10 @@ function setUpTaskJavascript(context) {
           stringify       = require('stringify'),
           uglifyify       = require('uglifyify');
 
-
       var karma           = require('../lib/test/karma'),
           browserify      = require('../lib/build/browserify'),
           ngInject        = require('../lib/build/browserify-nginject'),
+          esmangleify     = require('../lib/build/esmangleify'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams'),
           jshintReporter  = require('../lib/util/jshint-reporter');
@@ -235,7 +235,8 @@ function setUpTaskJavascript(context) {
           to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (degenerate regex)
           stringify({ minify: false }),               // allow import of html to a string
           ngInject(),                                 // annotate dependencies for angularjs
-          isMinify && uglifyify, MINIFY_OPTIONS
+//          isMinify && uglifyify, MINIFY_OPTIONS
+          isMinify && esmangleify()
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
