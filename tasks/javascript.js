@@ -219,23 +219,11 @@ function setUpTaskJavascript(context) {
        * @param {boolean} isMinify Indicates whether minification will be used
        */
       function getTransforms(isMinify) {
-        /* jshint -W106 */
-        var MINIFY_OPTIONS = {
-          compress: { // anything that changes semicolons to commas will cause debugger problems
-            sequences: false,
-            join_vars: false
-          },
-          mangle  : {
-            toplevel: true
-          }
-        };
-        /* jshint +W106 */
         return [
           to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (degenerate regex)
           stringify({ minify: false }),               // allow import of html to a string
           ngInject(),                                 // annotate dependencies for angularjs
-          isMinify && esmangleify(),
-          require('../lib/build/browserify-debug')()
+          isMinify && esmangleify()
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
