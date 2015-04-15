@@ -120,12 +120,12 @@ function setUpTaskJavascript(context) {
           semiflat        = require('gulp-semiflat'),
           combined        = require('combined-stream'),
           to5ify          = require('6to5ify'),
-          stringify       = require('stringify');
+          stringify       = require('stringify'),
+          ngInject        = require('browserify-nginject'),
+          esmangleify     = require('esmangleify');
 
       var karma           = require('../lib/test/karma'),
           browserify      = require('../lib/build/browserify'),
-          ngInject        = require('../lib/build/browserify-nginject'),
-          esmangleify     = require('../lib/build/esmangleify'),
           hr              = require('../lib/util/hr'),
           streams         = require('../lib/config/streams'),
           jshintReporter  = require('../lib/util/jshint-reporter');
