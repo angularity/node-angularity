@@ -136,17 +136,19 @@ function setUpTaskJavascript(context) {
         .wrap(80)
         .argv;
 
-      var bundlerBuild = browserify({
-        bowerRelative: true,
-        transforms   : getTransforms(!cliArgs.unminified),
-        anonymous    : !cliArgs.unminified
-      });
-
-      var bundlerTest = browserify({
-        bowerRelative: true,
-        transforms   : getTransforms(false),
-        sourceMapBase: '/base'
-      });
+      var bundlerFactory = browserify();  // share a common cache
+      var bundlerBuild   = bundlerFactory
+        .create({
+          bowerRelative: true,
+          transforms   : getTransforms(!cliArgs.unminified),
+          anonymous    : !cliArgs.unminified
+        });
+      var bundlerTest    = bundlerFactory
+        .create({
+          bowerRelative: true,
+          transforms   : getTransforms(false),
+          sourceMapBase: '/base'
+        });
 
       gulp.task('javascript', function (done) {
         console.log(hr('-', 80, 'javascript'));
