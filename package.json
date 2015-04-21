@@ -105,7 +105,6 @@
     "task-yargs": "latest",
     "through-pipes": "latest",
     "through2": "latest",
-    "watchify": "latest",
     "yargs": "latest"
   },
   "devDependencies": {
