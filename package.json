@@ -113,7 +113,7 @@
     "jshint-stylish": "^1.0.1",
     "ncp": "~2.0.0",
     "ps-tree": "~0.0.3",
-    "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-B",
-    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-B"
+    "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-D",
+    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-D"
   }
 }
