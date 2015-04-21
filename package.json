@@ -42,12 +42,11 @@
     "npm": ">=2.0"
   },
   "dependencies": {
-    "6to5ify": "latest",
+    "babelify": "latest",
     "angularity-jshint-reporter": "latest",
     "bower-directory": "latest",
     "browser-sync": "latest",
     "browserify": "latest",
-    "browserify-debug-tools": "latest",
     "browserify-esprima-tools": "latest",
     "browserify-nginject": "latest",
     "browserify-transform-tools": "latest",
