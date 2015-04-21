@@ -1954,9 +1954,9 @@
       }
     },
     "browserify-nginject": {
-      "version": "1.1.0",
-      "from": "browserify-nginject@1.1.0",
-      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.1.0.tgz"
+      "version": "1.2.0",
+      "from": "browserify-nginject@1.2.0",
+      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.2.0.tgz"
     },
     "browserify-transform-tools": {
       "version": "1.2.2",
