@@ -136,15 +136,12 @@ function setUpTaskJavascript(context) {
         .wrap(80)
         .argv;
 
-      var bundlerFactory = browserify();  // share a common cache
-      var bundlerBuild   = bundlerFactory
-        .create({
+      var bundlerBuild = browserify({
           bowerRelative: true,
           transforms   : getTransforms(!cliArgs.unminified),
           anonymous    : !cliArgs.unminified
         });
-      var bundlerTest    = bundlerFactory
-        .create({
+      var bundlerTest  = browserify({
           bowerRelative: true,
           transforms   : getTransforms(false),
           sourceMapBase: '/base'
@@ -222,10 +219,10 @@ function setUpTaskJavascript(context) {
        */
       function getTransforms(isMinify) {
         return [
-          babelify.configure({ ignore: /(?!)/ }),   // convert any es6 to es5 (degenerate regex)
-          stringify({ minify: false }),             // allow import of html to a string
-          ngInject(),                               // annotate dependencies for angularjs
-          isMinify && esmangleify()                 // minify
+          babelify.configure({ignore: /(?!)/}),   // convert any es6 to es5 (degenerate regex)
+          stringify({minify: false}),             // allow import of html to a string
+          ngInject(),                             // annotate dependencies for angular
+          isMinify && esmangleify()               // minify
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
