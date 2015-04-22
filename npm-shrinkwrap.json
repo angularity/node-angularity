@@ -1691,8 +1691,8 @@
       }
     },
     "browserify-incremental-plugin": {
-      "version": "0.0.3",
-      "from": "browserify-incremental-plugin@latest"
+      "version": "1.0.0",
+      "from": "browserify-incremental-plugin@1.0.0"
     },
     "browserify-nginject": {
       "version": "1.1.0",
