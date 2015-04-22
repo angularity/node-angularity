@@ -136,15 +136,12 @@ function setUpTaskJavascript(context) {
         .wrap(80)
         .argv;
 
-      var bundlerFactory = browserify();  // share a common cache
-      var bundlerBuild   = bundlerFactory
-        .create({
+      var bundlerBuild = browserify({
           bowerRelative: true,
           transforms   : getTransforms(!cliArgs.unminified),
           anonymous    : !cliArgs.unminified
         });
-      var bundlerTest    = bundlerFactory
-        .create({
+      var bundlerTest  = browserify({
           bowerRelative: true,
           transforms   : getTransforms(false),
           sourceMapBase: '/base'
