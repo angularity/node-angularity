@@ -224,8 +224,8 @@ function setUpTaskJavascript(context) {
         return [
           to5ify.configure({ ignoreRegex: /(?!)/ }),  // convert any es6 to es5 (degenerate regex)
           stringify({ minify: false }),               // allow import of html to a string
-          ngInject(),                                 // annotate dependencies for angularjs
-          isMinify && esmangleify()
+          ngInject(),                                 // annotate dependencies for angular
+          isMinify && esmangleify()                   // minify
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
