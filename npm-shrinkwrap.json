@@ -1602,8 +1602,9 @@
       }
     },
     "browserify-anonymous-labeler": {
-      "version": "0.0.3",
-      "from": "browserify-anonymous-labeler@latest"
+      "version": "1.0.0",
+      "from": "browserify-anonymous-labeler@latest",
+      "resolved": "https://registry.npmjs.org/browserify-anonymous-labeler/-/browserify-anonymous-labeler-1.0.0.tgz"
     },
     "browserify-esprima-tools": {
       "version": "1.1.0",
@@ -1663,30 +1664,6 @@
           "version": "2.2.0",
           "from": "https://registry.npmjs.org/esprima/-/esprima-2.2.0.tgz",
           "resolved": "https://registry.npmjs.org/esprima/-/esprima-2.2.0.tgz"
-        },
-        "through2": {
-          "version": "0.6.5",
-          "from": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
-          "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
-          "dependencies": {
-            "readable-stream": {
-              "version": "1.0.33",
-              "from": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
-              "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
-              "dependencies": {
-                "string_decoder": {
-                  "version": "0.10.31",
-                  "from": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz",
-                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
-                }
-              }
-            },
-            "xtend": {
-              "version": "4.0.0",
-              "from": "https://registry.npmjs.org/xtend/-/xtend-4.0.0.tgz",
-              "resolved": "https://registry.npmjs.org/xtend/-/xtend-4.0.0.tgz"
-            }
-          }
         }
       }
     },
@@ -4550,24 +4527,24 @@
     },
     "through2": {
       "version": "0.6.5",
-      "from": "through2@latest",
+      "from": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
       "resolved": "https://registry.npmjs.org/through2/-/through2-0.6.5.tgz",
       "dependencies": {
         "readable-stream": {
           "version": "1.0.33",
-          "from": "readable-stream@>=1.0.33-1 <1.1.0-0",
+          "from": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.0.33.tgz",
           "dependencies": {
             "string_decoder": {
               "version": "0.10.31",
-              "from": "string_decoder@>=0.10.0 <0.11.0",
+              "from": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz",
               "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.31.tgz"
             }
           }
         },
         "xtend": {
           "version": "4.0.0",
-          "from": "xtend@>=4.0.0 <4.1.0-0",
+          "from": "https://registry.npmjs.org/xtend/-/xtend-4.0.0.tgz",
           "resolved": "https://registry.npmjs.org/xtend/-/xtend-4.0.0.tgz"
         }
       }
