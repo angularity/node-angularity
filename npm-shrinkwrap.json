@@ -1869,8 +1869,9 @@
       }
     },
     "browserify-anonymous-labeler": {
-      "version": "0.0.3",
-      "from": "browserify-anonymous-labeler@latest"
+      "version": "1.0.0",
+      "from": "browserify-anonymous-labeler@1.0.0",
+      "resolved": "https://registry.npmjs.org/browserify-anonymous-labeler/-/browserify-anonymous-labeler-1.0.0.tgz"
     },
     "browserify-esprima-tools": {
       "version": "1.1.0",
