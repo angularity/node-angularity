@@ -16,7 +16,9 @@
   ],
   "scripts": {
     "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs",
-    "lint": "node test/jshint.js"
+    "lint": "node test/jshint.js",
+    "generatedocs": "mkdir -p documentation && echo 'autodocs test' > documentation/index.html",
+    "autodocs": "node ./node_modules/autodocs"
   },
   "contributors": [
     "bholloway",
@@ -107,12 +109,13 @@
     "yargs": "latest"
   },
   "devDependencies": {
+    "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-A",
+    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-C",
+    "autodocs": "^0.6.4",
     "jasmine-diff-matchers": "~2.0.0",
     "jasmine-node": "2.0.0-beta4",
     "jshint-stylish": "^1.0.1",
     "ncp": "~2.0.0",
-    "ps-tree": "~0.0.3",
-    "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-A",
-    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-C"
+    "ps-tree": "~0.0.3"
   }
 }

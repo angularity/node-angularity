@@ -17,5 +17,15 @@ install:
 
 script:
   - node node_modules/jasmine-node/bin/jasmine-node --version # expect jasmine 2.x
+  - npm run autodocs
   - npm run lint
   - npm test
+
+after_success:
+  # TODO move autodocs here
+env:
+  global:
+  - secure: U+IdWhk/tUsG9e7hOxxeGhzbJ3iYYtvRyz4zExVI6JJz22TJX5UXwJJQmrrNcM1bwt1GTAbX3xYavE+kqs9I5wyeMX92+/o1gz2vp/46wRXAKC/X8lULVH0vopVtnKZnyKUIzQTYd7NxX0JsweJ9Y/4szkskygnTDu6lXkpPPVk=
+  - DOCUMENT_BRANCH: ${TRAVIS_BRANCH}
+  - REPO_SLUG: 'angularity/angularity.github.io'
+  # - GH_PUBLISH_BRANCH: 'unicorn-pages'
