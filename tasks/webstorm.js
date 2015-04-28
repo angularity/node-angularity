@@ -240,7 +240,7 @@ function setUpWebStormTask(context) {
           jshintPath              : '$PROJECT_DIR$/.jshintrc',
           jsDebugPort             : properties.port,
           javascriptVersion       : 'ES6',
-          watcherSuppressedTasks  : 'Traceur compiler;SCSS',
+          watcherSuppressedTasks  : 'Traceur compiler;SCSS;Babel',
           JsKarmaPackageDirSetting: path.resolve(__dirname, '..', 'node_modules', 'karma'),
           contentPaths            : [
             {content: 'file://' + process.cwd()}
