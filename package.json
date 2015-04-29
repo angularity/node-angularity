@@ -16,7 +16,9 @@
   ],
   "scripts": {
     "test": "node node_modules/jasmine-node/bin/jasmine-node --verbose --captureExceptions test/specs",
-    "lint": "node test/jshint.js"
+    "lint": "node test/jshint.js",
+    "generatedocs": "mkdir -p documentation && echo 'autodocs placeholder documentation' > documentation/index.html && ls -la documentation && echo 'Placeholder documentation generated'",
+    "autodocs": "node ./node_modules/autodocs"
   },
   "contributors": [
     "bholloway",
@@ -42,17 +44,21 @@
     "npm": ">=2.0"
   },
   "dependencies": {
-    "6to5ify": "latest",
+    "babelify": "latest",
     "angularity-jshint-reporter": "latest",
-    "asks": "latest",
     "bower-directory": "latest",
     "browser-sync": "latest",
     "browserify": "latest",
-    "browserify-ngannotate": "latest",
+    "browserify-anonymous-labeler": "latest",
+    "browserify-esprima-tools": "latest",
+    "browserify-incremental-plugin": "latest",
+    "browserify-nginject": "latest",
     "browserify-transform-tools": "latest",
     "chalk": "latest",
+    "combine-source-map": "latest",
     "combined-stream": "latest",
     "convert-source-map": "latest",
+    "esmangleify": "latest",
     "gulp": "latest",
     "gulp-concat": "latest",
     "gulp-filter": "latest",
@@ -65,7 +71,6 @@
     "gulp-rimraf": "latest",
     "gulp-semiflat": "latest",
     "gulp-slash": "latest",
-    "gulp-track-filenames": "latest",
     "gulp-util": "latest",
     "gulp-watch": "latest",
     "gulp-watch-sequence": "latest",
@@ -85,7 +90,6 @@
     "lodash.reduce": "latest",
     "lodash.template": "latest",
     "mime": "latest",
-    "minifyify": "latest",
     "minimatch": "latest",
     "node-sass": "latest",
     "plugin-registry": "latest",
@@ -98,21 +102,22 @@
     "run-sequence": "latest",
     "shelljs": "latest",
     "source-map": "latest",
+    "sourcemap-to-ast": "latest",
     "stream-spigot": "latest",
     "stringify": "latest",
     "task-yargs": "latest",
     "through-pipes": "latest",
     "through2": "latest",
-    "wordwrap": "latest",
     "yargs": "latest"
   },
   "devDependencies": {
+    "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-D",
+    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-D",
+    "autodocs": "^0.6.5",
     "jasmine-diff-matchers": "~2.0.0",
     "jasmine-node": "2.0.0-beta4",
     "jshint-stylish": "^1.0.1",
     "ncp": "~2.0.0",
-    "ps-tree": "~0.0.3",
-    "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-A",
-    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-C"
+    "ps-tree": "~0.0.3"
   }
 }

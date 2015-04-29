@@ -1,4 +1,5 @@
 /.idea
 /node_modules
 /test/*temp
-npm-debug.log
+/npm-debug.log
+/documentation
