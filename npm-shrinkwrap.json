@@ -1869,14 +1869,14 @@
       }
     },
     "browserify-anonymous-labeler": {
-      "version": "1.2.2",
-      "from": "browserify-anonymous-labeler@1.2.2",
-      "resolved": "https://registry.npmjs.org/browserify-anonymous-labeler/-/browserify-anonymous-labeler-1.2.2.tgz"
+      "version": "1.3.0",
+      "from": "browserify-anonymous-labeler@1.3.0",
+      "resolved": "https://registry.npmjs.org/browserify-anonymous-labeler/-/browserify-anonymous-labeler-1.3.0.tgz"
     },
     "browserify-esprima-tools": {
-      "version": "1.5.0",
-      "from": "browserify-esprima-tools@1.5.0",
-      "resolved": "https://registry.npmjs.org/browserify-esprima-tools/-/browserify-esprima-tools-1.5.0.tgz",
+      "version": "1.6.0",
+      "from": "browserify-esprima-tools@1.6.0",
+      "resolved": "https://registry.npmjs.org/browserify-esprima-tools/-/browserify-esprima-tools-1.6.0.tgz",
       "dependencies": {
         "escodegen": {
           "version": "1.6.1",
@@ -1940,9 +1940,9 @@
       "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.1.tgz"
     },
     "browserify-nginject": {
-      "version": "1.3.3",
-      "from": "browserify-nginject@1.3.3",
-      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.3.3.tgz"
+      "version": "1.3.4",
+      "from": "browserify-nginject@1.3.4",
+      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.3.4.tgz"
     },
     "browserify-transform-tools": {
       "version": "1.3.3",
