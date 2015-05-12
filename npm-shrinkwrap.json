@@ -1869,14 +1869,14 @@
       }
     },
     "browserify-anonymous-labeler": {
-      "version": "1.2.0",
-      "from": "browserify-anonymous-labeler@1.2.0",
-      "resolved": "https://registry.npmjs.org/browserify-anonymous-labeler/-/browserify-anonymous-labeler-1.2.0.tgz"
+      "version": "1.3.0",
+      "from": "browserify-anonymous-labeler@1.3.0",
+      "resolved": "https://registry.npmjs.org/browserify-anonymous-labeler/-/browserify-anonymous-labeler-1.3.0.tgz"
     },
     "browserify-esprima-tools": {
-      "version": "1.3.0",
-      "from": "browserify-esprima-tools@1.3.0",
-      "resolved": "https://registry.npmjs.org/browserify-esprima-tools/-/browserify-esprima-tools-1.3.0.tgz",
+      "version": "1.6.0",
+      "from": "browserify-esprima-tools@1.6.0",
+      "resolved": "https://registry.npmjs.org/browserify-esprima-tools/-/browserify-esprima-tools-1.6.0.tgz",
       "dependencies": {
         "escodegen": {
           "version": "1.6.1",
@@ -1936,34 +1936,35 @@
     },
     "browserify-incremental-plugin": {
       "version": "1.0.1",
-      "from": "browserify-incremental-plugin@1.0.0"
+      "from": "browserify-incremental-plugin@1.0.1",
+      "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.1.tgz"
     },
     "browserify-nginject": {
-      "version": "1.3.1",
-      "from": "browserify-nginject@1.3.1",
-      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.3.1.tgz"
+      "version": "1.3.5",
+      "from": "browserify-nginject@1.3.5",
+      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.3.5.tgz"
     },
     "browserify-transform-tools": {
-      "version": "1.2.2",
-      "from": "https://registry.npmjs.org/browserify-transform-tools/-/browserify-transform-tools-1.2.2.tgz",
-      "resolved": "https://registry.npmjs.org/browserify-transform-tools/-/browserify-transform-tools-1.2.2.tgz",
+      "version": "1.3.3",
+      "from": "browserify-transform-tools@1.3.3",
+      "resolved": "https://registry.npmjs.org/browserify-transform-tools/-/browserify-transform-tools-1.3.3.tgz",
       "dependencies": {
-        "through": {
-          "version": "2.3.6",
-          "from": "https://registry.npmjs.org/through/-/through-2.3.6.tgz",
-          "resolved": "https://registry.npmjs.org/through/-/through-2.3.6.tgz"
-        },
         "falafel": {
-          "version": "0.3.1",
-          "from": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz",
-          "resolved": "https://registry.npmjs.org/falafel/-/falafel-0.3.1.tgz",
+          "version": "1.0.1",
+          "from": "falafel@>=1.0.1 <1.1.0",
+          "resolved": "https://registry.npmjs.org/falafel/-/falafel-1.0.1.tgz",
           "dependencies": {
-            "esprima": {
-              "version": "1.1.0-dev",
-              "from": "git://github.com/substack/esprima#is-keyword",
-              "resolved": "git://github.com/substack/esprima#0a7f8489a11b44b019ce168506f535f22d0be290"
+            "acorn": {
+              "version": "0.11.0",
+              "from": "acorn@>=0.11.0 <0.12.0",
+              "resolved": "https://registry.npmjs.org/acorn/-/acorn-0.11.0.tgz"
             }
           }
+        },
+        "through": {
+          "version": "2.3.7",
+          "from": "through@>=2.3.6 <2.4.0",
+          "resolved": "https://registry.npmjs.org/through/-/through-2.3.7.tgz"
         }
       }
     },
@@ -2448,9 +2449,9 @@
       "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-1.0.2.tgz"
     },
     "esmangleify": {
-      "version": "1.1.3",
-      "from": "esmangleify@1.1.3",
-      "resolved": "https://registry.npmjs.org/esmangleify/-/esmangleify-1.1.3.tgz",
+      "version": "1.1.4",
+      "from": "esmangleify@1.1.4",
+      "resolved": "https://registry.npmjs.org/esmangleify/-/esmangleify-1.1.4.tgz",
       "dependencies": {
         "esmangle": {
           "version": "1.0.1",
@@ -2520,15 +2521,15 @@
                   "resolved": "https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-1.0.6.tgz"
                 }
               }
-            },
-            "esprima": {
-              "version": "1.1.1",
-              "from": "esprima@>=1.1.1 <1.2.0",
-              "resolved": "https://registry.npmjs.org/esprima/-/esprima-1.1.1.tgz"
             }
           }
         }
       }
+    },
+    "esprima": {
+      "version": "1.1.1",
+      "from": "esprima@1.1.1",
+      "resolved": "https://registry.npmjs.org/esprima/-/esprima-1.1.1.tgz"
     },
     "esutils": {
       "version": "1.1.6",
