@@ -1940,9 +1940,9 @@
       "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.1.tgz"
     },
     "browserify-nginject": {
-      "version": "1.4.0",
-      "from": "browserify-nginject@1.4.0",
-      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.4.0.tgz"
+      "version": "1.4.1",
+      "from": "browserify-nginject@1.4.1",
+      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.4.1.tgz"
     },
     "browserify-transform-tools": {
       "version": "1.3.3",
