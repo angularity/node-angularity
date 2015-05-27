@@ -1,6 +1,6 @@
 {
   "name": "angularity",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "dependencies": {
     "alter": {
       "version": "0.2.0",
@@ -1935,14 +1935,14 @@
       }
     },
     "browserify-incremental-plugin": {
-      "version": "1.0.1",
-      "from": "browserify-incremental-plugin@1.0.1",
-      "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.1.tgz"
+      "version": "1.0.2",
+      "from": "browserify-incremental-plugin@1.0.2",
+      "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.2.tgz"
     },
     "browserify-nginject": {
-      "version": "1.3.5",
-      "from": "browserify-nginject@1.3.5",
-      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.3.5.tgz"
+      "version": "1.4.1",
+      "from": "browserify-nginject@1.4.1",
+      "resolved": "https://registry.npmjs.org/browserify-nginject/-/browserify-nginject-1.4.1.tgz"
     },
     "browserify-transform-tools": {
       "version": "1.3.3",
