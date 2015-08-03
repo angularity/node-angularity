@@ -215,10 +215,10 @@ function setUpTaskJavascript(context) {
        */
       function getTransforms(isMinify) {
         return [
-          babelify.configure({ignore: /(?!)/}),       // convert any es6 to es5 (degenerate regex)
-          stringify({minify: false}),                 // allow import of html to a string
-          ngInject({filter: /\.(?!html|json)\w+$/}),  // annotate dependencies for angular (not .json, not .html)
-          isMinify && esmangleify()                   // minify
+          babelify.configure({ignore: /(?!)/}),  // convert any es6 to es5 (degenerate regex)
+          stringify({minify: false}),            // allow import of html to a string
+          ngInject({filter: /\.(?!json)\w+$/}),  // annotate dependencies for angular (include all JS for consistency)
+          isMinify && esmangleify()              // minify
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
