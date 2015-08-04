@@ -1935,9 +1935,9 @@
       }
     },
     "browserify-incremental-plugin": {
-      "version": "1.0.2",
-      "from": "browserify-incremental-plugin@1.0.2",
-      "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.2.tgz"
+      "version": "1.0.3",
+      "from": "browserify-incremental-plugin@1.0.3",
+      "resolved": "https://registry.npmjs.org/browserify-incremental-plugin/-/browserify-incremental-plugin-1.0.3.tgz"
     },
     "browserify-nginject": {
       "version": "1.4.1",
