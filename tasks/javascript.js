@@ -8,11 +8,11 @@ function setUpTaskJavascript(context) {
     throw new Error('Context must specify run-sequence instance');
   }
 
-  var jshintReporter  = require('../lib/util/jshint-reporter');
-  var karma           = require('../lib/test/karma');
+  var jshintReporter = require('../lib/util/jshint-reporter'),
+      karma          = require('../lib/test/karma');
 
   var optionDefinitionJsHintReporter = {
-    key: 'jshint-reporter',
+    key  : 'jshint-reporter',
     value: {
       describe: 'Specify a custom JsHint reporter to use. Either a locally npm installed module, or the absolute ' +
       'path to one.',
@@ -24,7 +24,7 @@ function setUpTaskJavascript(context) {
   };
 
   var optionDefinitionKarmaReporter = {
-    key: 'karma-reporter',
+    key  : 'karma-reporter',
     value: {
       describe: 'Specify a custom Karma reporter to use. Either a locally npm installed module, or an absolute path ' +
       'to one.',
@@ -46,12 +46,12 @@ function setUpTaskJavascript(context) {
           jshintReporter.get(value);
         }
         catch (ex) {
-          throw new Error('Illegal value for "'+optionDefinitionJsHintReporter.key+'"\n' + ex);
+          throw new Error('Illegal value for "' + optionDefinitionJsHintReporter.key + '"\n' + ex);
         }
         return true;
       }
       else {
-        throw new Error('Required option "'+optionDefinitionJsHintReporter.key+'" in not specified');
+        throw new Error('Required option "' + optionDefinitionJsHintReporter.key + '" in not specified');
       }
     }
   }
@@ -78,8 +78,8 @@ function setUpTaskJavascript(context) {
   }
 
   var taskDefinition = {
-    name: 'javascript',
-    description: [
+    name             : 'javascript',
+    description      : [
       'The "javascript" task performs a one time build of the javascript composition root(s) and also bundles all ' +
       '.spec.js files in the project.',
       '',
@@ -95,40 +95,40 @@ function setUpTaskJavascript(context) {
       'angularity javascript -u     Run this task but do not minify javascript'
     ].join('\n'),
     prerequisiteTasks: ['help'],
-    options: [
+    options          : [
       {
-        key: 'unminified',
+        key  : 'unminified',
         value: {
           describe: 'Inhibit minification of javascript',
-          alias: ['u'],
-          boolean: true,
-          default: false
+          alias   : ['u'],
+          boolean : true,
+          default : false
         }
       },
       optionDefinitionJsHintReporter,
       optionDefinitionKarmaReporter
     ],
-    checks: [
+    checks           : [
       checkJsHintReporter,
       checkKarmaReporter
     ],
-    onInit: function onInitJavascriptTask(yargsInstance) {
-      var gulp            = context.gulp,
-          runSequence     = context.runSequence,
-          jshint          = require('gulp-jshint'),
-          rimraf          = require('gulp-rimraf'),
-          semiflat        = require('gulp-semiflat'),
-          combined        = require('combined-stream'),
-          babelify        = require('babelify'),
-          stringify       = require('stringify'),
-          ngInject        = require('browserify-nginject'),
-          esmangleify     = require('esmangleify');
+    onInit           : function onInitJavascriptTask(yargsInstance) {
+      var gulp        = context.gulp,
+          runSequence = context.runSequence,
+          jshint      = require('gulp-jshint'),
+          rimraf      = require('gulp-rimraf'),
+          semiflat    = require('gulp-semiflat'),
+          combined    = require('combined-stream'),
+          babelify    = require('babelify'),
+          stringify   = require('stringify'),
+          ngInject    = require('browserify-nginject'),
+          esmangleify = require('esmangleify');
 
-      var karma           = require('../lib/test/karma'),
-          browserify      = require('../lib/build/browserify'),
-          hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams'),
-          jshintReporter  = require('../lib/util/jshint-reporter');
+      var karma          = require('../lib/test/karma'),
+          browserify     = require('../lib/build/browserify'),
+          hr             = require('../lib/util/hr'),
+          streams        = require('../lib/config/streams'),
+          jshintReporter = require('../lib/util/jshint-reporter');
 
       var cliArgs;
       cliArgs = yargsInstance
@@ -137,15 +137,15 @@ function setUpTaskJavascript(context) {
         .argv;
 
       var bundlerBuild = browserify({
-          bowerRelative: true,
-          transforms   : getTransforms(!cliArgs.unminified),
-          anonymous    : !cliArgs.unminified
-        });
-      var bundlerTest  = browserify({
-          bowerRelative: true,
-          transforms   : getTransforms(false),
-          sourceMapBase: '/base'
-        });
+        bowerRelative: true,
+        transforms   : getTransforms(!cliArgs.unminified),
+        anonymous    : !cliArgs.unminified
+      });
+      var bundlerTest = browserify({
+        bowerRelative: true,
+        transforms   : getTransforms(false),
+        sourceMapBase: '/base'
+      });
 
       gulp.task('javascript', function (done) {
         console.log(hr('-', 80, 'javascript'));
@@ -195,19 +195,15 @@ function setUpTaskJavascript(context) {
           .concat(cliArgs[optionDefinitionKarmaReporter.key])
           .filter(Boolean);
         return combined.create()
-          .append(
-            streams
-              .testDependencies({
-                dev : true,
-                read: false
-              })
-          )
-          .append(
-            streams
-              .jsSpec()
-              .pipe(bundlerTest.all('index.js'))
-              .pipe(gulp.dest(streams.TEST))
-          )
+          .append(streams
+            .testDependencies({
+              dev : true,
+              read: false
+            }))
+          .append(streams
+            .jsSpec()
+            .pipe(bundlerTest.all('index.js'))
+            .pipe(gulp.dest(streams.TEST)))
           .pipe(semiflat(process.cwd()))
           .pipe(karma.createConfig(reporters))
           .pipe(gulp.dest(streams.TEST));
@@ -219,16 +215,16 @@ function setUpTaskJavascript(context) {
        */
       function getTransforms(isMinify) {
         return [
-          babelify.configure({ignore: /(?!)/}),   // convert any es6 to es5 (degenerate regex)
-          stringify({minify: false}),             // allow import of html to a string
-          ngInject({filter: /\.(?!json)\w+$/}),   // annotate dependencies for angular (everything except .json)
-          isMinify && esmangleify()               // minify
+          babelify.configure({ignore: /(?!)/}),  // convert any es6 to es5 (degenerate regex)
+          stringify({minify: false}),            // allow import of html to a string
+          ngInject({filter: /\.(?!json)\w+$/}),  // annotate dependencies for angular (include all JS for consistency)
+          isMinify && esmangleify()              // minify
         ].filter(Boolean);
         // TODO @bholloway fix stringify({ minify: true }) throwing error on badly formed html so that we can minify
       }
     },
-    onRun: function onRunJavascriptTask() {
-      var gulp        = context.gulp;
+    onRun            : function onRunJavascriptTask() {
+      var gulp = context.gulp;
       gulp.start(taskDefinition.name);
     }
   };

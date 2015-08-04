@@ -9,8 +9,8 @@ function setUpTaskWatch(context) {
   }
 
   var taskDefinition = {
-    name: 'watch',
-    description: [
+    name             : 'watch',
+    description      : [
       'The "watch" task performs an initial build and then serves the application on localhost at the given port.',
       '',
       'It then watches the project and performs rebuild of Javascript and/or SASS compositions and/or all .spec.js ' +
@@ -26,15 +26,15 @@ function setUpTaskWatch(context) {
       'angularity watch -p 12345     Run this task and serve on port 12345'
     ].join('\n'),
     prerequisiteTasks: ['help', 'server'],
-    checks: [],
-    options: [],
-    onInit: function onInitWatchTask() {
+    checks           : [],
+    options          : [],
+    onInit           : function onInitWatchTask() {
       var gulp          = context.gulp,
           watch         = require('gulp-watch'),
           watchSequence = require('gulp-watch-sequence');
 
-      var hr               = require('../lib/util/hr'),
-          streams          = require('../lib/config/streams');
+      var hr      = require('../lib/util/hr'),
+          streams = require('../lib/config/streams');
 
       gulp.task('watch', ['server'], function () {
         console.log(hr('-', 80, 'watch'));
@@ -46,25 +46,27 @@ function setUpTaskWatch(context) {
         });
 
         // watch statements
-        watch(getGlobApp('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
+        //  All JS and HTML sources but not the app HTML
+        watch(getGlobApp(['**/*.js', '**/*.html', '**/*.json', '!' + streams.APP + '/**/*.html', '!*.*']), {
           name      : 'JS|HTML',
           emitOnGlob: false
         }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
 
+        //  All SASS sources
         watch(getGlobApp(['**/*.scss', '!*.scss']), {
           name      : 'CSS',
           emitOnGlob: false
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
-        // don't conflict JS or CSS
+        //  App html, all bower, but not JS or SASS sources
         watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {
           name      : 'INJECT',
           emitOnGlob: false
         }, queue.getHandler('html', 'reload'));
       });
     },
-    onRun: function onRunWatchTask() {
-      var gulp        = context.gulp;
+    onRun            : function onRunWatchTask() {
+      var gulp = context.gulp;
       gulp.start(taskDefinition.name);
     }
   };
