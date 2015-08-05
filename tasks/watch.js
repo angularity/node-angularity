@@ -46,12 +46,12 @@ function setUpTaskWatch(context) {
         });
 
         // watch statements
-        watch(getGlobApp('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html', '!*.*'), {
+        watch(getGlobApp('**/*.js', '**/*.html', '!' + streams.APP + '/**/*.html'), {
           name      : 'JS|HTML',
           emitOnGlob: false
         }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
 
-        watch(getGlobApp(['**/*.scss', '!*.scss']), {
+        watch(getGlobApp('**/*.scss'), {
           name      : 'CSS',
           emitOnGlob: false
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
