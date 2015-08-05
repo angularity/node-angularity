@@ -47,13 +47,13 @@ function setUpTaskWatch(context) {
 
         // watch statements
         //  All JS and HTML sources but not the app HTML
-        watch(getGlobApp(['**/*.js', '**/*.html', '**/*.json', '!' + streams.APP + '/**/*.html', '!*.*']), {
+        watch(getGlobApp('**/*.js', '**/*.html', '**/*.json', '!' + streams.APP + '/**/*.html'), {
           name      : 'JS|HTML',
           emitOnGlob: false
         }, queue.getHandler('javascript', 'html', 'reload')); // html will be needed in case previous injection failed
 
         //  All SASS sources
-        watch(getGlobApp(['**/*.scss', '!*.scss']), {
+        watch(getGlobApp('**/*.scss'), {
           name      : 'CSS',
           emitOnGlob: false
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
