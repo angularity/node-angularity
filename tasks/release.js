@@ -63,11 +63,12 @@ function setUpTaskRelease(context) {
 
       // inject dependencies into html and output to build directory
       gulp.task('release:inject', function () {
-        function bower() {
-          return bowerFiles('*', {
+        function bower(opts) {
+          return bowerFiles({
+            context : 'release',
             base    : true,
             manifest: true
-          })
+          })(opts)
             .pipe(gulp.dest(streams.RELEASE_VENDOR));
         }
 
