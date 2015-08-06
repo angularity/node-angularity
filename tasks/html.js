@@ -51,7 +51,7 @@ function setUpTaskHtml(context) {
           .pipe(injectAdjacent('js|css', {
             name: 'inject'
           }))
-          .pipe(inject(bowerFiles().src('js|css', {read: false}), {
+          .pipe(inject(bowerFiles('js|css', {read: false}), {
             name: 'bower'
           }))
           .pipe(gulp.dest(streams.BUILD));
