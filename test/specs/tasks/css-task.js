@@ -26,8 +26,8 @@ function expectations(testCase) {
   var assetDir = path.join.apply(path, sourceBuildFile('index.css.assets'));
   if (fs.existsSync(assetDir)) {
     fs.readdirSync(assetDir)
-      .forEach(function eachAsset(relative) {
-        console.log(relative);
+      .forEach(function eachAsset(filename) {
+        var relative = path.join('index.css.assets', filename);
         expect(workingBuildFile(relative)).diffFilePatch(sourceBuildFile(relative));
       });
   }
