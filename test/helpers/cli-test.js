@@ -276,9 +276,9 @@ function factory(base) {
 
     // organise a working directory
     var signature = escapeFilenameString(source, command);
-    var src       = !params.hasRun && resolveSrc(source);
+    var sourceDir = !params.hasRun && resolveSrc(source);
     var cwd       = resolveDest(signature);
-    copySources(src, cwd, onCopyComplete);
+    copySources(sourceDir, cwd, onCopyComplete);
 
     // handler for end of copy process
     function onCopyComplete(error) {
@@ -366,7 +366,8 @@ function factory(base) {
     function getTestCase() {
       var args      = Array.prototype.slice.call(arguments);
       var testStats = {
-        sourceDir: src,
+        source   : source,
+        sourceDir: sourceDir,
         runner   : self,
         cwd      : cwd,
         command  : command,

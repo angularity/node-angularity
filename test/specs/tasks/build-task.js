@@ -22,8 +22,10 @@ function expectations(testCase) {
 function customMatchers() {
   jasmine.addMatchers(diffMatchers.diffPatch);
   jasmine.addMatchers({
-    toBeBuildHelpWithError  : matchers.getHelpMatcher(/^\s*The "build" task/)
+    toBeBuildHelpWithError: matchers.getHelpMatcher(/^\s*The "build" task/)
   });
+  javascriptTask.customMatchers();
+  cssTask.customMatchers();
 }
 
 module.exports = {
