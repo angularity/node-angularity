@@ -41,7 +41,9 @@ function setUpTaskCss(context) {
       // compile sass with the previously discovered lib paths
       gulp.task('css:build', function () {
         return streams.scssApp()
-          .pipe(nodeSass([streams.BOWER, streams.NODE]))
+          .pipe(nodeSass({
+            libraryPaths: [streams.BOWER, streams.NODE]
+          }))
           .pipe(gulp.dest(streams.BUILD));
       });
     },
