@@ -59,7 +59,7 @@ function setUpTaskWatch(context) {
         }, queue.getHandler('css', 'html', 'reload')); // html will be needed in case previous injection failed
 
         //  App html, all bower, but not JS or SASS sources
-        watch([streams.APP + '/**/*.html', streams.BOWER + '/**/*', '!**/*.js', '!**/*.scss'], {
+        watch(streams.APP + '/**/*.html', {
           name      : 'INJECT',
           emitOnGlob: false
         }, queue.getHandler('html', 'reload'));
