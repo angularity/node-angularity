@@ -56,7 +56,7 @@ function setUpTaskRelease(context) {
       });
 
       gulp.task('release:adjacent', function () {
-        return gulp.src([streams.BUILD + '/*.js*', streams.BUILD + '/*.css*', streams.BUILD + '/assets/**'])
+        return gulp.src([streams.BUILD + '/*.js*', streams.BUILD + '/*.css*', streams.BUILD + '/*assets/**'])
           .pipe(semiflat(streams.BUILD))
           .pipe(gulp.dest(streams.RELEASE_BUNDLE));
       });

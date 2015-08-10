@@ -9,19 +9,19 @@ function setUpTaskCss(context) {
   }
 
   var taskDefinition = {
-    name: 'css',
-    description: 'The "css" task performs a one time build of the SASS composition root(s).',
+    name             : 'css',
+    description      : 'The "css" task performs a one time build of the SASS composition root(s).',
     prerequisiteTasks: ['help'],
-    checks: [],
-    options: [],
-    onInit: function onInitCssTask() {
-      var gulp            = context.gulp,
-          runSequence     = context.runSequence,
-          rimraf          = require('gulp-rimraf');
+    checks           : [],
+    options          : [],
+    onInit           : function onInitCssTask() {
+      var gulp        = context.gulp,
+          runSequence = context.runSequence,
+          rimraf      = require('gulp-rimraf');
 
-      var nodeSass        = require('../lib/build/node-sass'),
-          hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams');
+      var nodeSass = require('../lib/build/node-sass'),
+          hr       = require('../lib/util/hr'),
+          streams  = require('../lib/config/streams');
 
       gulp.task('css', function (done) {
         console.log(hr('-', 80, 'css'));
@@ -41,12 +41,14 @@ function setUpTaskCss(context) {
       // compile sass with the previously discovered lib paths
       gulp.task('css:build', function () {
         return streams.scssApp()
-          .pipe(nodeSass(80, [streams.BOWER, streams.NODE]))
+          .pipe(nodeSass({
+            libraryPaths: [streams.BOWER, streams.NODE]
+          }))
           .pipe(gulp.dest(streams.BUILD));
       });
     },
-    onRun: function onRunCssTask() {
-      var gulp        = context.gulp;
+    onRun            : function onRunCssTask() {
+      var gulp = context.gulp;
       gulp.start(taskDefinition.name);
     }
   };

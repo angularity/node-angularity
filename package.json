@@ -111,7 +111,7 @@
   },
   "devDependencies": {
     "angularity-helloworld-es5": "angularity/angularity-helloworld-es5#ci-build-0.2.0-E",
-    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.2.0-F",
+    "angularity-todo-es5": "angularity/angularity-todo-es5#ci-build-0.3.1-A",
     "autodocs": "^0.6.8",
     "jasmine-diff-matchers": "~2.0.0",
     "jasmine-node": "2.0.0-beta4",
