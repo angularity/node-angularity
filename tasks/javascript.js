@@ -196,10 +196,7 @@ function setUpTaskJavascript(context) {
           .filter(Boolean);
         return combined.create()
           .append(streams
-            .testDependencies({
-              dev : true,
-              read: false
-            }))
+            .testDependencies({read: false}))
           .append(streams
             .jsSpec()
             .pipe(bundlerTest.all('index.js'))

@@ -9,22 +9,23 @@ function setUpTaskHtml(context) {
   }
 
   var taskDefinition = {
-    name: 'html',
-    description: 'The "html" task performs a one time injection of pre-built JS and CSS into the application HTML.',
+    name             : 'html',
+    description      : 'The "html" task performs a one time injection of pre-built JS and CSS into the application ' +
+    'HTML.',
     prerequisiteTasks: ['help'],
-    checks: [],
-    options: [],
-    onInit: function onInitHtmlTask() {
-      var gulp            = context.gulp,
-          runSequence     = context.runSequence,
-          inject          = require('gulp-inject'),
-          plumber         = require('gulp-plumber'),
-          rimraf          = require('gulp-rimraf');
+    checks           : [],
+    options          : [],
+    onInit           : function onInitHtmlTask() {
+      var gulp        = context.gulp,
+          runSequence = context.runSequence,
+          inject      = require('gulp-inject'),
+          plumber     = require('gulp-plumber'),
+          rimraf      = require('gulp-rimraf');
 
-      var injectAdjacent  = require('../lib/inject/adjacent-files'),
-          bowerFiles      = require('../lib/inject/bower-files'),
-          hr              = require('../lib/util/hr'),
-          streams         = require('../lib/config/streams');
+      var injectAdjacent = require('../lib/inject/adjacent-files'),
+          bowerFiles     = require('../lib/inject/bower-files'),
+          hr             = require('../lib/util/hr'),
+          streams        = require('../lib/config/streams');
 
       // `cliArgs` are available within gulp tasks by means of closure,
       // as they are only called after `onRun` has been invoked, and they have been passed
@@ -39,21 +40,21 @@ function setUpTaskHtml(context) {
 
       // clean the html build directory
       gulp.task('html:clean', function () {
-        return gulp.src([streams.BUILD + '/**/*.html*', streams.BUILD + '/**/assets'], { read: false })
+        return gulp.src([streams.BUILD + '/**/*.html*', streams.BUILD + '/**/assets'], {read: false})
           .pipe(rimraf());
       });
 
       // inject dependencies into html and output to build directory
       gulp.task('html:inject', function () {
+        var bower = bowerFiles({
+          pattern: 'js|css',
+          context: 'build'
+        });
         return streams.htmlApp()
           .pipe(plumber())
           .pipe(gulp.dest(streams.BUILD)) // put html in final directory first to get correct inject paths
-          .pipe(injectAdjacent('js|css', {
-            name: 'inject'
-          }))
-          .pipe(inject(bowerFiles().src('js|css', {read: false}), {
-            name: 'bower'
-          }))
+          .pipe(injectAdjacent('js|css', {name: 'inject'}))
+          .pipe(inject(bower({read: false}), {name: 'bower'}))
           .pipe(gulp.dest(streams.BUILD));
       });
 
@@ -63,8 +64,8 @@ function setUpTaskHtml(context) {
           .pipe(gulp.dest(streams.BUILD));
       });
     },
-    onRun: function onRunHtmlTask() {
-      var gulp        = context.gulp;
+    onRun            : function onRunHtmlTask() {
+      var gulp = context.gulp;
       gulp.start(taskDefinition.name);
     }
   };
