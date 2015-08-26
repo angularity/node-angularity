@@ -1,6 +1,6 @@
 {
   "name": "angularity",
-  "version": "0.4.0-rc",
+  "version": "0.4.0",
   "dependencies": {
     "alter": {
       "version": "0.2.0",
