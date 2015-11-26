@@ -212,7 +212,7 @@ function setUpTaskJavascript(context) {
        */
       function getTransforms(isMinify) {
         return [
-          babelify.configure({ignore: /(?!)/}),  // convert any es6 to es5 (degenerate regex)
+          babelify.configure({compact: false, ignore: /(?!)/}),  // convert any es6 to es5 (degenerate regex)
           stringify({minify: false}),            // allow import of html to a string
           ngInject({filter: /\.(?!json)\w+$/}),  // annotate dependencies for angular (include all JS for consistency)
           isMinify && esmangleify()              // minify
