@@ -7,6 +7,14 @@
 [![Build Status](https://travis-ci.org/angularity/node-angularity.svg?branch=master)](https://travis-ci.org/angularity/node-angularity)
 [![Build status](https://ci.appveyor.com/api/projects/status/6b1xir7y1j0wm64a/branch/master?svg=true)](https://ci.appveyor.com/project/impaler/node-angularity/branch/master)
 
+> **-- IMPORTANT ANNOUNCEMENT --**
+>
+> Angularity is now **deprecated** and may be removed at any time.
+>
+> Do **not** use for new projects.
+>
+> Use the [Webpack implementation](https://www.npmjs.com/package/webpack-angularity-solution) for existing Angularity (Browserify/SASS) projects using **Angular 1.x**.
+
 Build projects, not build systems.
 
 - Hand picked and industry proven front end technologies.
@@ -35,7 +43,7 @@ modules, minification, source maps, linting, testing, live reloading, release an
 
 ## Maintained by
 
-Ben Holloway, Chris Decoster, Brendan Graetz
+Ben Holloway, Chris Decoster, Brendan Graetz, Tony Sepentulevski
 
 ## Licence
 

@@ -1,7 +1,7 @@
 {
   "name": "angularity",
   "description": "An opinionated NodeJs build system for ECMAScript 6 AngularJs projects",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "tags": [
     "build",
     "system",
@@ -23,7 +23,8 @@
   "contributors": [
     "bholloway",
     "impaler",
-    "bguiz"
+    "bguiz",
+    "tosh001"
   ],
   "license": "MIT",
   "repository": {
